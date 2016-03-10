@@ -6,6 +6,6 @@
   "height"        : 1024,
   "forceExit"     : true,
   "vSyncEnabled"  : true,
-  "foregroundFPS" : 60.0,
-  "backgroundFPS" : 5.0
+  "foregroundFPS" : 60,
+  "backgroundFPS" : 5
 }

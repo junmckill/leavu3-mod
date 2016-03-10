@@ -30,8 +30,8 @@ object Configuration extends Schema[Configuration] with Logging {
   val height        = required[Int]     ("height",        default = 768)
   val forceExit     = required[Boolean] ("forceExit",     default = false)
   val vSyncEnabled  = required[Boolean] ("vSyncEnabled",  default = true)
-  val foregroundFPS = required[Double]  ("foregroundFPS", default = 60)
-  val backgroundFPS = required[Double]  ("backgroundFPS", default = 5)
+  val foregroundFPS = required[Int]     ("foregroundFPS", default = 60)
+  val backgroundFPS = required[Int]     ("backgroundFPS", default = 5)
 
 
   def readFromFile(s: String = "leavu3-cfg.json"): Configuration = {
