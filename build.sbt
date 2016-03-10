@@ -9,6 +9,7 @@ val leavu3 = Project(id = "leavu3", base = file("."))
     scalacOptions ++= Seq("-feature", "-unchecked", "-deprecation"),
 
     libraryDependencies ++= Seq(
+      "com.github.mpilquist"  %%  "simulacrum"            %   "0.7.0",
       "com.badlogicgames.gdx" %   "gdx"                   % ext_libgdxVersion,
       "com.badlogicgames.gdx" %   "gdx-freetype"          % ext_libgdxVersion,
       "com.badlogicgames.gdx" %   "gdx-backend-lwjgl"     % ext_libgdxVersion,
@@ -20,4 +21,5 @@ val leavu3 = Project(id = "leavu3", base = file("."))
     
   )
   .dependsOn(uri("git://github.com/GiGurra/service-utils.git#0.1.4"))
-  
+
+addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full)

@@ -9,7 +9,6 @@ object DesktopMain extends Logging {
   def main(args: Array[String]): Unit = {
     val config = loadConfig(args.headOption.getOrElse("leavu3-cfg.json"))
     val lwjglConfig = loadLwjglConfig(config)
-
     new LwjglApplication(new GdxAppListener(config))
   }
 

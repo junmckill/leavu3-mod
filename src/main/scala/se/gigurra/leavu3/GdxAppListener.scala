@@ -1,6 +1,7 @@
 package se.gigurra.leavu3
 
 import com.badlogic.gdx.ApplicationListener
+import se.gigurra.leavu3.mfd.Mfd
 
 case class GdxAppListener(initialConfiguration: Configuration) extends ApplicationListener {
 
