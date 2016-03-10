@@ -1,2 +1,11 @@
 {
+  "title"         : "Leavu 3 MFD",
+  "x"             : 300,
+  "y"             : 300,
+  "width"         : 1024,
+  "height"        : 1024,
+  "forceExit"     : true,
+  "vSyncEnabled"  : true,
+  "foregroundFPS" : 60.0,
+  "backgroundFPS" : 5.0
 }
