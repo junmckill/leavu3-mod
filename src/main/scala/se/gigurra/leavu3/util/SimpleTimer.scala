@@ -13,7 +13,12 @@ class SimpleTimer(interval: Duration, op: () => Unit) {
 }
 
 object SimpleTimer {
+
   def apply(interval: Duration)(op: => Unit): SimpleTimer = {
     new SimpleTimer(interval, () => op)
+  }
+
+  def fromFps(fps: Int)(op: => Unit): SimpleTimer = {
+    apply(Duration.fromMilliseconds(1000 / fps))(op)
   }
 }

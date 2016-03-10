@@ -19,6 +19,11 @@ case class Configuration(source: SourceData = Map.empty) extends Parsed[Configur
   val vSyncEnabled  = parse(schema.vSyncEnabled)
   val foregroundFPS = parse(schema.foregroundFPS)
   val backgroundFPS = parse(schema.backgroundFPS)
+  val gameDataFps   = parse(schema.gameDataFps)
+  val dlinkInFps    = parse(schema.dlinkInFps)
+  val dlinkOutFps   = parse(schema.dlinkOutFps)
+  val restAddress   = parse(schema.restAddress)
+  val restPort      = parse(schema.restPort)
 }
 
 object Configuration extends Schema[Configuration] with Logging {
@@ -31,10 +36,11 @@ object Configuration extends Schema[Configuration] with Logging {
   val vSyncEnabled  = required[Boolean] ("vSyncEnabled",  default = true)
   val foregroundFPS = required[Int]     ("foregroundFPS", default = 30)
   val backgroundFPS = required[Int]     ("backgroundFPS", default = 5)
-
   val gameDataFps   = required[Int]     ("gameDataFps",   default = 40)
   val dlinkInFps    = required[Int]     ("dlinkInFps",    default = 5)
   val dlinkOutFps   = required[Int]     ("dlinkOutFps",   default = 5)
+  val restAddress   = required[String]  ("restAddress",   default = "127.0.0.1")
+  val restPort      = required[Int]     ("restPort",      default = 12340)
 
 
   def readFromFile(s: String = "leavu3-cfg.json"): Configuration = {

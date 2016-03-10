@@ -10,5 +10,7 @@
   "backgroundFPS" : 5,
   "gameDataFps"   : 40,
   "dlinkInFps"    : 5,
-  "dlinkOutFps"   : 5
+  "dlinkOutFps"   : 5,
+  "restAddress"   : "127.0.0.1",
+  "restPort"      : 12340
 }
