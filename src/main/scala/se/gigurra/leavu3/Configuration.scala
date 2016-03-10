@@ -9,8 +9,7 @@ import se.gigurra.serviceutils.twitter.logging.Logging
 
 import scala.util.{Failure, Success, Try}
 
-case class Configuration(source: SourceData = Map.empty)
-  extends Parsed[Configuration.type] {
+case class Configuration(source: SourceData = Map.empty) extends Parsed[Configuration.type] {
   val title         = parse(schema.title)
   val x             = parse(schema.x)
   val y             = parse(schema.y)
@@ -30,8 +29,12 @@ object Configuration extends Schema[Configuration] with Logging {
   val height        = required[Int]     ("height",        default = 768)
   val forceExit     = required[Boolean] ("forceExit",     default = false)
   val vSyncEnabled  = required[Boolean] ("vSyncEnabled",  default = true)
-  val foregroundFPS = required[Int]     ("foregroundFPS", default = 60)
+  val foregroundFPS = required[Int]     ("foregroundFPS", default = 30)
   val backgroundFPS = required[Int]     ("backgroundFPS", default = 5)
+
+  val gameDataFps   = required[Int]     ("gameDataFps",   default = 40)
+  val dlinkInFps    = required[Int]     ("dlinkInFps",    default = 5)
+  val dlinkOutFps   = required[Int]     ("dlinkOutFps",   default = 5)
 
 
   def readFromFile(s: String = "leavu3-cfg.json"): Configuration = {

@@ -6,6 +6,9 @@
   "height"        : 1024,
   "forceExit"     : true,
   "vSyncEnabled"  : true,
-  "foregroundFPS" : 60,
-  "backgroundFPS" : 5
+  "foregroundFPS" : 30,
+  "backgroundFPS" : 5,
+  "gameDataFps"   : 40,
+  "dlinkInFps"    : 5,
+  "dlinkOutFps"   : 5
 }
