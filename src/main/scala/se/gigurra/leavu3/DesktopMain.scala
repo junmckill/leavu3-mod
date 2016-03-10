@@ -1,6 +1,6 @@
 package se.gigurra.leavu3
 
-import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration
+import com.badlogic.gdx.backends.lwjgl.{LwjglApplication, LwjglApplicationConfiguration}
 import se.gigurra.serviceutils.json.JSON
 import se.gigurra.serviceutils.twitter.logging.Logging
 
@@ -10,6 +10,7 @@ object DesktopMain extends Logging {
     val config = loadConfig(args.headOption.getOrElse("leavu3-cfg.json"))
     val lwjglConfig = loadLwjglConfig(config)
 
+    new LwjglApplication(new GdxAppListener(config))
   }
 
   private def loadLwjglConfig(config: Configuration): LwjglApplicationConfiguration = {
