@@ -24,17 +24,17 @@ object mappers {
 }
 
 case class UnitType(source: SourceData) extends Parsed[UnitType.type] {
-  val level1          = parse(schema.level1)
-  val level2          = parse(schema.level2)
-  val level3          = parse(schema.level3)
-  val level4          = parse(schema.level4)
+  val level1 = parse(schema.level1)
+  val level2 = parse(schema.level2)
+  val level3 = parse(schema.level3)
+  val level4 = parse(schema.level4)
 }
 
 object UnitType extends Schema[UnitType] {
-  val level1          = required[Int]("level1")
-  val level2          = required[Int]("level2")
-  val level3          = required[Int]("level3")
-  val level4          = required[Int]("level4")
+  val level1 = required[Int]("level1")
+  val level2 = required[Int]("level2")
+  val level3 = required[Int]("level3")
+  val level4 = required[Int]("level4")
 }
 
 case class Emitter(source: SourceData) extends Parsed[Emitter.type] {
