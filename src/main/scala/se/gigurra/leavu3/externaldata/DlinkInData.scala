@@ -19,7 +19,7 @@ object DlinkInData extends Schema[DlinkInData] {
     val client = RestClient(addr, port)
 
     SimpleTimer.fromFps(fps) {
-      ExternalData.dlinkIn = JSON.read(client.pollBlocking("/dlink/in"))
+      ExternalData.dlinkIn = JSON.read(client.getBlocking("/dlink/in", cacheMaxAgeMillis = Some(10000L)))
     }
   }
 }

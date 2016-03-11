@@ -1,12 +1,12 @@
 package se.gigurra.leavu3.util
 
-import com.twitter.util.{JavaTimer, Duration}
+import com.twitter.util.{Time, JavaTimer, Duration}
 
 /**
   * Created by kjolh on 3/10/2016.
   */
 class SimpleTimer(interval: Duration, op: () => Unit) {
-  SimpleTimer.timer.schedule(interval) {
+  SimpleTimer.timer.schedule(Time.now, interval) {
     op()
   }
 }
