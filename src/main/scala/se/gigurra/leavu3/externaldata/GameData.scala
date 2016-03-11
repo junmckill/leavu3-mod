@@ -555,6 +555,66 @@ object Indicators extends Schema[Indicators] {
   val HsiIndicators     = required[HsiIndicators]("HSI")
 }
 
+case class Spatial(source: SourceData) extends Parsed[Spatial.type] {
+  val x        = parse(schema.x)
+  val y        = parse(schema.y)
+  val z        = parse(schema.z)
+  val position = parse(schema.position)
+}
+
+object Spatial extends Schema[Spatial] {
+  val x        = required[Vector3]("x")
+  val y        = required[Vector3]("y")
+  val z        = required[Vector3]("z")
+  val position = required[Vector3]("p")
+}
+
+case class AiWingman(source: SourceData) extends Parsed[AiWingman.type] {
+  val orderedTask     = parse(schema.orderedTask)
+  val currentTarget   = parse(schema.currentTarget)
+  val currentTask     = parse(schema.currentTask)
+  val wingmenPosition = parse(schema.wingmenPosition)
+  val wingmenId       = parse(schema.wingmenId)
+  val orderedTarget   = parse(schema.orderedTarget)
+}
+
+object AiWingman extends Schema[AiWingman] {
+  val orderedTask     = required[String]("ordered_task")
+  val currentTarget   = required[Int]("current_target")
+  val currentTask     = required[String]("current_task")
+  val wingmenPosition = required[Spatial]("wingmen_position")
+  val wingmenId       = required[Int]("wingmen_id")
+  val orderedTarget   = required[Int]("ordered_target")
+}
+
+case class Waypoint(source: SourceData) extends Parsed[Waypoint.type] {
+  val position      = parse(schema.position)
+  val estimatedTime = parse(schema.estimatedTime)
+  val speedReq      = parse(schema.speedReq)
+  val nextPointNum  = parse(schema.nextPointNum)
+  val pointAction   = parse(schema.pointAction)
+  val thisPointNum  = parse(schema.thisPointNum)
+}
+
+object Waypoint extends Schema[Waypoint] {
+  val position      = required[Vector3]("world_point")
+  val estimatedTime = required[Double]("estimated_time")
+  val speedReq      = required[Double]("speed_req")
+  val nextPointNum  = required[Double]("next_point_num")
+  val pointAction   = required[Double]("point_action")
+  val thisPointNum  = required[Double]("this_point_num")
+}
+
+case class Route(source: SourceData) extends Parsed[Route.type] {
+  val waypoints       = parse(schema.waypoints)
+  val currentWaypoint = parse(schema.currentWaypoint)
+}
+
+object Route extends Schema[Route] {
+  val waypoints       = required[Seq[Waypoint]]("route")
+  val currentWaypoint = required[Waypoint]("goto_point")
+}
+
 case class GameData(source: SourceData) extends Parsed[GameData.type] {
 
   // DCS Remote Metadata
@@ -585,8 +645,8 @@ object GameData extends Schema[GameData] {
   val sensors         = optional[Sensors]("sensor")
   val aiWingmenTgts   = optional[Seq[Vector3]]("wingTargets")
   val indicators      = optional[Indicators]("indicators")
-  //val aiWingmen       = optional[Seq[Option[AiWingman]]]("wingMen")
-  //val route           = optional[Route]("route")
+  val aiWingmen       = optional[Seq[Option[AiWingman]]]("wingMen")
+  val route           = optional[Route]("route")
   //val metadata        = optional[Route]("metaData")
 
 
