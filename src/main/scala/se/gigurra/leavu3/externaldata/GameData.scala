@@ -9,10 +9,18 @@ import se.gigurra.serviceutils.json.JSON
   * Created by kjolh on 3/10/2016.
   */
 case class GameData(source: SourceData) extends Parsed[GameData.type] {
-
+  val err = parse(schema.err)
 }
 
 object GameData extends Schema[GameData] {
+
+  val err = optional[String]("err")
+
+
+  ///////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////
+
 
   val path = "export/dcs_remote_export_data()"
 
@@ -24,6 +32,7 @@ object GameData extends Schema[GameData] {
       ExternalData.gameData = JSON.read(
         client.getBlocking(path, cacheMaxAgeMillis = Some((1000.0 / fps / 2.0).toLong))
       )
+      println(ExternalData.gameData)
 
     }
   }

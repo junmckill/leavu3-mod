@@ -22,7 +22,7 @@ case class RestClient(addr: String, port: Int) {
   }
 
   def getBlocking(path: String, cacheMaxAgeMillis: Option[Long] = None, timeout: Duration = Duration.fromSeconds(3)): String = {
-    Await.result(get(path), timeout)
+    Await.result(get(path, cacheMaxAgeMillis), timeout)
   }
 
   def post(path: String, data: String): Future[Unit] = {
