@@ -163,27 +163,43 @@ object FlightModel extends Schema[FlightModel] {
   val ilsGlideslope     = required[Double]("glideDeviation")
 }
 
+case class Sensors(source: SourceData) extends Parsed[Sensors.type] {
+}
+
+object Sensors extends Schema[Sensors] {
+}
+
 case class GameData(source: SourceData) extends Parsed[GameData.type] {
 
   // DCS Remote Metadata
-  val err = parse(schema.err)
+  val err       = parse(schema.err)
+  val requestId = parse(schema.requestId)
 
   // Actual game data
   val rwr             = parse(schema.rwr)
   val counterMeasures = parse(schema.counterMeasures)
   val payload         = parse(schema.payload)
+  val flightModel     = parse(schema.flightModel)
 }
 
 object GameData extends Schema[GameData] {
 
   // DCS Remote Metadata
-  val err = optional[String]("err")
+  val err       = optional[String]("err")
+  val requestId = optional[String]("requestId")
 
   // Actual game data
   val rwr             = optional[Rwr]("rwr")
   val counterMeasures = optional[CounterMeasures]("counterMeasures")
   val payload         = optional[Payload]("payload")
   val flightModel     = optional[FlightModel]("flightModel")
+  val sensors         = optional[Sensors]("sensor")
+
+ /* val aiWingmenTgts   = optional[Seq[Vector3]]("wingTargets")
+  val indicators      = optional[Indicators]("indicators")
+  val aiWingmen       = optional[Seq[Option[AiWingman]]]("wingMen")
+  val route           = optional[Route]("route")
+  val metadata        = optional[Route]("metaData")*/
 
 
   ///////////////////////////////////////////////////////////////
@@ -199,7 +215,8 @@ object GameData extends Schema[GameData] {
 
     SimpleTimer.fromFps(fps) {
       ExternalData.gameData = JSON.read(client.getBlocking(path, cacheMaxAgeMillis = Some((1000.0 / fps / 2.0).toLong)))
-      println(JSON.write(ExternalData.gameData))
+     // println(JSON.write(ExternalData.gameData))
+     // println(ExternalData.gameData.requestId)
     }
   }
 
