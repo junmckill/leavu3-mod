@@ -1,3 +1,5 @@
+dcs_remote_export_cache = {}
+
 function dcs_remote_export_data()
 
     -- only export if we're alive
@@ -74,9 +76,7 @@ function dcs_remote_export_data()
 
             }
         end
-
-        return dcs_remote_export_cache
-    else
-        return dcs_remote_export_cache
     end
+
+    return dcs_remote_export_cache
 end
