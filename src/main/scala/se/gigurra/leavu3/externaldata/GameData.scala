@@ -1,5 +1,6 @@
 package se.gigurra.leavu3.externaldata
 
+import scala.language.implicitConversions
 import com.badlogic.gdx.math.Vector3
 import se.gigurra.heisenberg.MapData._
 import se.gigurra.heisenberg.{MapDataProducer, MapDataParser, Schema, Parsed}
@@ -239,23 +240,75 @@ object Prf extends Schema[Prf] {
   val current   = required[String]("current")
 }
 
-case class DetectedTarget(source: SourceData) extends Parsed[DetectedTarget.type] {
+case class Dlz(source: SourceData) extends Parsed[Dlz.type] {
+  val rAero = parse(schema.rAero)
+  val rMin  = parse(schema.rMin)
+  val rPi   = parse(schema.rPi)
+  val rTr   = parse(schema.rTr)
 }
 
-object DetectedTarget extends Schema[DetectedTarget] {
+object Dlz extends Schema[Dlz] {
+  val rAero = required[Double]("RAERO")
+  val rMin  = required[Double]("RMIN")
+  val rPi   = required[Double]("RPI")
+  val rTr   = required[Double]("RTR")
 }
 
-case class TwsTarget(source: SourceData) extends Parsed[TwsTarget.type] {
+case class Target(source: SourceData) extends Parsed[Target.type] {
+  val contact = parse(schema.contact)
+  val dlz     = parse(schema.dlz)
 }
 
-object TwsTarget extends Schema[TwsTarget] {
+object Target extends Schema[Target] {
+  val contact = required[Contact]("target")
+  val dlz     = required[Dlz]("DLZ")
+  implicit def tgt2ctct(target: Target): Contact = target.contact
 }
 
-case class LockedTarget(source: SourceData) extends Parsed[LockedTarget.type] {
+case class Contact(source: SourceData) extends Parsed[Contact.type] {
+  val id                     = parse(schema.id)
+  val course                 = parse(schema.course)
+  val flags                  = parse(schema.flags)
+  val aspect                 = parse(schema.aspect)
+  val verticalViewingAngle   = parse(schema.verticalViewingAngle)
+  val horizontalViewingAngle = parse(schema.horizontalViewingAngle)
+  val updatesNumber          = parse(schema.updatesNumber)
+  val startOfLong            = parse(schema.startOfLong)
+  val rcs                    = parse(schema.rcs)
+  val forces                 = parse(schema.forces)
+  val country                = parse(schema.country)
+  val burnthrough            = parse(schema.burnthrough)
+  val jamming                = parse(schema.jamming) != 0
+  val closure                = parse(schema.closure)
+  val machNumber             = parse(schema.machNumber)
+  val spatial                = parse(schema.spatial)
+  val typ                    = parse(schema.typ)
+  val velocity               = parse(schema.velocity)
+  val distance               = parse(schema.distance)
 }
 
-object LockedTarget extends Schema[LockedTarget] {
+object Contact extends Schema[Contact] {
+  val id                     = required[Int]("ID")
+  val course                 = required[Double]("course")
+  val flags                  = required[Int]("flags")
+  val aspect                 = required[Double]("delta_psi")
+  val verticalViewingAngle   = required[Double]("fin")
+  val horizontalViewingAngle = required[Double]("fim")
+  val updatesNumber          = required[Int]("updates_number")
+  val startOfLong            = required[Double]("start_of_lock")
+  val rcs                    = required[Double]("reflection")
+  val forces                 = required[Vector3]("forces")
+  val country                = required[Int]("country")
+  val burnthrough            = required[Boolean]("jammer_burned")
+  val jamming                = required[Int]("isjamming")
+  val closure                = required[Double]("convergence_velocity")
+  val machNumber             = required[Double]("mach")
+  val spatial                = required[Spatial]("position")
+  val typ                    = required[UnitType]("type")
+  val velocity               = required[Vector3]("velocity")
+  val distance               = required[Double]("distance")
 }
+
 
 case class Targets(source: SourceData) extends Parsed[Targets.type] {
   val detected = parse(schema.detected)
@@ -264,9 +317,9 @@ case class Targets(source: SourceData) extends Parsed[Targets.type] {
 }
 
 object Targets extends Schema[Targets] {
-  val detected = required[Seq[DetectedTarget]]("detected")
-  val tws      = required[Seq[TwsTarget]]("tws")
-  val locked   = required[Seq[LockedTarget]]("locked")
+  val detected = required[Seq[Contact]]("detected")
+  val tws      = required[Seq[Target]]("tws")
+  val locked   = required[Seq[Target]]("locked")
 }
 
 case class Sensors(source: SourceData) extends Parsed[Sensors.type] {
@@ -758,10 +811,7 @@ object GameData extends Schema[GameData] {
 
     SimpleTimer.fromFps(fps) {
       val stringData = client.getBlocking(path, cacheMaxAgeMillis = Some((1000.0 / fps / 2.0).toLong))
-      //println(stringData)
       ExternalData.gameData = JSON.read(stringData)
-     // println(ExternalData.gameData.requestId)
-      println(JSON.write(ExternalData.gameData.sensors.get.targets))
     }
   }
 
