@@ -279,6 +279,200 @@ object Sensors extends Schema[Sensors] {
   val targets = required[Targets]("targets")
 }
 
+case class NavRequirements(source: SourceData) extends Parsed[NavRequirements.type] {
+  val altitude      = parse(schema.altitude)
+  val verticalSpeed = parse(schema.verticalSpeed)
+  val roll          = parse(schema.roll)
+  val pitch         = parse(schema.pitch)
+  val speed         = parse(schema.speed)
+}
+
+object NavRequirements extends Schema[NavRequirements] {
+  val altitude      = required[Double]("altitude")
+  val verticalSpeed = required[Double]("vertical_speed")
+  val roll          = required[Double]("roll")
+  val pitch         = required[Double]("pitch")
+  val speed         = required[Double]("speed")
+}
+
+case class Acs(source: SourceData) extends Parsed[Acs.type] {
+  val autoThrust = parse(schema.autoThrust)
+  val mode       = parse(schema.mode)
+}
+
+object Acs extends Schema[Acs] {
+  val autoThrust = required[Boolean]("autoThrust")
+  val mode       = required[String]("mode")
+}
+
+case class AircraftMode(source: SourceData) extends Parsed[AircraftMode.type] {
+  val submode = parse(schema.submode)
+  val master  = parse(schema.master)
+}
+
+object AircraftMode extends Schema[AircraftMode] {
+  val submode = required[String]("submode")
+  val master  = required[String]("master")
+}
+
+case class NavIndicators(source: SourceData) extends Parsed[NavIndicators.type] {
+  val requirements = parse(schema.requirements)
+  val acs          = parse(schema.acs)
+  val mode         = parse(schema.mode)
+}
+
+object NavIndicators extends Schema[NavIndicators] {
+  val requirements = required[NavRequirements]("Requirements")
+  val acs          = required[Acs]("ACS")
+  val mode         = required[AircraftMode]("SystemMode")
+}
+
+case class BeaconIndicators(source: SourceData) extends Parsed[BeaconIndicators.type] {
+  val glideSlope  = parse(schema.glideslope)
+  val localizer   = parse(schema.localizer)
+  val outerMarker = parse(schema.outerMarker)
+  val innerMarker = parse(schema.innerMarker)
+}
+
+object BeaconIndicators extends Schema[BeaconIndicators] {
+  val glideslope  = required[Boolean]("glideslope_deviation_beacon_lock")
+  val localizer   = required[Boolean]("course_deviation_beacon_lock")
+  val outerMarker = required[Boolean]("airfield_far")
+  val innerMarker = required[Boolean]("airfield_near")
+}
+
+case class LeftRight(source: SourceData) extends Parsed[LeftRight.type] {
+  val left  = parse(schema.left)
+  val right = parse(schema.right)
+}
+
+object LeftRight extends Schema[LeftRight] {
+  val left  = required[Double]("left")
+  val right = required[Double]("right")
+}
+
+case class StatusAndValue(source: SourceData) extends Parsed[StatusAndValue.type] {
+  val status = parse(schema.status)
+  val value  = parse(schema.value)
+}
+
+object StatusAndValue extends Schema[StatusAndValue] {
+  val status = required[Int]("status")
+  val value  = required[Double]("Value")
+}
+
+case class EngineIndicators(source: SourceData) extends Parsed[EngineIndicators.type] {
+  val engineStart       = parse(schema.engineStart)
+  val hydraulicPressure = parse(schema.hydraulicPressure)
+  val fuelConsumption   = parse(schema.fuelConsumption)
+  val rpm               = parse(schema.rpm)
+  val temperature       = parse(schema.temperature)
+  val fuelInternal      = parse(schema.fuelInternal)
+  val fuelExternal      = parse(schema.fuelExternal)
+}
+
+object EngineIndicators extends Schema[EngineIndicators] {
+  val engineStart       = required[LeftRight]("EngineStart")
+  val hydraulicPressure = required[LeftRight]("HydraulicPressure")
+  val fuelConsumption   = required[LeftRight]("FuelConsumption")
+  val rpm               = required[LeftRight]("RPM")
+  val temperature       = required[LeftRight]("Temperature")
+  val fuelInternal      = required[Double]("fuel_internal")
+  val fuelExternal      = required[Double]("fuel_external")
+}
+
+case class Wheel(source: SourceData) extends Parsed[Wheel.type] {
+  val rod = parse(schema.rod)
+}
+
+object Wheel extends Schema[Wheel] {
+  val rod = required[Double]("rod")
+}
+
+case class BackWheels(source: SourceData) extends Parsed[BackWheels.type] {
+  val left  = parse(schema.left)
+  val right = parse(schema.right)
+}
+
+object BackWheels extends Schema[BackWheels] {
+  val left  = required[Wheel]("left")
+  val right = required[Wheel]("right")
+}
+
+case class Gear(source: SourceData) extends Parsed[Gear.type] {
+  val value  = parse(schema.value)
+  val nose   = parse(schema.nose)
+  val main   = parse(schema.main)
+  val status = parse(schema.status)
+}
+
+object Gear extends Schema[Gear] {
+  val value  = required[Double]("value")
+  val nose   = required[Wheel]("value")
+  val main   = required[BackWheels]("value")
+  val status = required[Int]("value")
+}
+
+case class ControlSurfaces(source: SourceData) extends Parsed[ControlSurfaces.type] {
+  val aileron  = parse(schema.aileron)
+  val elevator = parse(schema.elevator)
+  val rudder   = parse(schema.rudder)
+}
+
+object ControlSurfaces extends Schema[ControlSurfaces] {
+  val aileron  = required[LeftRight]("eleron")
+  val elevator = required[LeftRight]("elevator")
+  val rudder   = required[LeftRight]("rudder")
+}
+
+case class MechIndicators(source: SourceData) extends Parsed[MechIndicators.type] {
+  val wheelbrakes     = parse(schema.wheelbrakes)
+  val wing            = parse(schema.wing)
+  val gear            = parse(schema.gear)
+  val controlSurfaces = parse(schema.controlSurfaces)
+  val airintake       = parse(schema.airintake)
+  val refuelingboom   = parse(schema.refuelingboom)
+  val flaps           = parse(schema.flaps)
+  val parachute       = parse(schema.parachute)
+  val noseflap        = parse(schema.noseflap)
+  val hook            = parse(schema.hook)
+  val speedbrakes     = parse(schema.speedbrakes)
+  val canopy          = parse(schema.canopy)
+}
+
+object MechIndicators extends Schema[MechIndicators] {
+  val wheelbrakes     = required[StatusAndValue]("wheelbrakes")
+  val wing            = required[StatusAndValue]("wing")
+  val gear            = required[Gear]("gear")
+  val controlSurfaces = required[ControlSurfaces]("controlsurfaces")
+  val airintake       = required[StatusAndValue]("airintake")
+  val refuelingboom   = required[StatusAndValue]("refuelingboom")
+  val flaps           = required[StatusAndValue]("flaps")
+  val parachute       = required[StatusAndValue]("parachute")
+  val noseflap        = required[StatusAndValue]("noseflap")
+  val hook            = required[StatusAndValue]("hook")
+  val speedbrakes     = required[StatusAndValue]("speedbrakes")
+  val canopy          = required[StatusAndValue]("canopy")
+}
+
+case class Indicators(source: SourceData) extends Parsed[Indicators.type] {
+  val nav               = parse(schema.nav)
+  val beacons           = parse(schema.beacons)
+  val engines           = parse(schema.engines)
+  val mechIndicators    = parse(schema.mechIndicators)
+  val failureIndicators = parse(schema.failureIndicators)
+  val HsiIndicators     = parse(schema.HsiIndicators)
+}
+
+object Indicators extends Schema[Indicators] {
+  val nav               = required[NavIndicators]("nav")
+  val beacons           = required[BeaconIndicators]("beacon")
+  val engines           = required[EngineIndicators]("engines")
+  val mechIndicators    = required[MechIndicators]("mech")
+  val failureIndicators = required[FailureIndicators]("failures")
+  val HsiIndicators     = required[HsiIndicators]("failures")
+}
+
 case class GameData(source: SourceData) extends Parsed[GameData.type] {
 
   // DCS Remote Metadata
@@ -292,6 +486,7 @@ case class GameData(source: SourceData) extends Parsed[GameData.type] {
   val flightModel     = parse(schema.flightModel)
   val sensors         = parse(schema.sensors)
   val aiWingmenTgts   = parse(schema.aiWingmenTgts)
+  val indicators      = parse(schema.indicators)
 }
 
 object GameData extends Schema[GameData] {
@@ -307,7 +502,7 @@ object GameData extends Schema[GameData] {
   val flightModel     = optional[FlightModel]("flightModel")
   val sensors         = optional[Sensors]("sensor")
   val aiWingmenTgts   = optional[Seq[Vector3]]("wingTargets")
-  //val indicators      = optional[Indicators]("indicators")
+  val indicators      = optional[Indicators]("indicators")
   //val aiWingmen       = optional[Seq[Option[AiWingman]]]("wingMen")
   //val route           = optional[Route]("route")
   //val metadata        = optional[Route]("metaData")
