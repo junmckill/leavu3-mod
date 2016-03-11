@@ -301,7 +301,7 @@ case class Acs(source: SourceData) extends Parsed[Acs.type] {
 }
 
 object Acs extends Schema[Acs] {
-  val autoThrust = required[Boolean]("autoThrust")
+  val autoThrust = required[Boolean]("autothrust")
   val mode       = required[String]("mode")
 }
 
@@ -358,7 +358,7 @@ case class StatusAndValue(source: SourceData) extends Parsed[StatusAndValue.type
 
 object StatusAndValue extends Schema[StatusAndValue] {
   val status = required[Int]("status")
-  val value  = required[Double]("Value")
+  val value  = required[Double]("value")
 }
 
 case class EngineIndicators(source: SourceData) extends Parsed[EngineIndicators.type] {
@@ -408,9 +408,9 @@ case class Gear(source: SourceData) extends Parsed[Gear.type] {
 
 object Gear extends Schema[Gear] {
   val value  = required[Double]("value")
-  val nose   = required[Wheel]("value")
-  val main   = required[BackWheels]("value")
-  val status = required[Int]("value")
+  val nose   = required[Wheel]("nose")
+  val main   = required[BackWheels]("main")
+  val status = required[Int]("status")
 }
 
 case class ControlSurfaces(source: SourceData) extends Parsed[ControlSurfaces.type] {
@@ -455,6 +455,88 @@ object MechIndicators extends Schema[MechIndicators] {
   val canopy          = required[StatusAndValue]("canopy")
 }
 
+case class FailureIndicators(source: SourceData) extends Parsed[FailureIndicators.type] {
+  val canopyOpen            = parse(schema.canopyOpen)
+  val cannonFailure         = parse(schema.cannonFailure)
+  val rightTailPlaneFailure = parse(schema.rightTailPlaneFailure)
+  val leftAileronFailure    = parse(schema.leftAileronFailure)
+  val autopilotFailure      = parse(schema.autopilotFailure)
+  val hydraulicsFailure     = parse(schema.hydraulicsFailure)
+  val hudFailure            = parse(schema.hudFailure)
+  val rightWingPumpFailure  = parse(schema.rightWingPumpFailure)
+  val leftWingPumpFailure   = parse(schema.leftWingPumpFailure)
+  val ecmFailure            = parse(schema.ecmFailure)
+  val rightEngineFailure    = parse(schema.rightEngineFailure)
+  val stallSignalization    = parse(schema.stallSignalization)
+  val helmetFailure         = parse(schema.helmetFailure)
+  val radarFailure          = parse(schema.radarFailure)
+  val rightMainPumpFailure  = parse(schema.rightMainPumpFailure)
+  val acsFailure            = parse(schema.acsFailure)
+  val mfdFailure            = parse(schema.mfdFailure)
+  val leftEngineFailure     = parse(schema.leftEngineFailure)
+  val leftTailPlaneFailure  = parse(schema.leftTailPlaneFailure)
+  val mlwsFailure           = parse(schema.mlwsFailure)
+  val eosFailure            = parse(schema.eosFailure)
+  val autopilotOn           = parse(schema.autopilotOn)
+  val leftMainPumpFailure   = parse(schema.leftMainPumpFailure)
+  val rightAileronFailure   = parse(schema.rightAileronFailure)
+  val rwsFailure            = parse(schema.rwsFailure)
+  val masterCaution         = parse(schema.masterCaution)
+  val fuelTankDamage        = parse(schema.fuelTankDamage)
+  val hearFailure           = parse(schema.hearFailure)
+}
+
+object FailureIndicators extends Schema[FailureIndicators] {
+  val canopyOpen            = required[Boolean]("CanopyOpen")
+  val cannonFailure         = required[Boolean]("CannonFailure")
+  val rightTailPlaneFailure = required[Boolean]("RightTailPlaneFailure")
+  val leftAileronFailure    = required[Boolean]("LeftAileronFailure")
+  val autopilotFailure      = required[Boolean]("AutopilotFailure")
+  val hydraulicsFailure     = required[Boolean]("HydraulicsFailure")
+  val hudFailure            = required[Boolean]("HUDFailure")
+  val rightWingPumpFailure  = required[Boolean]("RightWingPumpFailure")
+  val leftWingPumpFailure   = required[Boolean]("LeftWingPumpFailure")
+  val ecmFailure            = required[Boolean]("ECMFailure")
+  val rightEngineFailure    = required[Boolean]("RightEngineFailure")
+  val stallSignalization    = required[Boolean]("StallSignalization")
+  val helmetFailure         = required[Boolean]("HelmetFailure")
+  val radarFailure          = required[Boolean]("RadarFailure")
+  val rightMainPumpFailure  = required[Boolean]("RightMainPumpFailure")
+  val acsFailure            = required[Boolean]("ACSFailure")
+  val mfdFailure            = required[Boolean]("MFDFailure")
+  val leftEngineFailure     = required[Boolean]("LeftEngineFailure")
+  val leftTailPlaneFailure  = required[Boolean]("LeftTailPlaneFailure")
+  val mlwsFailure           = required[Boolean]("MLWSFailure")
+  val eosFailure            = required[Boolean]("EOSFailure")
+  val autopilotOn           = required[Boolean]("AutopilotOn")
+  val leftMainPumpFailure   = required[Boolean]("LeftMainPumpFailure")
+  val rightAileronFailure   = required[Boolean]("RightAileronFailure")
+  val rwsFailure            = required[Boolean]("RWSFailure")
+  val masterCaution         = required[Boolean]("MasterWarning")
+  val fuelTankDamage        = required[Boolean]("FuelTankDamage")
+  val hearFailure           = required[Boolean]("GearFailure")
+}
+
+case class HsiIndicators(source: SourceData) extends Parsed[HsiIndicators.type] {
+  val rmiRaw          = parse(schema.rmiRaw)
+  val courseDeviation = parse(schema.courseDeviation)
+  val course          = parse(schema.course)
+  val headingRaw      = parse(schema.headingRaw)
+  val headingPointer  = parse(schema.headingPointer)
+  val bearingPointer  = parse(schema.bearingPointer)
+  val adfRaw          = parse(schema.adfRaw)
+}
+
+object HsiIndicators extends Schema[HsiIndicators] {
+  val rmiRaw          = required[Double]("RMI_raw")
+  val courseDeviation = required[Double]("CourseDeviation")
+  val course          = required[Double]("Course")
+  val headingRaw      = required[Double]("Heading_raw")
+  val headingPointer  = required[Double]("HeadingPointer")
+  val bearingPointer  = required[Double]("BearingPointer")
+  val adfRaw          = required[Double]("ADF_raw")
+}
+
 case class Indicators(source: SourceData) extends Parsed[Indicators.type] {
   val nav               = parse(schema.nav)
   val beacons           = parse(schema.beacons)
@@ -470,7 +552,7 @@ object Indicators extends Schema[Indicators] {
   val engines           = required[EngineIndicators]("engines")
   val mechIndicators    = required[MechIndicators]("mech")
   val failureIndicators = required[FailureIndicators]("failures")
-  val HsiIndicators     = required[HsiIndicators]("failures")
+  val HsiIndicators     = required[HsiIndicators]("HSI")
 }
 
 case class GameData(source: SourceData) extends Parsed[GameData.type] {
@@ -520,7 +602,9 @@ object GameData extends Schema[GameData] {
     val client = RestClient(addr, port)
 
     SimpleTimer.fromFps(fps) {
-      ExternalData.gameData = JSON.read(client.getBlocking(path, cacheMaxAgeMillis = Some((1000.0 / fps / 2.0).toLong)))
+      val stringData = client.getBlocking(path, cacheMaxAgeMillis = Some((1000.0 / fps / 2.0).toLong))
+      println(stringData)
+      ExternalData.gameData = JSON.read(stringData)
       println(ExternalData.gameData.requestId)
     }
   }
