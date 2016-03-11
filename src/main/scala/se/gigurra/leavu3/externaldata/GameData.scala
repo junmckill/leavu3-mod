@@ -758,9 +758,10 @@ object GameData extends Schema[GameData] {
 
     SimpleTimer.fromFps(fps) {
       val stringData = client.getBlocking(path, cacheMaxAgeMillis = Some((1000.0 / fps / 2.0).toLong))
-      println(stringData)
+      //println(stringData)
       ExternalData.gameData = JSON.read(stringData)
-      println(ExternalData.gameData.requestId)
+     // println(ExternalData.gameData.requestId)
+      println(JSON.write(ExternalData.gameData.sensors.get.targets))
     }
   }
 
