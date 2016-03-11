@@ -29,11 +29,7 @@ object GameData extends Schema[GameData] {
     val client = RestClient(addr, port)
 
     SimpleTimer.fromFps(fps) {
-      ExternalData.gameData = JSON.read(
-        client.getBlocking(path, cacheMaxAgeMillis = Some((1000.0 / fps / 2.0).toLong))
-      )
-      println(ExternalData.gameData)
-
+      ExternalData.gameData = JSON.read(client.getBlocking(path, cacheMaxAgeMillis = Some((1000.0 / fps / 2.0).toLong)))
     }
   }
 
