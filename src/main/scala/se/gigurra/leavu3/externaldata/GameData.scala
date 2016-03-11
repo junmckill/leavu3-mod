@@ -12,7 +12,7 @@ object mappers {
   implicit val vec3MapDataParser = new MapDataParser[Vector3] {
     override def parse(field: Any): Vector3 = {
       val data = field.asInstanceOf[Map[String, Number]]
-      new Vector3(data("x").floatValue, data("y").floatValue, data("z").floatValue)
+      new Vector3(data("x").floatValue, data("y").floatValue, data.get("z").map(_.floatValue).getOrElse(0.0f))
     }
   }
 
@@ -163,10 +163,40 @@ object FlightModel extends Schema[FlightModel] {
   val ilsGlideslope     = required[Double]("glideDeviation")
 }
 
+case class SensorsStatus(source: SourceData) extends Parsed[SensorsStatus.type] {
+  val manufacturer     = parse(schema.manufacturer)
+  val launchAuthorized = parse(schema.launchAuthorized)
+  val eosOn            = parse(schema.eosOn)
+  val radarOn          = parse(schema.radarOn)
+  val laserOn          = parse(schema.laserOn)
+  val ecmOn            = parse(schema.ecmOn)
+  val scale            = parse(schema.scale)
+  val tdc              = parse(schema.tdc)
+  val scanZone         = parse(schema.scanZone)
+  val prf              = parse(schema.prf)
+}
+
+object SensorsStatus extends Schema[SensorsStatus] {
+  val manufacturer      = required[String]("Manufacturer")
+  val launchAuthorized  = required[Boolean]("LaunchAuthorized")
+  val eosOn             = required[Boolean]("optical_system_on")
+  val radarOn           = required[Boolean]("radar_on")
+  val laserOn           = required[Boolean]("laser_on")
+  val ecmOn             = required[Boolean]("ECM_on")
+  val scale             = required[SensorScale]("scale")
+  val tdc               = required[Vector3]("TDC")
+  val scanZone          = required[ScanZone]("ScanZone")
+  val prf               = required[Prf]("PRF")
+}
+
 case class Sensors(source: SourceData) extends Parsed[Sensors.type] {
+  val status = parse(schema.status)
+  val targets = parse(schema.targets)
 }
 
 object Sensors extends Schema[Sensors] {
+  val status  = required[SensorsStatus]("status")
+  val targets = required[Targets]("targets")
 }
 
 case class GameData(source: SourceData) extends Parsed[GameData.type] {
