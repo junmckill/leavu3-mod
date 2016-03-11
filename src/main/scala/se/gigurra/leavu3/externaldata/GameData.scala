@@ -615,6 +615,100 @@ object Route extends Schema[Route] {
   val currentWaypoint = required[Waypoint]("goto_point")
 }
 
+case class Version(source: SourceData) extends Parsed[Version.type] {
+  val productName    = parse(schema.productName)
+  val fileVersion    = parse(schema.fileVersion).mkString(".")
+  val productVersion = parse(schema.productVersion).mkString(".")
+}
+
+object Version extends Schema[Version] {
+  val productName    = required[String]("ProductName")
+  val fileVersion    = required[Seq[Int]]("FileVersion")
+  val productVersion = required[Seq[Int]]("ProductVersion")
+}
+
+case class StatusFlags(source: SourceData) extends Parsed[StatusFlags.type] {
+  val aiOn        = parse(schema.aiOn)
+  val jamming     = parse(schema.jamming)
+  val born        = parse(schema.born)
+  val static      = parse(schema.static)
+  val human       = parse(schema.human)
+  val radarActive = parse(schema.radarActive)
+  val iRJamming   = parse(schema.iRJamming)
+  val invisible   = parse(schema.invisible)
+}
+
+object StatusFlags extends Schema[StatusFlags] {
+  val aiOn        = required[Boolean]("AI_ON")
+  val jamming     = required[Boolean]("Jamming")
+  val born        = required[Boolean]("Born")
+  val static      = required[Boolean]("Static")
+  val human       = required[Boolean]("Human")
+  val radarActive = required[Boolean]("RadarActive")
+  val iRJamming   = required[Boolean]("IRJamming")
+  val invisible   = required[Boolean]("Invisible")
+}
+
+case class GeoPosition(source: SourceData) extends Parsed[GeoPosition.type] {
+  val lat = parse(schema.lat)
+  val lon = parse(schema.lon)
+  val alt = parse(schema.alt)
+}
+
+object GeoPosition extends Schema[GeoPosition] {
+  val lat = required[Double]("Lat")
+  val lon = required[Double]("Long")
+  val alt = required[Double]("Alt")
+}
+
+case class SelfData(source: SourceData) extends Parsed[SelfData.type] {
+  val statusFlags  = parse(schema.statusFlags)
+  val callsign     = parse(schema.callsign)
+  val aircraftName = parse(schema.aircraftName)
+  val geoPosition  = parse(schema.geoPosition)
+  val coalition    = parse(schema.coalition)
+  val country      = parse(schema.country)
+  val position     = parse(schema.position)
+  val groupname    = parse(schema.groupname)
+  val coalitionId  = parse(schema.coalitionId)
+  val pitch        = parse(schema.pitch)
+  val roll         = parse(schema.roll)
+  val heading      = parse(schema.heading)
+  val typ          = parse(schema.typ)
+}
+
+object SelfData extends Schema[SelfData] {
+  val statusFlags  = required[StatusFlags]("Flags")
+  val callsign     = required[String]("UnitName")
+  val aircraftName = required[String]("Name")
+  val geoPosition  = required[GeoPosition]("LatLongAlt")
+  val coalition    = required[String]("Coalition")
+  val country      = required[Int]("Country")
+  val position     = required[Vector3]("Position")
+  val groupname    = required[String]("GroupName")
+  val coalitionId  = required[Int]("CoalitionID")
+  val pitch        = required[Double]("Pitch")
+  val roll         = required[Double]("Bank")
+  val heading      = required[Double]("Heading")
+  val typ          = required[UnitType]("Type")
+}
+
+case class MetaData(source: SourceData) extends Parsed[MetaData.type] {
+  val camera   = parse(schema.camera)
+  val planeId  = parse(schema.planeId)
+  val time     = parse(schema.time)
+  val version  = parse(schema.version)
+  val selfData = parse(schema.selfData)
+}
+
+object MetaData extends Schema[MetaData] {
+  val camera   = required[Spatial]("camPos")
+  val planeId  = required[Int]("playerPlaneId")
+  val time     = required[Double]("modelTime")
+  val version  = required[Version]("version")
+  val selfData = required[SelfData]("selfData")
+}
+
 case class GameData(source: SourceData) extends Parsed[GameData.type] {
 
   // DCS Remote Metadata
@@ -629,6 +723,7 @@ case class GameData(source: SourceData) extends Parsed[GameData.type] {
   val sensors         = parse(schema.sensors)
   val aiWingmenTgts   = parse(schema.aiWingmenTgts)
   val indicators      = parse(schema.indicators)
+  val metaData        = parse(schema.metadata)
 }
 
 object GameData extends Schema[GameData] {
@@ -647,7 +742,7 @@ object GameData extends Schema[GameData] {
   val indicators      = optional[Indicators]("indicators")
   val aiWingmen       = optional[Seq[Option[AiWingman]]]("wingMen")
   val route           = optional[Route]("route")
-  //val metadata        = optional[Route]("metaData")
+  val metadata        = optional[MetaData]("metaData")
 
 
   ///////////////////////////////////////////////////////////////
