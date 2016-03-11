@@ -133,8 +133,6 @@ case class FlightModel(source: SourceData) extends Parsed[FlightModel.type] {
 
   val ilsLocalizer      = parse(schema.ilsLocalizer)
   val ilsGlideslope     = parse(schema.ilsGlideslope)
-
-
 }
 
 object FlightModel extends Schema[FlightModel] {
@@ -163,6 +161,36 @@ object FlightModel extends Schema[FlightModel] {
   val ilsGlideslope     = required[Double]("glideDeviation")
 }
 
+case class SensorAngles(source: SourceData) extends Parsed[SensorAngles.type] {
+  val azimuth   = parse(schema.azimuth)
+  val elevation = parse(schema.elevation)
+}
+
+object SensorAngles extends Schema[SensorAngles] {
+  val azimuth   = required[Double]("azimuth")
+  val elevation = required[Double]("elevation")
+}
+
+case class RadarDisplayScale(source: SourceData) extends Parsed[RadarDisplayScale.type] {
+  val azimuth  = parse(schema.azimuth)
+  val distance = parse(schema.distance)
+}
+
+object RadarDisplayScale extends Schema[RadarDisplayScale] {
+  val azimuth  = required[Double]("azimuth")
+  val distance = required[Double]("distance")
+}
+
+case class MinMax(source: SourceData) extends Parsed[MinMax.type] {
+  val min = parse(schema.min)
+  val max = parse(schema.max)
+}
+
+object MinMax extends Schema[MinMax] {
+  val min = required[Double]("min")
+  val max = required[Double]("max")
+}
+
 case class SensorsStatus(source: SourceData) extends Parsed[SensorsStatus.type] {
   val manufacturer     = parse(schema.manufacturer)
   val launchAuthorized = parse(schema.launchAuthorized)
@@ -183,10 +211,62 @@ object SensorsStatus extends Schema[SensorsStatus] {
   val radarOn           = required[Boolean]("radar_on")
   val laserOn           = required[Boolean]("laser_on")
   val ecmOn             = required[Boolean]("ECM_on")
-  val scale             = required[SensorScale]("scale")
+  val scale             = required[RadarDisplayScale]("scale")
   val tdc               = required[Vector3]("TDC")
   val scanZone          = required[ScanZone]("ScanZone")
   val prf               = required[Prf]("PRF")
+}
+
+case class ScanZone(source: SourceData) extends Parsed[ScanZone.type] {
+  val altitudeCoverage = parse(schema.altitudeCoverage)
+  val size             = parse(schema.size)
+  val direction        = parse(schema.direction)
+}
+
+object ScanZone extends Schema[ScanZone] {
+  val altitudeCoverage = required[MinMax]("coverage_H")
+  val size             = required[SensorAngles]("size")
+  val direction        = required[SensorAngles]("position")
+}
+
+case class Prf(source: SourceData) extends Parsed[Prf.type] {
+  val selection = parse(schema.selection)
+  val current   = parse(schema.current)
+}
+
+object Prf extends Schema[Prf] {
+  val selection = required[String]("selection")
+  val current   = required[String]("current")
+}
+
+case class DetectedTarget(source: SourceData) extends Parsed[DetectedTarget.type] {
+}
+
+object DetectedTarget extends Schema[DetectedTarget] {
+}
+
+case class TwsTarget(source: SourceData) extends Parsed[TwsTarget.type] {
+}
+
+object TwsTarget extends Schema[TwsTarget] {
+}
+
+case class LockedTarget(source: SourceData) extends Parsed[LockedTarget.type] {
+}
+
+object LockedTarget extends Schema[LockedTarget] {
+}
+
+case class Targets(source: SourceData) extends Parsed[Targets.type] {
+  val detected = parse(schema.detected)
+  val tws      = parse(schema.tws)
+  val locked   = parse(schema.locked)
+}
+
+object Targets extends Schema[Targets] {
+  val detected = required[Seq[DetectedTarget]]("detected")
+  val tws      = required[Seq[TwsTarget]]("tws")
+  val locked   = required[Seq[LockedTarget]]("locked")
 }
 
 case class Sensors(source: SourceData) extends Parsed[Sensors.type] {
@@ -210,6 +290,8 @@ case class GameData(source: SourceData) extends Parsed[GameData.type] {
   val counterMeasures = parse(schema.counterMeasures)
   val payload         = parse(schema.payload)
   val flightModel     = parse(schema.flightModel)
+  val sensors         = parse(schema.sensors)
+  val aiWingmenTgts   = parse(schema.aiWingmenTgts)
 }
 
 object GameData extends Schema[GameData] {
@@ -224,12 +306,11 @@ object GameData extends Schema[GameData] {
   val payload         = optional[Payload]("payload")
   val flightModel     = optional[FlightModel]("flightModel")
   val sensors         = optional[Sensors]("sensor")
-
- /* val aiWingmenTgts   = optional[Seq[Vector3]]("wingTargets")
-  val indicators      = optional[Indicators]("indicators")
-  val aiWingmen       = optional[Seq[Option[AiWingman]]]("wingMen")
-  val route           = optional[Route]("route")
-  val metadata        = optional[Route]("metaData")*/
+  val aiWingmenTgts   = optional[Seq[Vector3]]("wingTargets")
+  //val indicators      = optional[Indicators]("indicators")
+  //val aiWingmen       = optional[Seq[Option[AiWingman]]]("wingMen")
+  //val route           = optional[Route]("route")
+  //val metadata        = optional[Route]("metaData")
 
 
   ///////////////////////////////////////////////////////////////
@@ -245,8 +326,7 @@ object GameData extends Schema[GameData] {
 
     SimpleTimer.fromFps(fps) {
       ExternalData.gameData = JSON.read(client.getBlocking(path, cacheMaxAgeMillis = Some((1000.0 / fps / 2.0).toLong)))
-     // println(JSON.write(ExternalData.gameData))
-     // println(ExternalData.gameData.requestId)
+      println(ExternalData.gameData.requestId)
     }
   }
 
