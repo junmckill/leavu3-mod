@@ -1,5 +1,6 @@
 package se.gigurra.leavu3.mfd
 
+import com.badlogic.gdx.math.{Vector2, Vector3}
 import se.gigurra.leavu3.externaldata.{DlinkInData, DlinkOutData, GameData}
 import se.gigurra.leavu3.gfx.RenderContext._
 
@@ -8,20 +9,25 @@ case class Mfd() {
   def update(game: GameData, dlinkIn: DlinkInData, dlinkOut: DlinkOutData): Unit = frame {
 
 
-    geo_viewport(at = self.position, viewportSize = 20, heading = self.heading).ppi {
+    val p = self.position : Vector2
+
+    geo_viewport(at = p, viewportSize = 20.0f, heading = self.heading).ppi {
+
       batched {
 
-        val ul = self.position + (-5f,  5f)
-        val ur = self.position + ( 5f,  5f)
-        val ll = self.position + (-5f, -5f)
-        val lr = self.position + ( 5f, -5f)
+        val ul = p + (-5f,  5f)
+        val ur = p + ( 5f,  5f)
+        val ll = p + (-5f, -5f)
+        val lr = p + ( 5f, -5f)
 
-        circle(at = self.position, radius = 10f, color = WHITE)
-        circle(at = self.position, radius = 5f, typ = FILL)
-        circle(at = self.position, radius = 2.5f, typ = FILL, color = BLACK)
+        circle(at = p, radius = 10f, color = WHITE)
+        circle(at = p, radius = 5f, typ = FILL)
+        circle(at = p, radius = 2.5f, typ = FILL, color = BLACK)
         lines(Seq(ul -> ur, ll -> lr), color = GREEN)
       }
+
     }
+
 
     batched {
       val text =

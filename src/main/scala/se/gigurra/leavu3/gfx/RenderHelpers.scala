@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20._
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType
-import com.badlogic.gdx.math.Vector3
+import com.badlogic.gdx.math.{Vector2, Vector3}
 import se.gigurra.leavu3.externaldata.ExternalData
 import se.gigurra.leavu3.math.UnitConversions
 
@@ -53,12 +53,13 @@ trait RenderHelpers extends UnitConversions { _: RenderContext.type =>
     shapeRenderer.setProjectionMatrix(camera.combined)
   }
 
-  case class geo_viewport(at: Vector3, viewportSize: Float, heading: Float = 0.0f) {
+  case class geo_viewport(at: Vector2, viewportSize: Float, heading: Float = 0.0f) {
     def ppi(f: => Unit): Unit = {
-      transform(_.loadIdentity()
-        .translate(-at)
+      transform(
+        _.scalexy(1.0f / viewportSize)
         .rotate(-heading)
-        .scalexy(1.0f / viewportSize)) {
+        .translate(-at.x, -at.y, 0.0f)
+        ) {
         f
       }
     }
@@ -76,7 +77,7 @@ trait RenderHelpers extends UnitConversions { _: RenderContext.type =>
     }
   }
 
-  def circle(at: Vector3,
+  def circle(at: Vector2,
              radius: Float,
              steps: Int = 50,
              typ: ShapeRenderer.ShapeType = LINE,
@@ -86,7 +87,7 @@ trait RenderHelpers extends UnitConversions { _: RenderContext.type =>
     }
   }
 
-  def lines(dashes: Seq[(Vector3, Vector3)], color: Color = null): Unit = {
+  def lines(dashes: Seq[(Vector2, Vector2)], color: Color = null): Unit = {
     shape(LINE, color) {
       for ((p1, p2) <- dashes) {
         shapeRenderer.line(p1, p2)
