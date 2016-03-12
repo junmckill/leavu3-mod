@@ -56,12 +56,9 @@ trait RenderHelpers extends UnitConversions { _: RenderContext.type =>
   def ppi_viewport(viewportSize: Double, heading: Float = 0.0f, offs: Vector2 = Vector2.Zero)(f: => Unit) {
     transform(_
       .translate(offs.x, offs.y, 0.0f)
-      .scalexy(1.0f / viewportSize.toFloat)
-      .rotate(heading)
-    ) {
-      viewportGeoScaleStack.push(viewportSize)
+      .scalexy(2.0f / viewportSize.toFloat)
+      .rotate(heading)) {
       f
-      viewportGeoScaleStack.pop()
     }
   }
 

@@ -12,11 +12,11 @@ case class Mfd() {
     ppi_viewport(viewportSize = 20 nmi, heading = self.heading) {
 
       // Draw myself in the center
-      circle(radius = 0.25 nmi, color = WHITE, typ = FILL)
+      circle(radius = 0.05 nmi, color = WHITE, typ = FILL)
 
       // Draw every ai wingman
       game.aiWingmen foreach { wingman =>
-        circle(at = wingman.position - self.position, radius = 0.2 nmi, color = CYAN)
+        circle(at = wingman.position - self.position, radius = 0.1 nmi, color = CYAN)
       }
     }
 
