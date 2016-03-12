@@ -19,7 +19,7 @@ case class GdxAppListener(initialConfiguration: Configuration) extends Applicati
         throw e
     }
   logger.info(s"Creating instrument: $instrumentClass")
-  lazy val instrument = instrumentClass.newInstance()
+  lazy val instrument = instrumentClass.getConstructor(classOf[Configuration]).newInstance(initialConfiguration)
 
   override def resize(width: Int, height: Int): Unit = {
   }

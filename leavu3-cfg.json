@@ -14,5 +14,6 @@
   "restAddress"   : "127.0.0.1",
   "restPort"      : 12340,
   "aaSamples"     : 4,
-  "instrument"    : "se.gigurra.leavu3.mfd.Mfd"
+  "instrument"    : "se.gigurra.leavu3.mfd.Mfd",
+  "symbolScale"   : 1.0
 }

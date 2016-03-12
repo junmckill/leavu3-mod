@@ -1,5 +1,6 @@
 package se.gigurra.leavu3.mfd
 
+import se.gigurra.leavu3.Configuration
 import se.gigurra.leavu3.externaldata.{DlinkInData, DlinkOutData, GameData, Vec2}
 import se.gigurra.leavu3.gfx.RenderContext._
 import se.gigurra.leavu3.util.CircleBuffer
@@ -8,15 +9,15 @@ import scala.language.postfixOps
 /**
   * Created by kjolh on 3/12/2016.
   */
-case class HsdPage() extends Page {
+case class HsdPage(config: Configuration) extends Page {
 
-  val scale = CircleBuffer(10 nmi, 20 nmi, 40 nmi, 80 nmi, 160 nmi).withDefaultValue(40 nmi)
+  val distance = CircleBuffer(10 nmi, 20 nmi, 40 nmi, 80 nmi, 160 nmi).withDefaultValue(40 nmi)
   val deprFactor = CircleBuffer(0.0, 0.5).withDefaultValue(0.5)
 
-  def standardObjectRadius = 0.025 * screen2World
+  def symbolScale = config.symbolScale * screen2World
 
   def update(game: GameData, dlinkIn: DlinkInData, dlinkOut: DlinkOutData): Unit = {
-    ppi_viewport(viewportSize = scale * 2.0, offs = Vec2(0.0, -scale * deprFactor), heading = self.heading) {
+    ppi_viewport(viewportSize = distance * 2.0, offs = Vec2(0.0, -distance * deprFactor), heading = self.heading) {
       drawSelf(game)
       drawHsi(game)
       drawWaypoints(game)
@@ -29,25 +30,27 @@ case class HsdPage() extends Page {
   }
 
   def drawHsi(game: GameData): Unit = {
-    circle(radius = scale     * 0.50, color = DARK_GRAY)
-    circle(radius = scale     * 1.00)
-    circle(radius = scale     * 1.50)
-    lines(shapes.hsi.flag     * screen2World + Vec2(0.0, scale * 0.50))
-    lines(shapes.hsi.flag     * screen2World + Vec2(0.0, scale * 1.00))
-    lines(shapes.hsi.flag     * screen2World + Vec2(0.0, scale * 1.50))
-    lines(shapes.hsi.eastPin  * screen2World + Vec2(scale * 0.50, 0.0))
-    lines(shapes.hsi.eastPin  * screen2World + Vec2(scale * 1.00, 0.0))
-    lines(shapes.hsi.eastPin  * screen2World + Vec2(scale * 1.50, 0.0))
-    lines(shapes.hsi.westPin  * screen2World + Vec2(-scale * 0.50, 0.0))
-    lines(shapes.hsi.westPin  * screen2World + Vec2(-scale * 1.00, 0.0))
-    lines(shapes.hsi.westPin  * screen2World + Vec2(-scale * 1.50, 0.0))
-    lines(shapes.hsi.southPin * screen2World + Vec2(0.0, -scale * 0.50))
-    lines(shapes.hsi.southPin * screen2World + Vec2(0.0, -scale * 1.00))
-    lines(shapes.hsi.southPin * screen2World + Vec2(0.0, -scale * 1.50))
+    circle(radius = distance     * 0.50, color = DARK_GRAY)
+    circle(radius = distance     * 1.00)
+    circle(radius = distance     * 1.50)
+    lines(shapes.hsi.flag     * symbolScale + Vec2(0.0, distance * 0.50))
+    lines(shapes.hsi.flag     * symbolScale + Vec2(0.0, distance * 1.00))
+    lines(shapes.hsi.flag     * symbolScale + Vec2(0.0, distance * 1.50))
+    lines(shapes.hsi.eastPin  * symbolScale + Vec2(distance * 0.50, 0.0))
+    lines(shapes.hsi.eastPin  * symbolScale + Vec2(distance * 1.00, 0.0))
+    lines(shapes.hsi.eastPin  * symbolScale + Vec2(distance * 1.50, 0.0))
+    lines(shapes.hsi.westPin  * symbolScale + Vec2(-distance * 0.50, 0.0))
+    lines(shapes.hsi.westPin  * symbolScale + Vec2(-distance * 1.00, 0.0))
+    lines(shapes.hsi.westPin  * symbolScale + Vec2(-distance * 1.50, 0.0))
+    lines(shapes.hsi.southPin * symbolScale + Vec2(0.0, -distance * 0.50))
+    lines(shapes.hsi.southPin * symbolScale + Vec2(0.0, -distance * 1.00))
+    lines(shapes.hsi.southPin * symbolScale + Vec2(0.0, -distance * 1.50))
   }
 
   def drawSelf(game: GameData): Unit = {
-    circle(radius = standardObjectRadius, color = WHITE, typ = FILL)
+    transform(_.rotate(-self.heading)) {
+      lines(shapes.self.coords * symbolScale, color = LIGHT_GRAY)
+    }
   }
 
   def drawWaypoints(game: GameData): Unit = {
@@ -55,7 +58,7 @@ case class HsdPage() extends Page {
 
   def drawAiWingmen(game: GameData): Unit = {
     game.aiWingmen foreach { wingman =>
-      circle(at = wingman.position - self.position, radius = standardObjectRadius, color = CYAN)
+      circle(at = wingman.position - self.position, radius = 0.025 * symbolScale, color = CYAN)
     }
   }
 

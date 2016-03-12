@@ -8,11 +8,3 @@ abstract class Page extends Logging {
   val shortName = this.getClass.getSimpleName.toLowerCase.subSequence(0, 3)
   logger.info(s"Created $shortName mfd page")
 }
-
-object Pages {
-  val hsd = HsdPage()
-  val rwr = RwrPage()
-  val sms = SmsPage()
-  val fcr = FcrPage()
-  val available = Seq(hsd, rwr, sms, fcr)
-}
