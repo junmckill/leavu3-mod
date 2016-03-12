@@ -30,6 +30,8 @@ case class GameData(source: SourceData) extends Parsed[GameData.type] {
   val aiWingmen       = parse(schema.aiWingmen)
   val route           = parse(schema.route)
   val metaData        = parse(schema.metadata)
+
+  def selfData: SelfData = metaData.selfData
 }
 
 object GameData extends Schema[GameData] with Logging {

@@ -66,4 +66,5 @@ case class Matrix4Stack(depth: Int, uploader: Matrix4 => Unit) {
   def overrideScaleXY(s: Float) = scale(x = s / current.getScaleX, y = s / current.getScaleY)
   def rotate(angle: Float, x: Float = 0.0f, y: Float = 0.0f, z: Float = 0.0f) = transform(_.rotate(angle, x, y, z))
   def rotate(angle: Float, axis: Vector3) = transform(_.rotate(axis, angle))
+  def rotate(angle: Float) = transform(_.rotate(Vector3.Z, angle))
 }

@@ -12,5 +12,6 @@
   "dlinkInFps"    : 5,
   "dlinkOutFps"   : 5,
   "restAddress"   : "127.0.0.1",
-  "restPort"      : 12340
+  "restPort"      : 12340,
+  "aaSamples"     : 4
 }

@@ -24,6 +24,7 @@ case class Configuration(source: SourceData = Map.empty) extends Parsed[Configur
   val dlinkOutFps   = parse(schema.dlinkOutFps)
   val restAddress   = parse(schema.restAddress)
   val restPort      = parse(schema.restPort)
+  val aaSamples     = parse(schema.aaSamples)
 }
 
 object Configuration extends Schema[Configuration] with Logging {
@@ -41,6 +42,7 @@ object Configuration extends Schema[Configuration] with Logging {
   val dlinkOutFps   = required[Int]     ("dlinkOutFps",   default = 5)
   val restAddress   = required[String]  ("restAddress",   default = "127.0.0.1")
   val restPort      = required[Int]     ("restPort",      default = 12340)
+  val aaSamples     = required[Int]     ("aaSamples",     default = 4)
 
 
   def readFromFile(s: String = "leavu3-cfg.json"): Configuration = {

@@ -4,9 +4,15 @@ import com.badlogic.gdx.graphics.Color._
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
-import se.gigurra.leavu3.math.Matrix4Stack
+import se.gigurra.leavu3.math.{RichVector3Implicits, Matrix4Stack}
 
-object RenderContext extends GdxImplicits with RenderHelpers {
+import scala.collection.mutable
+
+object RenderContext
+  extends GdxImplicits
+    with RenderHelpers
+    with RichVector3Implicits {
+
   val shapeRenderer = new ShapeRenderer()
   val camera = new OrthographicCamera(1.0f, 1.0f)
   val batch = new SpriteBatch
@@ -15,5 +21,8 @@ object RenderContext extends GdxImplicits with RenderHelpers {
     batch.setTransformMatrix(t)
     shapeRenderer.setTransformMatrix(t)
   })
+  val viewportGeoScaleStack = mutable.Stack[Float](1.0f)
   font.setColor(RED)
+
+  def viewportGeoScale: Float = viewportGeoScaleStack.head
 }

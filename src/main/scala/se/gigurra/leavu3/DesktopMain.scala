@@ -29,6 +29,7 @@ object DesktopMain extends Logging {
       vSyncEnabled = config.vSyncEnabled
       foregroundFPS = config.foregroundFPS.toInt
       backgroundFPS = config.backgroundFPS.toInt
+      samples = config.aaSamples
     }
   }
 

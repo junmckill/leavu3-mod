@@ -54,9 +54,9 @@ case class Emitter(source: SourceData) extends Parsed[Emitter.type] {
 object Emitter extends Schema[Emitter] {
   val id          = required[Int]("ID")
   val signalType  = required[String]("SignalType")
-  val azimuth     = required[Double]("Azimuth")
-  val priority    = required[Double]("Priority")
-  val power       = required[Double]("Power")
+  val azimuth     = required[Float]("Azimuth")
+  val priority    = required[Float]("Priority")
+  val power       = required[Float]("Power")
   val unitType    = required[UnitType]("Type")
 }
 
@@ -141,29 +141,29 @@ case class FlightModel(source: SourceData = Map.empty) extends Parsed[FlightMode
 }
 
 object FlightModel extends Schema[FlightModel] {
-  val pitch             = required[Double]("pitch", default = 0)
-  val roll              = required[Double]("roll", default = 0)
-  val trueHeading       = required[Double]("heading", default = 0)
-  val magneticHeading   = required[Double]("magneticYaw", default = 0)
-  val angleOfAttack     = required[Double]("AOA", default = 0)
+  val pitch             = required[Float]("pitch", default = 0)
+  val roll              = required[Float]("roll", default = 0)
+  val trueHeading       = required[Float]("heading", default = 0)
+  val magneticHeading   = required[Float]("magneticYaw", default = 0)
+  val angleOfAttack     = required[Float]("AOA", default = 0)
 
   val velocity          = required[Vector3]("vectorVelocity", default = Vector3.Zero)
   val acceleration      = required[Vector3]("acc", default = Vector3.Zero)
 
-  val indicatedAirspeed = required[Double]("IAS", default = 0)
-  val trueAirspeed      = required[Double]("TAS", default = 0)
-  val verticalVelocity  = required[Double]("vv", default = 0)
-  val machNumber        = required[Double]("mach", default = 0)
+  val indicatedAirspeed = required[Float]("IAS", default = 0)
+  val trueAirspeed      = required[Float]("TAS", default = 0)
+  val verticalVelocity  = required[Float]("vv", default = 0)
+  val machNumber        = required[Float]("mach", default = 0)
 
-  val altitudeAGL       = required[Double]("altitudeAboveGroundLevel", default = 0)
-  val altitudeAsl       = required[Double]("altitudeAboveSeaLevel", default = 0)
+  val altitudeAGL       = required[Float]("altitudeAboveGroundLevel", default = 0)
+  val altitudeAsl       = required[Float]("altitudeAboveSeaLevel", default = 0)
 
   val windVelocity      = required[Vector3]("windVectorVelocity", default = Vector3.Zero)
-  val airPressure       = required[Double]("atmospherePressure", default = 0)
-  val slipBallDeviation = required[Double]("slipBallPosition", default = 0)
+  val airPressure       = required[Float]("atmospherePressure", default = 0)
+  val slipBallDeviation = required[Float]("slipBallPosition", default = 0)
 
-  val ilsLocalizer      = required[Double]("sideDeviation", default = 0)
-  val ilsGlideslope     = required[Double]("glideDeviation", default = 0)
+  val ilsLocalizer      = required[Float]("sideDeviation", default = 0)
+  val ilsGlideslope     = required[Float]("glideDeviation", default = 0)
 }
 
 case class SensorAngles(source: SourceData = Map.empty) extends Parsed[SensorAngles.type] {
@@ -172,8 +172,8 @@ case class SensorAngles(source: SourceData = Map.empty) extends Parsed[SensorAng
 }
 
 object SensorAngles extends Schema[SensorAngles] {
-  val azimuth   = required[Double]("azimuth", default = 0)
-  val elevation = required[Double]("elevation", default = 0)
+  val azimuth   = required[Float]("azimuth", default = 0)
+  val elevation = required[Float]("elevation", default = 0)
 }
 
 case class RadarDisplayScale(source: SourceData = Map.empty) extends Parsed[RadarDisplayScale.type] {
@@ -182,8 +182,8 @@ case class RadarDisplayScale(source: SourceData = Map.empty) extends Parsed[Rada
 }
 
 object RadarDisplayScale extends Schema[RadarDisplayScale] {
-  val azimuth  = required[Double]("azimuth", default = 0)
-  val distance = required[Double]("distance", default = 0)
+  val azimuth  = required[Float]("azimuth", default = 0)
+  val distance = required[Float]("distance", default = 0)
 }
 
 case class MinMax(source: SourceData = Map.empty) extends Parsed[MinMax.type] {
@@ -192,8 +192,8 @@ case class MinMax(source: SourceData = Map.empty) extends Parsed[MinMax.type] {
 }
 
 object MinMax extends Schema[MinMax] {
-  val min = required[Double]("min", default = 0)
-  val max = required[Double]("max", default = 0)
+  val min = required[Float]("min", default = 0)
+  val max = required[Float]("max", default = 0)
 }
 
 case class TdcPosition(source: SourceData = Map.empty) extends Parsed[TdcPosition.type] {
@@ -202,8 +202,8 @@ case class TdcPosition(source: SourceData = Map.empty) extends Parsed[TdcPositio
 }
 
 object TdcPosition extends Schema[TdcPosition] {
-  val x = required[Double]("x", default = 0)
-  val y = required[Double]("y", default = 0)
+  val x = required[Float]("x", default = 0)
+  val y = required[Float]("y", default = 0)
 }
 
 case class SensorsStatus(source: SourceData = Map.empty) extends Parsed[SensorsStatus.type] {
@@ -262,10 +262,10 @@ case class Dlz(source: SourceData = Map.empty) extends Parsed[Dlz.type] {
 }
 
 object Dlz extends Schema[Dlz] {
-  val rAero = required[Double]("RAERO", default = 0)
-  val rMin  = required[Double]("RMIN", default = 0)
-  val rPi   = required[Double]("RPI", default = 0)
-  val rTr   = required[Double]("RTR", default = 0)
+  val rAero = required[Float]("RAERO", default = 0)
+  val rMin  = required[Float]("RMIN", default = 0)
+  val rPi   = required[Float]("RPI", default = 0)
+  val rTr   = required[Float]("RTR", default = 0)
 }
 
 case class Target(source: SourceData) extends Parsed[Target.type] {
@@ -287,7 +287,7 @@ case class Contact(source: SourceData) extends Parsed[Contact.type] {
   val verticalViewingAngle   = parse(schema.verticalViewingAngle).toDegrees
   val horizontalViewingAngle = parse(schema.horizontalViewingAngle).toDegrees
   val updatesNumber          = parse(schema.updatesNumber)
-  val startOfLong            = parse(schema.startOfLong)
+  val startOfLock            = parse(schema.startOfLock)
   val rcs                    = parse(schema.rcs)
   val forces                 = parse(schema.forces)
   val country                = parse(schema.country)
@@ -303,24 +303,24 @@ case class Contact(source: SourceData) extends Parsed[Contact.type] {
 
 object Contact extends Schema[Contact] {
   val id                     = required[Int]("ID")
-  val course                 = required[Double]("course")
+  val course                 = required[Float]("course")
   val flags                  = required[Int]("flags")
-  val aspect                 = required[Double]("delta_psi")
-  val verticalViewingAngle   = required[Double]("fin")
-  val horizontalViewingAngle = required[Double]("fim")
+  val aspect                 = required[Float]("delta_psi")
+  val verticalViewingAngle   = required[Float]("fin")
+  val horizontalViewingAngle = required[Float]("fim")
   val updatesNumber          = required[Int]("updates_number")
-  val startOfLong            = required[Double]("start_of_lock")
+  val startOfLock            = required[Double]("start_of_lock")
   val rcs                    = required[Double]("reflection")
   val forces                 = required[Vector3]("forces")
   val country                = required[Int]("country")
   val burnthrough            = required[Boolean]("jammer_burned")
   val jamming                = required[Int]("isjamming")
-  val closure                = required[Double]("convergence_velocity")
-  val machNumber             = required[Double]("mach")
+  val closure                = required[Float]("convergence_velocity")
+  val machNumber             = required[Float]("mach")
   val spatial                = required[Spatial]("position")
   val typ                    = required[UnitType]("type")
   val velocity               = required[Vector3]("velocity")
-  val distance               = required[Double]("distance")
+  val distance               = required[Float]("distance")
 }
 
 case class Targets(source: SourceData = Map.empty) extends Parsed[Targets.type] {
@@ -354,11 +354,11 @@ case class NavRequirements(source: SourceData = Map.empty) extends Parsed[NavReq
 }
 
 object NavRequirements extends Schema[NavRequirements] {
-  val altitude      = required[Double]("altitude", default = 0)
-  val verticalSpeed = required[Double]("vertical_speed", default = 0)
-  val roll          = required[Double]("roll", default = 0)
-  val pitch         = required[Double]("pitch", default = 0)
-  val speed         = required[Double]("speed", default = 0)
+  val altitude      = required[Float]("altitude", default = 0)
+  val verticalSpeed = required[Float]("vertical_speed", default = 0)
+  val roll          = required[Float]("roll", default = 0)
+  val pitch         = required[Float]("pitch", default = 0)
+  val speed         = required[Float]("speed", default = 0)
 }
 
 case class Acs(source: SourceData = Map.empty) extends Parsed[Acs.type] {
@@ -413,8 +413,8 @@ case class LeftRight(source: SourceData = Map.empty) extends Parsed[LeftRight.ty
 }
 
 object LeftRight extends Schema[LeftRight] {
-  val left  = required[Double]("left", default = 0)
-  val right = required[Double]("right", default = 0)
+  val left  = required[Float]("left", default = 0)
+  val right = required[Float]("right", default = 0)
 }
 
 case class StatusAndValue(source: SourceData = Map.empty) extends Parsed[StatusAndValue.type] {
@@ -452,7 +452,7 @@ case class Wheel(source: SourceData = Map.empty) extends Parsed[Wheel.type] {
 }
 
 object Wheel extends Schema[Wheel] {
-  val rod = required[Double]("rod", default = 0)
+  val rod = required[Float]("rod", default = 0)
 }
 
 case class BackWheels(source: SourceData = Map.empty) extends Parsed[BackWheels.type] {
@@ -473,7 +473,7 @@ case class Gear(source: SourceData = Map.empty) extends Parsed[Gear.type] {
 }
 
 object Gear extends Schema[Gear] {
-  val value  = required[Double]("value", default = 0)
+  val value  = required[Float]("value", default = 0)
   val nose   = required[Wheel]("nose", default = Wheel())
   val main   = required[BackWheels]("main", default = BackWheels())
   val status = required[Int]("status", default = 0)
@@ -594,13 +594,13 @@ case class HsiIndicators(source: SourceData = Map.empty) extends Parsed[HsiIndic
 }
 
 object HsiIndicators extends Schema[HsiIndicators] {
-  val rmiRaw          = required[Double]("RMI_raw", default = 0)
-  val courseDeviation = required[Double]("CourseDeviation", default = 0)
-  val course          = required[Double]("Course", default = 0)
-  val headingRaw      = required[Double]("Heading_raw", default = 0)
-  val headingPointer  = required[Double]("HeadingPointer", default = 0)
-  val bearingPointer  = required[Double]("BearingPointer", default = 0)
-  val adfRaw          = required[Double]("ADF_raw", default = 0)
+  val rmiRaw          = required[Float]("RMI_raw", default = 0)
+  val courseDeviation = required[Float]("CourseDeviation", default = 0)
+  val course          = required[Float]("Course", default = 0)
+  val headingRaw      = required[Float]("Heading_raw", default = 0)
+  val headingPointer  = required[Float]("HeadingPointer", default = 0)
+  val bearingPointer  = required[Float]("BearingPointer", default = 0)
+  val adfRaw          = required[Float]("ADF_raw", default = 0)
 }
 
 case class Indicators(source: SourceData = Map.empty) extends Parsed[Indicators.type] {
@@ -666,9 +666,9 @@ object Waypoint extends Schema[Waypoint] {
   val position      = required[Vector3]("world_point", default = Vector3.Zero)
   val estimatedTime = required[Double]("estimated_time", default = 0)
   val speedReq      = required[Double]("speed_req", default = 0)
-  val nextPointNum  = required[Double]("next_point_num", default = 0)
+  val nextPointNum  = required[Int]("next_point_num", default = 0)
   val pointAction   = required[String]("point_action", default = "")
-  val thisPointNum  = required[Double]("this_point_num", default = 0)
+  val thisPointNum  = required[Int]("this_point_num", default = 0)
 }
 
 case class Route(source: SourceData = Map.empty) extends Parsed[Route.type] {
@@ -753,9 +753,9 @@ object SelfData extends Schema[SelfData] {
   val position     = required[Vector3]("Position", default = Vector3.Zero)
   val groupname    = required[String]("GroupName", default = "")
   val coalitionId  = required[Int]("CoalitionID", default = 0)
-  val pitch        = required[Double]("Pitch", default = 0)
-  val roll         = required[Double]("Bank", default = 0)
-  val heading      = required[Double]("Heading", default = 0)
+  val pitch        = required[Float]("Pitch", default = 0)
+  val roll         = required[Float]("Bank", default = 0)
+  val heading      = required[Float]("Heading", default = 0)
   val typ          = required[UnitType]("Type", default = UnitType())
 }
 
