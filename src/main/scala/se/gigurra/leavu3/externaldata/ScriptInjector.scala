@@ -4,6 +4,7 @@ import com.twitter.util.Duration
 import se.gigurra.leavu3.util.{Resource2String, SimpleTimer, RestClient}
 import se.gigurra.serviceutils.json.JSON
 import se.gigurra.serviceutils.twitter.logging.Logging
+import se.gigurra.serviceutils.twitter.service.ServiceException
 
 import scala.util.{Failure, Try, Success}
 
@@ -20,6 +21,8 @@ object ScriptInjector extends Logging {
 
     SimpleTimer.apply(Duration.fromSeconds(10)) {
       Try(JSON.read[GameData](client.getBlocking(GameData.path))) match {
+        case Failure(e: ServiceException) =>
+          logger.warning(s"Dcs Remote replied: Unable to inject game export script: $e")
         case Failure(_) | Success(BadGameData()) =>
           logger.info(s"Injecting data export script .. -> ${GameData.path}")
           client.postBlocking("export", luaDataExportScript)

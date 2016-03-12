@@ -3,6 +3,7 @@ package se.gigurra.leavu3.util
 import com.twitter.finagle.Http
 import com.twitter.finagle.http._
 import com.twitter.util.{Future, Duration, Await}
+import se.gigurra.serviceutils.twitter.service.ServiceException
 
 /**
   * Created by kjolh on 3/10/2016.
@@ -16,8 +17,7 @@ case class RestClient(addr: String, port: Int) {
     val request = Request(path, params:_*)
     client.apply(request) flatMap {
       case OkResponse(response)  => Future.value(response.contentString)
-      case NotFound(response)    => Future.exception(new NoSuchElementException(s"No resource found at $path: $response: ${response.contentString}"))
-      case BadResponse(response) => Future.exception(new RuntimeException(s"Could not GET from $path: $response: ${response.contentString}"))
+      case BadResponse(response) => Future.exception(ServiceException(response))
     }
   }
 
@@ -30,7 +30,7 @@ case class RestClient(addr: String, port: Int) {
     request.setContentString(data)
     client.apply(request) flatMap {
       case OkResponse(response)  => Future.Unit
-      case BadResponse(response) => Future.exception(new RuntimeException(s"Could not POST to $path: $response: ${response.contentString}"))
+      case BadResponse(response) => Future.exception(ServiceException(response))
     }
   }
 
