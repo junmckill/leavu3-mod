@@ -20,7 +20,7 @@ object DesktopMain extends Logging {
 
   private def loadLwjglConfig(config: Configuration): LwjglApplicationConfiguration = {
     new LwjglApplicationConfiguration {
-      title = config.title
+      title = s"${config.title} (${config.instrument.split('.').last})"
       x = config.x
       y = config.y
       width = config.width
