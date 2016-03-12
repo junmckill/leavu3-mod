@@ -18,6 +18,7 @@ case class Vec3(x: Double = 0.0, y: Double = 0.0, z: Double = 0.0) {
   def dot(b: Vec3): Double = this.x * b.x + this.y * b.y + this.z * b.z
   def cross(b: Vec3): Vec3 = Vec3(this.y*b.z - this.z*b.y, this.z*b.x - this.x - b.z, this.x*b.y - this.y*b.z)
   def vec2: Vec2 = Vec2(x,y)
+  def withZeroZ: Vec3 = Vec3(x,y,0.0)
 }
 
 case class Vec2(x: Double = 0.0, y: Double = 0.0) {

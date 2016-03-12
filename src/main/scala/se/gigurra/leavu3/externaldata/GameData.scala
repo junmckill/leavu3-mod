@@ -85,31 +85,39 @@ object GameData extends Schema[GameData] with Logging {
     // Known states that needs fusion:
     // - rws detections (only visible a few frames) - Needs manual storage
     // - If in NAV mode: Store waypoints that have not yet been seen (workaround for missing waypoints bug)
-    Seq(newData)
-      .reduce((a,_) => waypointWorkaround(a))
+    newData.waypointWorkaround()
   }
 
-  private def waypointWorkaround(newData: GameData): GameData = {
-    if (newData.route.waypoints.nonEmpty) {
-      newData
-    } else {
-      // DCS FC waypoint export in NAV mode is broken.. we only get the current one.
-      // so keep in memory which ones we've cycled through (yay - Nice idea by GG!)
-      val curWp = newData.route.currentWaypoint
-      knownNavWaypoints.get(curWp.index) match {
-        case Some(knownWaypoint) if knownWaypoint != curWp =>
-          logger.info(s"Known navpoint changed - assuming mission change - clearing known navpoints!")
-          knownNavWaypoints.clear()
-        case _ =>
-        // No clearing required. Same or new waypoint
+  implicit class GameDataWorkarounds(newData: GameData) {
+
+    def waypointWorkaround(): GameData = {
+      if (newData.route.waypoints.nonEmpty) {
+        newData
+      } else {
+        // DCS FC waypoint export in NAV mode is broken.. we only get the current one.
+        // so keep in memory which ones we've cycled through (yay - Nice idea by GG!)
+        val curWp = newData.route.currentWaypoint
+        knownNavWaypoints.get(curWp.index) match {
+          case Some(knownWaypoint) if knownWaypoint != curWp =>
+            logger.info(s"Known navpoint changed - assuming mission change - clearing known navpoints!")
+            knownNavWaypoints.clear()
+          case _ =>
+          // No clearing required. Same or new waypoint
+        }
+
+        // DCS gives us an extra wp (index 2 million :))
+        if (0 <= curWp.index && curWp.index < 100)
+          knownNavWaypoints.put(curWp.index, curWp)
+        else
+          knownNavWaypoints.put(-1, curWp.withIndex(-1))
+
+        val allWps = knownNavWaypoints.values.toSeq.sortBy(_.index)
+        val newRoute = newData.route.withWaypoints(allWps)
+        newData.withRoute(newRoute)
       }
-      knownNavWaypoints.put(curWp.index, curWp)
-      val allWps = knownNavWaypoints.values.toSeq.sortBy(_.index)
-      val newRoute = newData.route.withWaypoints(allWps)
-      newData.withRoute(newRoute)
     }
-  }
 
+  }
 }
 
 

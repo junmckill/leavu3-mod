@@ -1,7 +1,8 @@
 package se.gigurra.leavu3.mfd
 
+import com.badlogic.gdx.math.Vector2
 import se.gigurra.leavu3.Configuration
-import se.gigurra.leavu3.externaldata.{DlinkInData, DlinkOutData, GameData, Vec2}
+import se.gigurra.leavu3.externaldata._
 import se.gigurra.leavu3.gfx.RenderContext._
 import se.gigurra.leavu3.util.CircleBuffer
 import scala.language.postfixOps
@@ -55,8 +56,37 @@ case class HsdPage(config: Configuration) extends Page {
   }
 
   def drawWaypoints(game: GameData): Unit = {
+
     val current = game.route.currentWaypoint
-    val all = (Seq(game.route.currentWaypoint) ++ game.route.waypoints).sortBy(_.index)
+
+    def wpByIndex(i: Int): Option[Waypoint] = {
+      game.route.waypoints.find(_.index == i)
+    }
+
+    for (wp <- game.route.waypoints) {
+      circle(at = wp.position - self.position, radius = 0.015 * symbolScale, color = WHITE)
+      wpByIndex(wp.next) match {
+        case None =>
+        case Some(nextWp) =>
+          val thisOne = wp.position - self.position
+          val nextOne = nextWp.position - self.position
+          lines(Seq(thisOne -> nextOne))
+      }
+    }
+    circle(at = current.position - self.position, radius = 0.015 * symbolScale, typ = FILL, color = WHITE)
+
+
+    // Draw all text last for batching!
+    batched {
+      for (wp <- game.route.waypoints) {
+        val text = if (wp.index > 0) (wp.index - 1).toString else "x"
+        transform(_
+          .translate((wp.position - self.position).withZeroZ)
+          .scalexy(0.05f * symbolScale.toFloat / font.size)) {
+          text.draw()
+        }
+      }
+    }
   }
 
   def drawAiWingmen(game: GameData): Unit = {
