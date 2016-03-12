@@ -16,8 +16,8 @@ case class RestClient(addr: String, port: Int) {
     val request = Request(path, params:_*)
     client.apply(request) flatMap {
       case OkResponse(response)  => Future.value(response.contentString)
-      case NotFound(response)    => Future.exception(new NoSuchElementException(s"No resource found at $path: $response"))
-      case BadResponse(response) => Future.exception(new RuntimeException(s"Could not GET from $path: $response"))
+      case NotFound(response)    => Future.exception(new NoSuchElementException(s"No resource found at $path: $response: ${response.contentString}"))
+      case BadResponse(response) => Future.exception(new RuntimeException(s"Could not GET from $path: $response: ${response.contentString}"))
     }
   }
 
@@ -30,7 +30,7 @@ case class RestClient(addr: String, port: Int) {
     request.setContentString(data)
     client.apply(request) flatMap {
       case OkResponse(response)  => Future.Unit
-      case BadResponse(response) => Future.exception(new RuntimeException(s"Could not POST to $path: $response"))
+      case BadResponse(response) => Future.exception(new RuntimeException(s"Could not POST to $path: $response: ${response.contentString}"))
     }
   }
 
