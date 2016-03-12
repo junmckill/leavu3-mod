@@ -92,6 +92,17 @@ trait RenderHelpers extends UnitConversions { _: RenderContext.type =>
     }
   }
 
+  def lines(dashSets: Seq[(Vector2, Vector2)]*): Unit = {
+    shape(LINE) {
+      for {
+        dashes <- dashSets
+        (p1, p2) <- dashes
+      } {
+        shapeRenderer.line(p1, p2)
+      }
+    }
+  }
+
   def screen2World: Float = {
     1.0f / transform.current.getScaleX
   }

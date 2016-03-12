@@ -33,18 +33,19 @@ case class HsdPage(config: Configuration) extends Page {
     circle(radius = distance     * 0.50, color = DARK_GRAY)
     circle(radius = distance     * 1.00)
     circle(radius = distance     * 1.50)
-    lines(shapes.hsi.flag     * symbolScale + Vec2(0.0, distance * 0.50))
-    lines(shapes.hsi.flag     * symbolScale + Vec2(0.0, distance * 1.00))
-    lines(shapes.hsi.flag     * symbolScale + Vec2(0.0, distance * 1.50))
-    lines(shapes.hsi.eastPin  * symbolScale + Vec2(distance * 0.50, 0.0))
-    lines(shapes.hsi.eastPin  * symbolScale + Vec2(distance * 1.00, 0.0))
-    lines(shapes.hsi.eastPin  * symbolScale + Vec2(distance * 1.50, 0.0))
-    lines(shapes.hsi.westPin  * symbolScale + Vec2(-distance * 0.50, 0.0))
-    lines(shapes.hsi.westPin  * symbolScale + Vec2(-distance * 1.00, 0.0))
-    lines(shapes.hsi.westPin  * symbolScale + Vec2(-distance * 1.50, 0.0))
-    lines(shapes.hsi.southPin * symbolScale + Vec2(0.0, -distance * 0.50))
-    lines(shapes.hsi.southPin * symbolScale + Vec2(0.0, -distance * 1.00))
-    lines(shapes.hsi.southPin * symbolScale + Vec2(0.0, -distance * 1.50))
+    lines(shapes.hsi.flag * symbolScale + Vec2(0.0, distance * 0.50),
+      shapes.hsi.flag * symbolScale + Vec2(0.0, distance * 1.00),
+      shapes.hsi.flag * symbolScale + Vec2(0.0, distance * 1.50),
+      shapes.hsi.eastPin * symbolScale + Vec2(distance * 0.50, 0.0),
+      shapes.hsi.eastPin * symbolScale + Vec2(distance * 1.00, 0.0),
+      shapes.hsi.eastPin * symbolScale + Vec2(distance * 1.50, 0.0),
+      shapes.hsi.westPin * symbolScale + Vec2(-distance * 0.50, 0.0),
+      shapes.hsi.westPin * symbolScale + Vec2(-distance * 1.00, 0.0),
+      shapes.hsi.westPin * symbolScale + Vec2(-distance * 1.50, 0.0),
+      shapes.hsi.southPin * symbolScale + Vec2(0.0, -distance * 0.50),
+      shapes.hsi.southPin * symbolScale + Vec2(0.0, -distance * 1.00),
+      shapes.hsi.southPin * symbolScale + Vec2(0.0, -distance * 1.50)
+    )
   }
 
   def drawSelf(game: GameData): Unit = {
