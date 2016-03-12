@@ -29,12 +29,21 @@ case class HsdPage() extends Page {
   }
 
   def drawHsi(game: GameData): Unit = {
-    circle(radius = scale * 0.50, color = LIGHT_GRAY, typ = LINE)
-    circle(radius = scale * 1.00, color = LIGHT_GRAY, typ = LINE)
-    circle(radius = scale * 1.50, color = LIGHT_GRAY, typ = LINE)
-    lines(shapes.hsi.flag.coords * screen2World + Vec2(0.0, scale * 0.50))
-    lines(shapes.hsi.flag.coords * screen2World + Vec2(0.0, scale * 1.00))
-    lines(shapes.hsi.flag.coords * screen2World + Vec2(0.0, scale * 1.50))
+    circle(radius = scale     * 0.50, color = DARK_GRAY)
+    circle(radius = scale     * 1.00)
+    circle(radius = scale     * 1.50)
+    lines(shapes.hsi.flag     * screen2World + Vec2(0.0, scale * 0.50))
+    lines(shapes.hsi.flag     * screen2World + Vec2(0.0, scale * 1.00))
+    lines(shapes.hsi.flag     * screen2World + Vec2(0.0, scale * 1.50))
+    lines(shapes.hsi.eastPin  * screen2World + Vec2(scale * 0.50, 0.0))
+    lines(shapes.hsi.eastPin  * screen2World + Vec2(scale * 1.00, 0.0))
+    lines(shapes.hsi.eastPin  * screen2World + Vec2(scale * 1.50, 0.0))
+    lines(shapes.hsi.westPin  * screen2World + Vec2(-scale * 0.50, 0.0))
+    lines(shapes.hsi.westPin  * screen2World + Vec2(-scale * 1.00, 0.0))
+    lines(shapes.hsi.westPin  * screen2World + Vec2(-scale * 1.50, 0.0))
+    lines(shapes.hsi.southPin * screen2World + Vec2(0.0, -scale * 0.50))
+    lines(shapes.hsi.southPin * screen2World + Vec2(0.0, -scale * 1.00))
+    lines(shapes.hsi.southPin * screen2World + Vec2(0.0, -scale * 1.50))
   }
 
   def drawSelf(game: GameData): Unit = {
