@@ -10,7 +10,8 @@ case class Mfd() {
     val text =
       s"""
          |Heading: ${game.flightModel.trueHeading}
-         |Velocity: ${game.flightModel.velocity}""".stripMargin
+         |Velocity: ${game.flightModel.velocity}
+         |nwps: ${game.route.waypoints.size}""".stripMargin
 
     transform(_.scalexy(1.0f / text.width)) {
       text.draw()

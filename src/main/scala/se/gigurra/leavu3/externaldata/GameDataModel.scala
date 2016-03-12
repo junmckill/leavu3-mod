@@ -667,7 +667,7 @@ object Waypoint extends Schema[Waypoint] {
   val estimatedTime = required[Double]("estimated_time", default = 0)
   val speedReq      = required[Double]("speed_req", default = 0)
   val nextPointNum  = required[Double]("next_point_num", default = 0)
-  val pointAction   = required[Double]("point_action", default = 0)
+  val pointAction   = required[String]("point_action", default = "")
   val thisPointNum  = required[Double]("this_point_num", default = 0)
 }
 
