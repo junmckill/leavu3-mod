@@ -10,7 +10,7 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFont
 import com.badlogic.gdx.graphics.g2d.{BitmapFont, GlyphLayout, PixmapPacker}
 import com.badlogic.gdx.utils.Align
 import se.gigurra.leavu3.util.Decorated
-import GfxImplicitImports._
+import RenderContext._
 
 case class Font(font: BitmapFont, size: Float)
   extends Decorated[BitmapFont](font)

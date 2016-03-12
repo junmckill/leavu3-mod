@@ -45,7 +45,7 @@ object UnitType extends Schema[UnitType] {
 case class Emitter(source: SourceData) extends Parsed[Emitter.type] {
   val id          = parse(schema.id)
   val signalType  = parse(schema.signalType)
-  val azimuth     = parse(schema.azimuth)
+  val azimuth     = parse(schema.azimuth).toDegrees
   val priority    = parse(schema.priority)
   val power       = parse(schema.power)
   val unitType    = parse(schema.unitType)
@@ -115,11 +115,11 @@ object Payload extends Schema[Payload] {
 }
 
 case class FlightModel(source: SourceData = Map.empty) extends Parsed[FlightModel.type] {
-  val pitch             = parse(schema.pitch)
-  val roll              = parse(schema.roll)
-  val trueHeading       = parse(schema.trueHeading)
-  val magneticHeading   = parse(schema.magneticHeading)
-  val angleOfAttack     = parse(schema.angleOfAttack)
+  val pitch             = parse(schema.pitch).toDegrees
+  val roll              = parse(schema.roll).toDegrees
+  val trueHeading       = parse(schema.trueHeading).toDegrees
+  val magneticHeading   = parse(schema.magneticHeading).toDegrees
+  val angleOfAttack     = parse(schema.angleOfAttack).toDegrees
 
   val velocity          = parse(schema.velocity)
   val acceleration      = parse(schema.acceleration)
@@ -167,8 +167,8 @@ object FlightModel extends Schema[FlightModel] {
 }
 
 case class SensorAngles(source: SourceData = Map.empty) extends Parsed[SensorAngles.type] {
-  val azimuth   = parse(schema.azimuth)
-  val elevation = parse(schema.elevation)
+  val azimuth   = parse(schema.azimuth).toDegrees
+  val elevation = parse(schema.elevation).toDegrees
 }
 
 object SensorAngles extends Schema[SensorAngles] {
@@ -177,7 +177,7 @@ object SensorAngles extends Schema[SensorAngles] {
 }
 
 case class RadarDisplayScale(source: SourceData = Map.empty) extends Parsed[RadarDisplayScale.type] {
-  val azimuth  = parse(schema.azimuth)
+  val azimuth  = parse(schema.azimuth).toDegrees
   val distance = parse(schema.distance)
 }
 
@@ -281,11 +281,11 @@ object Target extends Schema[Target] {
 
 case class Contact(source: SourceData) extends Parsed[Contact.type] {
   val id                     = parse(schema.id)
-  val course                 = parse(schema.course)
+  val course                 = parse(schema.course).toDegrees
   val flags                  = parse(schema.flags)
-  val aspect                 = parse(schema.aspect)
-  val verticalViewingAngle   = parse(schema.verticalViewingAngle)
-  val horizontalViewingAngle = parse(schema.horizontalViewingAngle)
+  val aspect                 = parse(schema.aspect).toDegrees
+  val verticalViewingAngle   = parse(schema.verticalViewingAngle).toDegrees
+  val horizontalViewingAngle = parse(schema.horizontalViewingAngle).toDegrees
   val updatesNumber          = parse(schema.updatesNumber)
   val startOfLong            = parse(schema.startOfLong)
   val rcs                    = parse(schema.rcs)
@@ -348,8 +348,8 @@ object Sensors extends Schema[Sensors] {
 case class NavRequirements(source: SourceData = Map.empty) extends Parsed[NavRequirements.type] {
   val altitude      = parse(schema.altitude)
   val verticalSpeed = parse(schema.verticalSpeed)
-  val roll          = parse(schema.roll)
-  val pitch         = parse(schema.pitch)
+  val roll          = parse(schema.roll).toDegrees
+  val pitch         = parse(schema.pitch).toDegrees
   val speed         = parse(schema.speed)
 }
 
@@ -584,13 +584,13 @@ object FailureIndicators extends Schema[FailureIndicators] {
 }
 
 case class HsiIndicators(source: SourceData = Map.empty) extends Parsed[HsiIndicators.type] {
-  val rmiRaw          = parse(schema.rmiRaw)
-  val courseDeviation = parse(schema.courseDeviation)
-  val course          = parse(schema.course)
-  val headingRaw      = parse(schema.headingRaw)
-  val headingPointer  = parse(schema.headingPointer)
-  val bearingPointer  = parse(schema.bearingPointer)
-  val adfRaw          = parse(schema.adfRaw)
+  val rmiRaw          = parse(schema.rmiRaw).toDegrees
+  val courseDeviation = parse(schema.courseDeviation).toDegrees
+  val course          = parse(schema.course).toDegrees
+  val headingRaw      = parse(schema.headingRaw).toDegrees
+  val headingPointer  = parse(schema.headingPointer).toDegrees
+  val bearingPointer  = parse(schema.bearingPointer).toDegrees
+  val adfRaw          = parse(schema.adfRaw).toDegrees
 }
 
 object HsiIndicators extends Schema[HsiIndicators] {
@@ -716,9 +716,9 @@ object StatusFlags extends Schema[StatusFlags] {
 }
 
 case class GeoPosition(source: SourceData = Map.empty) extends Parsed[GeoPosition.type] {
-  val lat = parse(schema.lat)
-  val lon = parse(schema.lon)
-  val alt = parse(schema.alt)
+  val lat = parse(schema.lat).toDegrees
+  val lon = parse(schema.lon).toDegrees
+  val alt = parse(schema.alt).toDegrees
 }
 
 object GeoPosition extends Schema[GeoPosition] {
@@ -737,9 +737,9 @@ case class SelfData(source: SourceData = Map.empty) extends Parsed[SelfData.type
   val position     = parse(schema.position)
   val groupname    = parse(schema.groupname)
   val coalitionId  = parse(schema.coalitionId)
-  val pitch        = parse(schema.pitch)
-  val roll         = parse(schema.roll)
-  val heading      = parse(schema.heading)
+  val pitch        = parse(schema.pitch).toDegrees
+  val roll         = parse(schema.roll).toDegrees
+  val heading      = parse(schema.heading).toDegrees
   val typ          = parse(schema.typ)
 }
 
