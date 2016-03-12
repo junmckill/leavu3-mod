@@ -2,6 +2,7 @@ package se.gigurra.leavu3.gfx
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Gdx.gl
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20._
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType
@@ -19,11 +20,18 @@ trait RenderHelpers extends UnitConversions { _: RenderContext.type =>
     gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f)
     gl.glClear(GL_COLOR_BUFFER_BIT)
     make11OrthoCamera()
-    batch.begin()
     transform(_.loadIdentity()) {
       f
     }
-    batch.end()
+  }
+
+  def batched(f: => Unit): Unit = {
+    try {
+      batch.begin()
+      f
+    } finally {
+      batch.end()
+    }
   }
 
   def make11OrthoCamera(scale: Float = 1.0f): Unit = {
@@ -56,10 +64,34 @@ trait RenderHelpers extends UnitConversions { _: RenderContext.type =>
     }
   }
 
-  def circle(at: Vector3, radius: Float, steps: Int = 50, typ: ShapeRenderer.ShapeType = LINE): Unit = {
-    shapeRenderer.begin(typ)
-    shapeRenderer.circle(at.x, at.y, radius, steps)
-    shapeRenderer.end()
+  def shape(typ: ShapeRenderer.ShapeType = LINE,
+            color: Color = null)(drawCode: => Unit): Unit = {
+    try {
+      shapeRenderer.begin(typ)
+      if (color != null)
+        shapeRenderer.setColor(color)
+      drawCode
+    } finally {
+      shapeRenderer.end()
+    }
+  }
+
+  def circle(at: Vector3,
+             radius: Float,
+             steps: Int = 50,
+             typ: ShapeRenderer.ShapeType = LINE,
+             color: Color = null): Unit = {
+    shape(typ, color) {
+      shapeRenderer.circle(at.x, at.y, radius, steps)
+    }
+  }
+
+  def lines(dashes: Seq[(Vector3, Vector3)], color: Color = null): Unit = {
+    shape(LINE, color) {
+      for ((p1, p2) <- dashes) {
+        shapeRenderer.line(p1, p2)
+      }
+    }
   }
 
   object self {

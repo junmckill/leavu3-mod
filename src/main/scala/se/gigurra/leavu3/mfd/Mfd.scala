@@ -1,6 +1,5 @@
 package se.gigurra.leavu3.mfd
 
-import com.badlogic.gdx.math.Vector3
 import se.gigurra.leavu3.externaldata.{DlinkInData, DlinkOutData, GameData}
 import se.gigurra.leavu3.gfx.RenderContext._
 
@@ -8,21 +7,35 @@ case class Mfd() {
 
   def update(game: GameData, dlinkIn: DlinkInData, dlinkOut: DlinkOutData): Unit = frame {
 
-    val text =
-      s"""
-         |Heading: ${game.flightModel.trueHeading}
-         |Velocity: ${game.flightModel.velocity}
-         |nwps: ${game.route.waypoints.size}""".stripMargin
 
-    transform(_.scalexy(1.0f / text.width)) {
-      text.draw()
+    geo_viewport(at = self.position, viewportSize = 20, heading = self.heading).ppi {
+      batched {
 
+        val ul = self.position +(-5f,  5f)
+        val ur = self.position +( 5f,  5f)
+        val ll = self.position +(-5f, -5f)
+        val lr = self.position +( 5f, -5f)
 
-      geo_viewport(at = self.position, viewportSize = 20, heading = self.heading).ppi {
-        circle(at = self.position, radius = 10f)
-        //circle(radius = 0.1f, filled = false).atScreen(x,y)
+        circle(at = self.position, radius = 10f, color = WHITE)
+        circle(at = self.position, radius = 5f, typ = FILL)
+        circle(at = self.position, radius = 2.5f, typ = FILL, color = BLACK)
+        lines(Seq(ul -> ur, ll -> lr), color = GREEN)
       }
     }
+
+    batched {
+      val text =
+        s"""
+           |Heading: ${game.flightModel.trueHeading}
+           |Velocity: ${game.flightModel.velocity}
+           |nwps: ${game.route.waypoints.size}""".stripMargin
+
+      transform(_.scalexy(1.0f / text.width)) {
+        text.draw()
+      }
+    }
+
+
   }
 
 }

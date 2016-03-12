@@ -2,9 +2,11 @@ package se.gigurra.leavu3.math
 
 import com.badlogic.gdx.math.Vector3
 
+import scala.language.implicitConversions
+
 trait RichVector3Implicits {
 
-  implicit class VectorConstOps(v: Vector3) {
+  implicit class VectorOps(v: Vector3) {
     def +(delta: Float): Vector3 = new Vector3(v.x + delta, v.y + delta, v.z + delta)
     def -(delta: Float): Vector3 = new Vector3(v.x - delta, v.y - delta, v.z - delta)
     def *(c: Float): Vector3 = new Vector3(v.x * c, v.y * c, v.z * c)
@@ -26,6 +28,9 @@ trait RichVector3Implicits {
     def *(v: Vector3): Vector3 = v * c
     def /(v: Vector3): Vector3 = new Vector3(c / v.x, c / v.y, c / v.z)
   }
+
+  implicit def tuple22V3(t: (Float, Float)): Vector3 = new Vector3(t._1, t._2, 0.0f)
+  implicit def tuple32V3(t: (Float, Float, Float)): Vector3 = new Vector3(t._1, t._2, t._3)
 
 }
 

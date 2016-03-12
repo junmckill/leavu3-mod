@@ -1,6 +1,5 @@
 package se.gigurra.leavu3.gfx
 
-import com.badlogic.gdx.graphics.Color._
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
@@ -11,7 +10,8 @@ import scala.collection.mutable
 object RenderContext
   extends GdxImplicits
     with RenderHelpers
-    with RichVector3Implicits {
+    with RichVector3Implicits
+    with Colors {
 
   val shapeRenderer = new ShapeRenderer()
   val camera = new OrthographicCamera(1.0f, 1.0f)
