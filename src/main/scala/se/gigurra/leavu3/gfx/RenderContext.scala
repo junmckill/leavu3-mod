@@ -3,6 +3,7 @@ package se.gigurra.leavu3.gfx
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
+import se.gigurra.leavu3.Configuration
 import se.gigurra.leavu3.math.{RichVector3Implicits, Matrix4Stack}
 
 import scala.collection.mutable
@@ -22,5 +23,8 @@ object RenderContext
     shapeRenderer.setTransformMatrix(t)
   })
   font.setColor(RED)
+
+  def symbolScale(implicit config: Configuration) = config.symbolScale * screen2World
+
 
 }

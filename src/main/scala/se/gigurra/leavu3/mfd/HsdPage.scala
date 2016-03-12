@@ -1,21 +1,19 @@
 package se.gigurra.leavu3.mfd
 
-import com.badlogic.gdx.math.Vector2
 import se.gigurra.leavu3.Configuration
 import se.gigurra.leavu3.externaldata._
 import se.gigurra.leavu3.gfx.RenderContext._
 import se.gigurra.leavu3.util.CircleBuffer
+
 import scala.language.postfixOps
 
 /**
   * Created by kjolh on 3/12/2016.
   */
-case class HsdPage(config: Configuration) extends Page {
+case class HsdPage(implicit config: Configuration) extends Page {
 
   val distance = CircleBuffer(10 nmi, 20 nmi, 40 nmi, 80 nmi, 160 nmi).withDefaultValue(40 nmi)
   val deprFactor = CircleBuffer(0.0, 0.5).withDefaultValue(0.5)
-
-  def symbolScale = config.symbolScale * screen2World
 
   def update(game: GameData, dlinkIn: DlinkInData, dlinkOut: DlinkOutData): Unit = {
     ppi_viewport(viewportSize = distance * 2.0, offs = Vec2(0.0, -distance * deprFactor), heading = self.heading) {
@@ -57,8 +55,6 @@ case class HsdPage(config: Configuration) extends Page {
 
   def drawWaypoints(game: GameData): Unit = {
 
-    val current = game.route.currentWaypoint
-
     def wpByIndex(i: Int): Option[Waypoint] = {
       game.route.waypoints.find(_.index == i)
     }
@@ -73,18 +69,12 @@ case class HsdPage(config: Configuration) extends Page {
           lines(Seq(thisOne -> nextOne))
       }
     }
-    circle(at = current.position - self.position, radius = 0.015 * symbolScale, typ = FILL, color = WHITE)
+    circle(at = game.route.currentWaypoint.position - self.position, radius = 0.015 * symbolScale, typ = FILL, color = WHITE)
 
-
-    // Draw all text last for batching!
     batched {
       for (wp <- game.route.waypoints) {
         val text = if (wp.index > 0) (wp.index - 1).toString else "x"
-        transform(_
-          .translate((wp.position - self.position).withZeroZ)
-          .scalexy(0.05f * symbolScale.toFloat / font.size)) {
-          text.draw()
-        }
+        text.drawNextToTarget(wp.position, WHITE)
       }
     }
   }
@@ -106,6 +96,7 @@ case class HsdPage(config: Configuration) extends Page {
 
   def drawMenuItems(game: GameData): Unit = {
 
+    /*
     batched {
       val text =
         s"""
@@ -114,8 +105,8 @@ case class HsdPage(config: Configuration) extends Page {
            |nwps: ${game.route.waypoints.size}""".stripMargin
 
       transform(_.scalexy(1.5f / text.width)) {
-        text.draw()
+        text.draw(color = RED)
       }
-    }
+    }*/
   }
 }
