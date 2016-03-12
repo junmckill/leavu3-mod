@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.GL20._
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType
 import com.badlogic.gdx.math.{Vector2, Vector3}
-import se.gigurra.leavu3.externaldata.ExternalData
+import se.gigurra.leavu3.externaldata.{Vec3, ExternalData}
 import se.gigurra.leavu3.math.UnitConversions
 
 trait RenderHelpers extends UnitConversions { _: RenderContext.type =>
@@ -53,15 +53,9 @@ trait RenderHelpers extends UnitConversions { _: RenderContext.type =>
     shapeRenderer.setProjectionMatrix(camera.combined)
   }
 
-  case class geo_viewport(at: Vector2, viewportSize: Float, heading: Float = 0.0f) {
-    def ppi(f: => Unit): Unit = {
-      transform(
-        _.scalexy(1.0f / viewportSize)
-        .rotate(-heading)
-        .translate(-at.x, -at.y, 0.0f)
-        ) {
-        f
-      }
+  def ppi_viewport(viewportSize: Float, heading: Float = 0.0f)(f: => Unit) {
+    transform(_.scalexy(1.0f / viewportSize).rotate(-heading)) {
+      f
     }
   }
 
@@ -99,8 +93,8 @@ trait RenderHelpers extends UnitConversions { _: RenderContext.type =>
     def pitch: Float = ExternalData.gameData.selfData.pitch
     def roll: Float = ExternalData.gameData.selfData.roll
     def heading: Float = ExternalData.gameData.selfData.heading
-    def position: Vector3 = ExternalData.gameData.selfData.position
-    def velocity: Vector3 = ExternalData.gameData.flightModel.velocity
-    def acceleration: Vector3 = ExternalData.gameData.flightModel.acceleration
+    def position: Vec3 = ExternalData.gameData.selfData.position
+    def velocity: Vec3 = ExternalData.gameData.flightModel.velocity
+    def acceleration: Vec3 = ExternalData.gameData.flightModel.acceleration
   }
 }

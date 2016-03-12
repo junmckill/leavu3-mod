@@ -27,7 +27,9 @@ case class GameData(source: SourceData) extends Parsed[GameData.type] {
   val sensors         = parse(schema.sensors)
   val aiWingmenTgts   = parse(schema.aiWingmenTgts)
   val indicators      = parse(schema.indicators)
-  val aiWingmen       = parse(schema.aiWingmen)
+  val aiWingmen       = parse(schema.aiWingmen).collect {
+    case Some(w: AiWingman) => w
+  }
   val route           = parse(schema.route)
   val metaData        = parse(schema.metadata)
 

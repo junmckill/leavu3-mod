@@ -1,7 +1,7 @@
 package se.gigurra.leavu3.mfd
 
 import com.badlogic.gdx.math.{Vector2, Vector3}
-import se.gigurra.leavu3.externaldata.{DlinkInData, DlinkOutData, GameData}
+import se.gigurra.leavu3.externaldata.{Vec2, DlinkInData, DlinkOutData, GameData}
 import se.gigurra.leavu3.gfx.RenderContext._
 
 case class Mfd() {
@@ -9,21 +9,30 @@ case class Mfd() {
   def update(game: GameData, dlinkIn: DlinkInData, dlinkOut: DlinkOutData): Unit = frame {
 
 
-    val p = self.position : Vector2
+    val p = self.position : Vec2
 
-    geo_viewport(at = p, viewportSize = 20.0f, heading = self.heading).ppi {
+    ppi_viewport(viewportSize = 20.0f, heading = self.heading) {
 
-      batched {
 
-        val ul = p + (-5f,  5f)
-        val ur = p + ( 5f,  5f)
-        val ll = p + (-5f, -5f)
-        val lr = p + ( 5f, -5f)
+      game.aiWingmen.headOption foreach { wingman =>
+        println(wingman)
+      }
+    }
 
-        circle(at = p, radius = 10f, color = WHITE)
-        circle(at = p, radius = 5f, typ = FILL)
-        circle(at = p, radius = 2.5f, typ = FILL, color = BLACK)
+    ppi_viewport(viewportSize = 20.0f, heading = self.heading) {
+
+        batched {
+
+        val ul: Vec2 = (-5.0,  5.0)
+        val ur: Vec2 = ( 5.0,  5.0)
+        val ll: Vec2 = (-5.0, -5.0)
+        val lr: Vec2 = ( 5.0, -5.0)
+
+        circle(at = Vec2(), radius = 10f, color = WHITE)
+        circle(at = Vec2(), radius = 5f, typ = FILL)
+        circle(at = Vec2(), radius = 2.5f, typ = FILL, color = BLACK)
         lines(Seq(ul -> ur, ll -> lr), color = GREEN)
+
       }
 
     }

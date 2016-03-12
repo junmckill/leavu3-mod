@@ -1,6 +1,7 @@
 package se.gigurra.leavu3.externaldata
 
 import com.badlogic.gdx.math.Vector3
+import com.badlogic.gdx.math.Vector2
 import mappers._
 import se.gigurra.heisenberg.MapData._
 import se.gigurra.heisenberg.{Schema, Parsed, MapDataProducer, MapDataParser}
@@ -8,24 +9,66 @@ import scala.language.implicitConversions
 
 object mappers {
 
-  implicit val vec3MapDataParser = new MapDataParser[Vector3] {
-    override def parse(field: Any): Vector3 = {
+  implicit val vec3MapDataParser = new MapDataParser[Vec3] {
+    override def parse(field: Any): Vec3 = {
       val data = field.asInstanceOf[Map[String, Number]]
       val dcsX_North = data("x").floatValue
       val dcsY_Up = data("y").floatValue
       val dcsZ_East = data("z").floatValue
-      new Vector3(dcsZ_East, dcsX_North, dcsY_Up)
+      Vec3(dcsZ_East, dcsX_North, dcsY_Up)
     }
   }
 
-  implicit val vec3MapDataProducer = new MapDataProducer[Vector3] {
-    override def produce(t: Vector3): Any = {
+  implicit val vec3MapDataProducer = new MapDataProducer[Vec3] {
+    override def produce(t: Vec3): Any = {
       val dcsX_North = t.y
       val dcsY_Up = t.z
       val dcsZ_East = t.x
       Map("x" -> dcsX_North, "y" -> dcsY_Up, "z" -> dcsZ_East)
     }
   }
+}
+
+case class Vec3(x: Double = 0.0, y: Double = 0.0, z: Double = 0.0) {
+  def +(delta: Double): Vec3 = new Vec3(this.x + delta, this.y + delta, this.z + delta)
+  def -(delta: Double): Vec3 = new Vec3(this.x - delta, this.y - delta, this.z - delta)
+  def *(c: Double): Vec3 = new Vec3(this.x * c, this.y * c, this.z * c)
+  def /(d: Double): Vec3 = new Vec3(this.x / d, this.y / d, this.z / d)
+  def unary_- : Vec3 = new Vec3(-this.x, -this.y, -this.z)
+  def norm: Double = Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z)
+  def normalized: Vec3 = this / norm
+  def +(b: Vec3): Vec3 = new Vec3(this.x + b.x, this.y + b.y, this.z + b.z)
+  def -(b: Vec3): Vec3 = new Vec3(this.x - b.x, this.y - b.y, this.z - b.z)
+  def ***(b: Vec3): Vec3 = new Vec3(this.x * b.x, this.y * b.y, this.z * b.z)
+  def /\/(b: Vec3): Vec3 = new Vec3(this.x / b.x, this.y / b.y, this.z / b.z)
+  def dot(b: Vec3): Double = this.x * b.x + this.y * b.y + this.z * b.z
+  def cross(b: Vec3): Vec3 = Vec3(this.y*b.z - this.z*b.y, this.z*b.x - this.x - b.z, this.x*b.y - this.y*b.z)
+  def vec2: Vec2 = Vec2(x,y)
+}
+
+case class Vec2(x: Double = 0.0, y: Double = 0.0) {
+  def +(delta: Double): Vec2 = new Vec2(this.x + delta, this.y + delta)
+  def -(delta: Double): Vec2 = new Vec2(this.x - delta, this.y - delta)
+  def *(c: Double): Vec2 = new Vec2(this.x * c, this.y * c)
+  def /(d: Double): Vec2 = new Vec2(this.x / d, this.y / d)
+  def unary_- : Vec2 = new Vec2(-this.x, -this.y)
+  def norm: Double = Math.sqrt(this.x * this.x + this.y * this.y)
+  def normalized: Vec2 = this / norm
+  def +(b: Vec2): Vec2 = new Vec2(this.x + b.x, this.y + b.y)
+  def -(b: Vec2): Vec2 = new Vec2(this.x - b.x, this.y - b.y)
+  def ***(b: Vec2): Vec2 = new Vec2(this.x * b.x, this.y * b.y)
+  def /\/(b: Vec2): Vec2 = new Vec2(this.x / b.x, this.y / b.y)
+  def dot(b: Vec2): Double = this.x * b.x + this.y * b.y
+}
+
+object Vec3 {
+  implicit def v32gdxv3(a: Vec3): Vector3 = new Vector3(a.x.toFloat, a.y.toFloat, a.z.toFloat)
+  implicit def v32gdxv2(a: Vec3): Vector2 = new Vector2(a.x.toFloat, a.y.toFloat)
+  implicit def v322(a: Vec3): Vec2 = a.vec2
+}
+
+object Vec2 {
+  implicit def v22gdxv2(a: Vec2): Vector2 = new Vector2(a.x.toFloat, a.y.toFloat)
 }
 
 case class UnitType(source: SourceData = Map.empty) extends Parsed[UnitType.type] {
@@ -147,8 +190,8 @@ object FlightModel extends Schema[FlightModel] {
   val magneticHeading   = required[Float]("magneticYaw", default = 0)
   val angleOfAttack     = required[Float]("AOA", default = 0)
 
-  val velocity          = required[Vector3]("vectorVelocity", default = Vector3.Zero)
-  val acceleration      = required[Vector3]("acc", default = Vector3.Zero)
+  val velocity          = required[Vec3]("vectorVelocity", default = Vec3())
+  val acceleration      = required[Vec3]("acc", default = Vec3())
 
   val indicatedAirspeed = required[Float]("IAS", default = 0)
   val trueAirspeed      = required[Float]("TAS", default = 0)
@@ -158,7 +201,7 @@ object FlightModel extends Schema[FlightModel] {
   val altitudeAGL       = required[Float]("altitudeAboveGroundLevel", default = 0)
   val altitudeAsl       = required[Float]("altitudeAboveSeaLevel", default = 0)
 
-  val windVelocity      = required[Vector3]("windVectorVelocity", default = Vector3.Zero)
+  val windVelocity      = required[Vec3]("windVectorVelocity", default = Vec3())
   val airPressure       = required[Float]("atmospherePressure", default = 0)
   val slipBallDeviation = required[Float]("slipBallPosition", default = 0)
 
@@ -311,7 +354,7 @@ object Contact extends Schema[Contact] {
   val updatesNumber          = required[Int]("updates_number")
   val startOfLock            = required[Double]("start_of_lock")
   val rcs                    = required[Double]("reflection")
-  val forces                 = required[Vector3]("forces")
+  val forces                 = required[Vec3]("forces")
   val country                = required[Int]("country")
   val burnthrough            = required[Boolean]("jammer_burned")
   val jamming                = required[Int]("isjamming")
@@ -319,7 +362,7 @@ object Contact extends Schema[Contact] {
   val machNumber             = required[Float]("mach")
   val spatial                = required[Spatial]("position")
   val typ                    = required[UnitType]("type")
-  val velocity               = required[Vector3]("velocity")
+  val velocity               = required[Vec3]("velocity")
   val distance               = required[Float]("distance")
 }
 
@@ -629,10 +672,10 @@ case class Spatial(source: SourceData = Map.empty) extends Parsed[Spatial.type] 
 }
 
 object Spatial extends Schema[Spatial] {
-  val x        = required[Vector3]("x", default = Vector3.Zero)
-  val y        = required[Vector3]("y", default = Vector3.Zero)
-  val z        = required[Vector3]("z", default = Vector3.Zero)
-  val position = required[Vector3]("p", default = Vector3.Zero)
+  val x        = required[Vec3]("x", default = Vec3())
+  val y        = required[Vec3]("y", default = Vec3())
+  val z        = required[Vec3]("z", default = Vec3())
+  val position = required[Vec3]("p", default = Vec3())
 }
 
 case class AiWingman(source: SourceData) extends Parsed[AiWingman.type] {
@@ -663,7 +706,7 @@ case class Waypoint(source: SourceData = Map.empty) extends Parsed[Waypoint.type
 }
 
 object Waypoint extends Schema[Waypoint] {
-  val position      = required[Vector3]("world_point", default = Vector3.Zero)
+  val position      = required[Vec3]("world_point", default = Vec3())
   val estimatedTime = required[Double]("estimated_time", default = 0)
   val speedReq      = required[Double]("speed_req", default = 0)
   val nextPointNum  = required[Int]("next_point_num", default = 0)
@@ -750,7 +793,7 @@ object SelfData extends Schema[SelfData] {
   val geoPosition  = required[GeoPosition]("LatLongAlt", default = GeoPosition())
   val coalition    = required[String]("Coalition", default = "")
   val country      = required[Int]("Country", default = 0)
-  val position     = required[Vector3]("Position", default = Vector3.Zero)
+  val position     = required[Vec3]("Position", default = Vec3())
   val groupname    = required[String]("GroupName", default = "")
   val coalitionId  = required[Int]("CoalitionID", default = 0)
   val pitch        = required[Float]("Pitch", default = 0)
