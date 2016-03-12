@@ -92,6 +92,10 @@ trait RenderHelpers extends UnitConversions { _: RenderContext.type =>
     }
   }
 
+  def toScreenCoords: Float = {
+    1.0f / transform.current.getScaleX
+  }
+
   object self {
     def pitch: Float = ExternalData.gameData.selfData.pitch
     def roll: Float = ExternalData.gameData.selfData.roll

@@ -13,21 +13,48 @@ case class HsdPage() extends Page {
   val scale = CircleBuffer(10 nmi, 20 nmi, 40 nmi, 80 nmi, 160 nmi).withDefaultValue(40 nmi)
   val deprFactor = CircleBuffer(0.0, 0.25).withDefaultValue(0.25)
 
-  def centerOffset = -scale * deprFactor
+  def standardObjectRadius = 0.025 * toScreenCoords
 
   def update(game: GameData, dlinkIn: DlinkInData, dlinkOut: DlinkOutData): Unit = {
-
-
-    ppi_viewport(viewportSize = scale, offs = Vec2(0.0, centerOffset), heading = self.heading) {
-
-      // Draw myself in the center
-      circle(radius = 0.05 nmi, color = WHITE, typ = FILL)
-
-      // Draw every ai wingman
-      game.aiWingmen foreach { wingman =>
-        circle(at = wingman.position - self.position, radius = 0.1 nmi, color = CYAN)
-      }
+    ppi_viewport(viewportSize = scale, offs = Vec2(0.0, -scale * deprFactor), heading = self.heading) {
+      drawSelf(game)
+      drawHsi(game)
+      drawWaypoints(game)
+      drawAiWingmen(game)
+      drawDlinkWingmen(dlinkIn)
+      drawDlinkWingmenTargets(dlinkIn)
+      drawLockedTargets(game)
     }
+    drawMenuItems(game)
+  }
+
+
+  def drawHsi(game: GameData): Unit = {
+  }
+
+  def drawSelf(game: GameData): Unit = {
+    circle(radius = standardObjectRadius, color = WHITE, typ = FILL)
+  }
+
+  def drawWaypoints(game: GameData): Unit = {
+  }
+
+  def drawAiWingmen(game: GameData): Unit = {
+    game.aiWingmen foreach { wingman =>
+      circle(at = wingman.position - self.position, radius = standardObjectRadius, color = CYAN)
+    }
+  }
+
+  def drawDlinkWingmen(dlinkIn: DlinkInData): Unit = {
+  }
+
+  def drawDlinkWingmenTargets(dlinkIn: DlinkInData): Unit = {
+  }
+
+  def drawLockedTargets(game: GameData): Unit = {
+  }
+
+  def drawMenuItems(game: GameData): Unit = {
 
     batched {
       val text =
@@ -40,7 +67,5 @@ case class HsdPage() extends Page {
         text.draw()
       }
     }
-
-
   }
 }
