@@ -11,13 +11,19 @@ object mappers {
   implicit val vec3MapDataParser = new MapDataParser[Vector3] {
     override def parse(field: Any): Vector3 = {
       val data = field.asInstanceOf[Map[String, Number]]
-      new Vector3(data("x").floatValue, data("y").floatValue, data.get("z").map(_.floatValue).getOrElse(0.0f))
+      val dcsX_North = data("x").floatValue
+      val dcsY_Up = data("y").floatValue
+      val dcsZ_East = data("z").floatValue
+      new Vector3(dcsZ_East, dcsX_North, dcsY_Up)
     }
   }
 
   implicit val vec3MapDataProducer = new MapDataProducer[Vector3] {
     override def produce(t: Vector3): Any = {
-      Map("x" -> t.x, "y" -> t.y, "z" -> t.z)
+      val dcsX_North = t.y
+      val dcsY_Up = t.z
+      val dcsZ_East = t.x
+      Map("x" -> dcsX_North, "y" -> dcsY_Up, "z" -> dcsZ_East)
     }
   }
 }
@@ -190,6 +196,16 @@ object MinMax extends Schema[MinMax] {
   val max = required[Double]("max", default = 0)
 }
 
+case class TdcPosition(source: SourceData = Map.empty) extends Parsed[TdcPosition.type] {
+  val x = parse(schema.x)
+  val y = parse(schema.y)
+}
+
+object TdcPosition extends Schema[TdcPosition] {
+  val x = required[Double]("x", default = 0)
+  val y = required[Double]("y", default = 0)
+}
+
 case class SensorsStatus(source: SourceData = Map.empty) extends Parsed[SensorsStatus.type] {
   val manufacturer     = parse(schema.manufacturer)
   val launchAuthorized = parse(schema.launchAuthorized)
@@ -211,7 +227,7 @@ object SensorsStatus extends Schema[SensorsStatus] {
   val laserOn           = required[Boolean]("laser_on", default = false)
   val ecmOn             = required[Boolean]("ECM_on", default = false)
   val scale             = required[RadarDisplayScale]("scale", default = RadarDisplayScale())
-  val tdc               = required[Vector3]("TDC", default = Vector3.Zero)
+  val tdc               = required[TdcPosition]("TDC", default = TdcPosition())
   val scanZone          = required[ScanZone]("ScanZone", default = ScanZone())
   val prf               = required[Prf]("PRF", default = Prf())
 }
