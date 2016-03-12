@@ -99,5 +99,7 @@ trait RenderHelpers extends UnitConversions { _: RenderContext.type =>
     def roll: Float = ExternalData.gameData.selfData.roll
     def heading: Float = ExternalData.gameData.selfData.heading
     def position: Vector3 = ExternalData.gameData.selfData.position
+    def velocity: Vector3 = ExternalData.gameData.flightModel.velocity
+    def acceleration: Vector3 = ExternalData.gameData.flightModel.acceleration
   }
 }

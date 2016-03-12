@@ -26,8 +26,8 @@ case class Mfd() {
     batched {
       val text =
         s"""
-           |Heading: ${game.flightModel.trueHeading}
-           |Velocity: ${game.flightModel.velocity}
+           |Heading: ${self.heading}
+           |Velocity: ${self.velocity}
            |nwps: ${game.route.waypoints.size}""".stripMargin
 
       transform(_.scalexy(1.0f / text.width)) {
