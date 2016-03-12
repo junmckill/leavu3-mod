@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.{OrthographicCamera, Color, GL20}
 import com.badlogic.gdx.graphics.GL20._
 import com.badlogic.gdx.graphics.Color._
 import com.badlogic.gdx.utils.Align
+import se.gigurra.leavu3.externaldata.{DlinkOutData, DlinkInData, ExternalData, GameData}
 import se.gigurra.leavu3.gfx.{RichGlyphLayout, Font}
 import se.gigurra.leavu3.math.Matrix4Stack
 
@@ -22,14 +23,22 @@ case class Mfd() {
   })
   font.setColor(RED)
 
-  def update(): Unit = frame {
+  def update(game: GameData, dlinkIn: DlinkInData, dlinkOut: DlinkOutData): Unit = frame {
 
-    val text = "Hello World"
+    val text =
+      s"""
+         |Heading: ${game.flightModel.trueHeading.toDegrees}
+         |Velocity: ${game.flightModel.velocity}""".stripMargin
 
-    transform(_.scalexy(1.0f / font.widthOf(text))) {
-
-      font.draw(batch, text, 0, 0)
+    transform(_.scalexy(1.0f / text.width)) {
+      text.draw()
     }
+  }
+
+  implicit class DrawableString(text: String) {
+    def draw(wOffs: Float = 0.5f, hOffs: Float = 0.5f): Unit = font.draw(batch, text, width * (wOffs - 1.0f), height * hOffs)
+    def width: Float = font.widthOf(text)
+    def height: Float = font.heightOf(text)
   }
 
   def frame(f: => Unit): Unit = {

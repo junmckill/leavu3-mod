@@ -32,16 +32,16 @@ object GameData extends Schema[GameData] {
   val requestId = optional[String]("requestId")
 
   // Actual game data
-  val rwr             = optional[Rwr]("rwr")
-  val counterMeasures = optional[CounterMeasures]("counterMeasures")
-  val payload         = optional[Payload]("payload")
-  val flightModel     = optional[FlightModel]("flightModel")
-  val sensors         = optional[Sensors]("sensor")
-  val aiWingmenTgts   = optional[Seq[Vector3]]("wingTargets")
-  val indicators      = optional[Indicators]("indicators")
-  val aiWingmen       = optional[Seq[Option[AiWingman]]]("wingMen")
-  val route           = optional[Route]("route")
-  val metadata        = optional[MetaData]("metaData")
+  val rwr             = required[Rwr]("rwr", default = Rwr())
+  val counterMeasures = required[CounterMeasures]("counterMeasures", default = CounterMeasures())
+  val payload         = required[Payload]("payload", default = Payload())
+  val flightModel     = required[FlightModel]("flightModel", default = FlightModel())
+  val sensors         = required[Sensors]("sensor", default = Sensors())
+  val aiWingmenTgts   = required[Seq[Vector3]]("wingTargets", default = Seq.empty)
+  val indicators      = required[Indicators]("indicators", default = Indicators())
+  val aiWingmen       = required[Seq[Option[AiWingman]]]("wingMen", default = Seq.empty)
+  val route           = required[Route]("route", default = Route())
+  val metadata        = required[MetaData]("metaData", default = MetaData())
 
 
   ///////////////////////////////////////////////////////////////

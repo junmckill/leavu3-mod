@@ -7,7 +7,7 @@
   "forceExit"     : true,
   "vSyncEnabled"  : true,
   "foregroundFPS" : 30,
-  "backgroundFPS" : 5,
+  "backgroundFPS" : 30,
   "gameDataFps"   : 40,
   "dlinkInFps"    : 5,
   "dlinkOutFps"   : 5,

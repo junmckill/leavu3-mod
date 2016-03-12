@@ -1,6 +1,7 @@
 package se.gigurra.leavu3
 
 import com.badlogic.gdx.ApplicationListener
+import se.gigurra.leavu3.externaldata.ExternalData
 import se.gigurra.leavu3.mfd.Mfd
 
 case class GdxAppListener(initialConfiguration: Configuration) extends ApplicationListener {
@@ -17,7 +18,7 @@ case class GdxAppListener(initialConfiguration: Configuration) extends Applicati
   }
 
   override def render(): Unit = {
-    mfd.update()
+    mfd.update(ExternalData.gameData, ExternalData.dlinkIn, ExternalData.dlinkOut)
   }
 
   override def resume(): Unit = {
