@@ -3,10 +3,23 @@ package se.gigurra.leavu3
 import com.badlogic.gdx.ApplicationListener
 import se.gigurra.leavu3.externaldata.ExternalData
 import se.gigurra.leavu3.mfd.Mfd
+import se.gigurra.serviceutils.twitter.logging.Logging
 
-case class GdxAppListener(initialConfiguration: Configuration) extends ApplicationListener {
+import scala.util.{Failure, Success, Try}
 
-  lazy val mfd = new Mfd()
+case class GdxAppListener(initialConfiguration: Configuration) extends ApplicationListener with Logging{
+
+  val instrumentClassName = initialConfiguration.instrument
+  val instrumentClass: Class[Instrument] =
+    Try(Class.forName(instrumentClassName)) match {
+      case Success(cls) =>
+        cls.asInstanceOf[Class[Instrument]]
+      case Failure(e) =>
+        logger.error(s"Could not find instrument $instrumentClassName - Check your spelling")
+        throw e
+    }
+  logger.info(s"Creating instrument: $instrumentClass")
+  lazy val instrument = instrumentClass.newInstance()
 
   override def resize(width: Int, height: Int): Unit = {
   }
@@ -18,7 +31,7 @@ case class GdxAppListener(initialConfiguration: Configuration) extends Applicati
   }
 
   override def render(): Unit = {
-    mfd.update(ExternalData.gameData, ExternalData.dlinkIn, ExternalData.dlinkOut)
+    instrument.update(ExternalData.gameData, ExternalData.dlinkIn, ExternalData.dlinkOut)
   }
 
   override def resume(): Unit = {

@@ -1,38 +1,30 @@
 package se.gigurra.leavu3.mfd
 
-import se.gigurra.leavu3.externaldata.{DlinkInData, DlinkOutData, GameData, Vec2}
+import se.gigurra.leavu3.Instrument
+import se.gigurra.leavu3.externaldata.{DlinkInData, DlinkOutData, GameData}
 import se.gigurra.leavu3.gfx.RenderContext._
 import scala.language.postfixOps
 
-case class Mfd() {
+case class Mfd() extends Instrument {
+  var qPages = Map[Int, Page](0 -> Pages.hsd, 1 -> Pages.rwr, 2-> Pages.sms)
+  var iQPage = 0
+  var mainMenuOpen: Boolean = false
+
+  def currentPage: Option[Page] = qPages.get(iQPage)
+
+  def updatePage(game: GameData, dlinkIn: DlinkInData, dlinkOut: DlinkOutData): Unit = {
+    currentPage.foreach(_.update(game, dlinkIn, dlinkOut))
+  }
+
+  def drawMainMenuIfOpen(): Unit = {
+    if (mainMenuOpen) {
+      // TODO: Draw something
+    }
+  }
 
   def update(game: GameData, dlinkIn: DlinkInData, dlinkOut: DlinkOutData): Unit = frame {
-
-
-    ppi_viewport(viewportSize = 20 nmi, heading = self.heading) {
-
-      // Draw myself in the center
-      circle(radius = 0.05 nmi, color = WHITE, typ = FILL)
-
-      // Draw every ai wingman
-      game.aiWingmen foreach { wingman =>
-        circle(at = wingman.position - self.position, radius = 0.1 nmi, color = CYAN)
-      }
-    }
-
-    batched {
-      val text =
-        s"""
-           |Heading: ${self.heading}
-           |Velocity: ${self.velocity}
-           |nwps: ${game.route.waypoints.size}""".stripMargin
-
-      transform(_.scalexy(1.5f / text.width)) {
-        text.draw()
-      }
-    }
-
-
+    updatePage(game, dlinkIn, dlinkOut)
+    drawMainMenuIfOpen()
   }
 
 }
