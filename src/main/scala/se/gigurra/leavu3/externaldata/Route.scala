@@ -6,6 +6,8 @@ import se.gigurra.heisenberg.{Schema, Parsed}
 case class Route(source: SourceData = Map.empty) extends Parsed[Route.type] {
   val waypoints       = parse(schema.waypoints)
   val currentWaypoint = parse(schema.currentWaypoint)
+
+  def withWaypoints(wps: Seq[Waypoint]) = marshal(this, schema.waypoints -> wps)
 }
 
 object Route extends Schema[Route] {

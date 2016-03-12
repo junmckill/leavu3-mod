@@ -50,11 +50,13 @@ case class HsdPage(config: Configuration) extends Page {
 
   def drawSelf(game: GameData): Unit = {
     transform(_.rotate(-self.heading)) {
-      lines(shapes.self.coords * symbolScale, color = LIGHT_GRAY)
+      lines(shapes.self.coords * symbolScale, LIGHT_GRAY)
     }
   }
 
   def drawWaypoints(game: GameData): Unit = {
+    val current = game.route.currentWaypoint
+    val all = (Seq(game.route.currentWaypoint) ++ game.route.waypoints).sortBy(_.index)
   }
 
   def drawAiWingmen(game: GameData): Unit = {

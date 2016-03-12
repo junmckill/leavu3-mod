@@ -7,9 +7,9 @@ case class Waypoint(source: SourceData = Map.empty) extends Parsed[Waypoint.type
   val position      = parse(schema.position)
   val estimatedTime = parse(schema.estimatedTime)
   val speedReq      = parse(schema.speedReq)
-  val nextPointNum  = parse(schema.nextPointNum)
   val pointAction   = parse(schema.pointAction)
-  val thisPointNum  = parse(schema.thisPointNum)
+  val index         = parse(schema.thisPointNum)
+  val next          = parse(schema.nextPointNum)
 }
 
 object Waypoint extends Schema[Waypoint] {
