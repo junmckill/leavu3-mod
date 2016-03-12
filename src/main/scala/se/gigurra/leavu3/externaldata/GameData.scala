@@ -48,7 +48,7 @@ object GameData extends Schema[GameData] with Logging {
   val payload         = required[Payload]("payload", default = Payload())
   val flightModel     = required[FlightModel]("flightModel", default = FlightModel())
   val sensors         = required[Sensors]("sensor", default = Sensors())
-  val aiWingmenTgts   = required[Seq[Vector3]]("wingTargets", default = Seq.empty)
+  val aiWingmenTgts   = required[Seq[Vec3]]("wingTargets", default = Seq.empty)
   val indicators      = required[Indicators]("indicators", default = Indicators())
   val aiWingmen       = required[Seq[Option[AiWingman]]]("wingMen", default = Seq.empty)
   val route           = required[Route]("route", default = Route())

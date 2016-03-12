@@ -71,8 +71,8 @@ trait RenderHelpers extends UnitConversions { _: RenderContext.type =>
     }
   }
 
-  def circle(at: Vector2,
-             radius: Float,
+  def circle(radius: Float,
+             at: Vector2 = Vector2.Zero,
              steps: Int = 50,
              typ: ShapeRenderer.ShapeType = LINE,
              color: Color = null): Unit = {

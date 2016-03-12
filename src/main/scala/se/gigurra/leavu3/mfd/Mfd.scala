@@ -1,7 +1,6 @@
 package se.gigurra.leavu3.mfd
 
-import com.badlogic.gdx.math.{Vector2, Vector3}
-import se.gigurra.leavu3.externaldata.{Vec2, DlinkInData, DlinkOutData, GameData}
+import se.gigurra.leavu3.externaldata.{DlinkInData, DlinkOutData, GameData, Vec2}
 import se.gigurra.leavu3.gfx.RenderContext._
 
 case class Mfd() {
@@ -21,22 +20,21 @@ case class Mfd() {
 
     ppi_viewport(viewportSize = 20.0f, heading = self.heading) {
 
-        batched {
+      batched {
 
         val ul: Vec2 = (-5.0,  5.0)
         val ur: Vec2 = ( 5.0,  5.0)
         val ll: Vec2 = (-5.0, -5.0)
         val lr: Vec2 = ( 5.0, -5.0)
 
-        circle(at = Vec2(), radius = 10f, color = WHITE)
-        circle(at = Vec2(), radius = 5f, typ = FILL)
-        circle(at = Vec2(), radius = 2.5f, typ = FILL, color = BLACK)
+        circle(radius = 10f, color = WHITE)
+        circle(radius = 5f, typ = FILL)
+        circle(radius = 2.5f, typ = FILL, color = BLACK)
         lines(Seq(ul -> ur, ll -> lr), color = GREEN)
 
       }
 
     }
-
 
     batched {
       val text =
@@ -45,7 +43,7 @@ case class Mfd() {
            |Velocity: ${self.velocity}
            |nwps: ${game.route.waypoints.size}""".stripMargin
 
-      transform(_.scalexy(1.0f / text.width)) {
+      transform(_.scalexy(1.5f / text.width)) {
         text.draw()
       }
     }
