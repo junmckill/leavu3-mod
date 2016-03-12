@@ -11,12 +11,12 @@ import scala.language.postfixOps
 case class HsdPage() extends Page {
 
   val scale = CircleBuffer(10 nmi, 20 nmi, 40 nmi, 80 nmi, 160 nmi).withDefaultValue(40 nmi)
-  val deprFactor = CircleBuffer(0.0, 0.25).withDefaultValue(0.25)
+  val deprFactor = CircleBuffer(0.0, 0.5).withDefaultValue(0.5)
 
-  def standardObjectRadius = 0.025 * toScreenCoords
+  def standardObjectRadius = 0.025 * screen2World
 
   def update(game: GameData, dlinkIn: DlinkInData, dlinkOut: DlinkOutData): Unit = {
-    ppi_viewport(viewportSize = scale, offs = Vec2(0.0, -scale * deprFactor), heading = self.heading) {
+    ppi_viewport(viewportSize = scale * 2.0, offs = Vec2(0.0, -scale * deprFactor), heading = self.heading) {
       drawSelf(game)
       drawHsi(game)
       drawWaypoints(game)
@@ -28,8 +28,13 @@ case class HsdPage() extends Page {
     drawMenuItems(game)
   }
 
-
   def drawHsi(game: GameData): Unit = {
+    circle(radius = scale * 0.50, color = LIGHT_GRAY, typ = LINE)
+    circle(radius = scale * 1.00, color = LIGHT_GRAY, typ = LINE)
+    circle(radius = scale * 1.50, color = LIGHT_GRAY, typ = LINE)
+    lines(shapes.hsi.flag.coords * screen2World + Vec2(0.0, scale * 0.50))
+    lines(shapes.hsi.flag.coords * screen2World + Vec2(0.0, scale * 1.00))
+    lines(shapes.hsi.flag.coords * screen2World + Vec2(0.0, scale * 1.50))
   }
 
   def drawSelf(game: GameData): Unit = {

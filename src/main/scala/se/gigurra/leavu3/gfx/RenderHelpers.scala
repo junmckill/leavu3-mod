@@ -92,7 +92,7 @@ trait RenderHelpers extends UnitConversions { _: RenderContext.type =>
     }
   }
 
-  def toScreenCoords: Float = {
+  def screen2World: Float = {
     1.0f / transform.current.getScaleX
   }
 
