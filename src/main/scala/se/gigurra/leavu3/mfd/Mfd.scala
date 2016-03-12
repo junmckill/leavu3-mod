@@ -2,38 +2,22 @@ package se.gigurra.leavu3.mfd
 
 import se.gigurra.leavu3.externaldata.{DlinkInData, DlinkOutData, GameData, Vec2}
 import se.gigurra.leavu3.gfx.RenderContext._
+import scala.language.postfixOps
 
 case class Mfd() {
 
   def update(game: GameData, dlinkIn: DlinkInData, dlinkOut: DlinkOutData): Unit = frame {
 
 
-    val p = self.position : Vec2
+    ppi_viewport(viewportSize = 20 nmi, heading = self.heading) {
 
-    ppi_viewport(viewportSize = 20.0f, heading = self.heading) {
+      // Draw myself in the center
+      circle(radius = 0.25 nmi, color = WHITE, typ = FILL)
 
-
-      game.aiWingmen.headOption foreach { wingman =>
-        println(wingman)
+      // Draw every ai wingman
+      game.aiWingmen foreach { wingman =>
+        circle(at = wingman.position - self.position, radius = 0.2 nmi, color = CYAN)
       }
-    }
-
-    ppi_viewport(viewportSize = 20.0f, heading = self.heading) {
-
-      batched {
-
-        val ul: Vec2 = (-5.0,  5.0)
-        val ur: Vec2 = ( 5.0,  5.0)
-        val ll: Vec2 = (-5.0, -5.0)
-        val lr: Vec2 = ( 5.0, -5.0)
-
-        circle(radius = 10f, color = WHITE)
-        circle(radius = 5f, typ = FILL)
-        circle(radius = 2.5f, typ = FILL, color = BLACK)
-        lines(Seq(ul -> ur, ll -> lr), color = GREEN)
-
-      }
-
     }
 
     batched {

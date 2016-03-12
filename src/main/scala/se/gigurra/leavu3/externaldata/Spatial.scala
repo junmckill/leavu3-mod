@@ -4,9 +4,9 @@ import se.gigurra.heisenberg.MapData._
 import se.gigurra.heisenberg.{Schema, Parsed}
 
 case class Spatial(source: SourceData = Map.empty) extends Parsed[Spatial.type] {
-  val x        = parse(schema.x)
-  val y        = parse(schema.y)
-  val z        = parse(schema.z)
+  val rwing    = parse(schema.x)
+  val nose     = parse(schema.y)
+  val up       = parse(schema.z)
   val position = parse(schema.position)
 }
 

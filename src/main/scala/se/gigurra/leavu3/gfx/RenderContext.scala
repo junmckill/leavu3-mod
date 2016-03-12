@@ -21,8 +21,8 @@ object RenderContext
     batch.setTransformMatrix(t)
     shapeRenderer.setTransformMatrix(t)
   })
-  val viewportGeoScaleStack = mutable.Stack[Float](1.0f)
+  val viewportGeoScaleStack = mutable.Stack[Double](1.0f)
   font.setColor(RED)
 
-  def viewportGeoScale: Float = viewportGeoScaleStack.head
+  def viewportGeoScale: Double = viewportGeoScaleStack.head
 }

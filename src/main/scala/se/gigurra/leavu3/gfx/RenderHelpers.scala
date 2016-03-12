@@ -53,9 +53,15 @@ trait RenderHelpers extends UnitConversions { _: RenderContext.type =>
     shapeRenderer.setProjectionMatrix(camera.combined)
   }
 
-  def ppi_viewport(viewportSize: Float, heading: Float = 0.0f)(f: => Unit) {
-    transform(_.scalexy(1.0f / viewportSize).rotate(-heading)) {
+  def ppi_viewport(viewportSize: Double, heading: Float = 0.0f, offs: Vector2 = Vector2.Zero)(f: => Unit) {
+    transform(_
+      .translate(offs.x, offs.y, 0.0f)
+      .scalexy(1.0f / viewportSize.toFloat)
+      .rotate(heading)
+    ) {
+      viewportGeoScaleStack.push(viewportSize)
       f
+      viewportGeoScaleStack.pop()
     }
   }
 
@@ -71,13 +77,13 @@ trait RenderHelpers extends UnitConversions { _: RenderContext.type =>
     }
   }
 
-  def circle(radius: Float,
+  def circle(radius: Number,
              at: Vector2 = Vector2.Zero,
              steps: Int = 50,
              typ: ShapeRenderer.ShapeType = LINE,
              color: Color = null): Unit = {
     shape(typ, color) {
-      shapeRenderer.circle(at.x, at.y, radius, steps)
+      shapeRenderer.circle(at.x, at.y, radius.floatValue, steps)
     }
   }
 

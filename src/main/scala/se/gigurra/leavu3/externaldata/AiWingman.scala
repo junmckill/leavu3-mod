@@ -7,9 +7,11 @@ case class AiWingman(source: SourceData) extends Parsed[AiWingman.type] {
   val orderedTask     = parse(schema.orderedTask)
   val currentTarget   = parse(schema.currentTarget)
   val currentTask     = parse(schema.currentTask)
-  val position        = parse(schema.wingmenPosition)
+  val spatial         = parse(schema.wingmenPosition)
   val id              = parse(schema.wingmenId)
   val orderedTarget   = parse(schema.orderedTarget)
+
+  def position = spatial.position
 }
 
 object AiWingman extends Schema[AiWingman] {
