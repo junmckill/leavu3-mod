@@ -174,28 +174,50 @@ case class HsdPage(implicit config: Configuration) extends Page {
 
   def drawDlinkMembers(dlinkIn: Map[String, DlinkData]): Unit = {
 
-    val membersOfInterest = dlinkIn.filter(m => m._2.data.planeId != self.planeId || m._1 != self.dlinkCallsign)
+    val dlinksOfInterest = dlinkIn.filter(m => m._2.data.planeId != self.planeId || m._1 != self.dlinkCallsign)
+    val targetsToDraw = new mutable.HashMap[Int, (DlinkData, Target)]
 
-    for ((name, member) <- membersOfInterest) {
+    for ((name, member) <- dlinksOfInterest) {
 
       val lag = CurTime.seconds - member.timestamp
-      val position = member.position + member.velocity * lag
+      val memberPosition = member.position + member.velocity * lag
       val radius = 0.015 * symbolScale
 
-      at(position, member.heading) {
+      at(memberPosition, member.heading) {
         circle(radius = radius, typ = FILL, color = CYAN)
         lines(Seq(Vec2(0.0, radius) -> Vec2(0.0, radius * 3)))
       }
 
       batched {
-        at(position) {
-          val altText = (position.z * m_to_kft).round.toString
+        at(memberPosition) {
+          val altText = (memberPosition.z * m_to_kft).round.toString
           altText.drawPpiLeftOf(color = CYAN)
           val nameText = name.take(2)
           nameText.drawPpiRightOf(scale = 0.5f, color = CYAN)
         }
       }
+
+      for (target <- member.targets) {
+
+        val targetPosition = target.position + target.velocity * lag
+
+        if (target.isPositionKnown) at(targetPosition, heading = target.heading) {
+          circle(radius = radius, typ = FILL, color = contactColor(target, fromDatalink = true))
+          lines(Seq(Vec2(0.0, radius) -> Vec2(0.0, radius * 3)))
+          batched {
+            val altText = (targetPosition.z * m_to_kft).round.toString
+            altText.drawPpiLeftOf(color = RED)
+            val nameText = name.take(2)
+            nameText.drawPpiCentered(scale = 0.35f, color = BLACK)
+          }
+        } else at(memberPosition) {
+          val b = targetPosition - member.position: Vec2
+          lines(Seq(Vec2() -> b) * 10000.0, RED)
+        }
+      }
+
     }
+
   }
 
   def contactColor(contact: Contact, fromDatalink: Boolean): Color = {
@@ -239,12 +261,9 @@ case class HsdPage(implicit config: Configuration) extends Page {
       .sortBy(_.index)
 
     for (contact <- positionsDesignated) {
-
-      at(contact.position) {
+      at(contact.position, heading = contact.heading) {
         circle(radius = radius, typ = FILL, color = contactColor(contact, fromDatalink = false))
-        rotatedTo(contact.heading) {
-          lines(Seq(Vec2(0.0, radius) -> Vec2(0.0, radius * 3)))
-        }
+        lines(Seq(Vec2(0.0, radius) -> Vec2(0.0, radius * 3)))
       }
     }
 
@@ -302,9 +321,6 @@ case class HsdPage(implicit config: Configuration) extends Page {
       }
     }*/
   }
-
-
-
 
   def drawBullsEyeNumbers(game: GameData) = {
 
