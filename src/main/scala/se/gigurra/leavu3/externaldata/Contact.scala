@@ -1,7 +1,16 @@
 package se.gigurra.leavu3.externaldata
 
+import java.time.Instant
+
 import se.gigurra.heisenberg.MapData._
 import se.gigurra.heisenberg.{Schema, Parsed}
+import RadarFlags._
+
+object RadarFlags {
+  val RADAR = 0x0002
+  val EOS   = 0x0004
+
+}
 
 case class Contact(source: SourceData) extends Parsed[Contact.type] {
   val id                     = parse(schema.id)
@@ -23,6 +32,13 @@ case class Contact(source: SourceData) extends Parsed[Contact.type] {
   val typ                    = parse(schema.typ)
   val velocity               = parse(schema.velocity)
   val distance               = parse(schema.distance)
+
+
+  val timestamp              = parse(schema.timestamp)
+  def ageSeconds             = Instant.now.toEpochMilli.toDouble / 1000.0 - timestamp
+
+ // def isDesignated           =
+ // def positionKnown          =
 }
 
 object Contact extends Schema[Contact] {
@@ -45,4 +61,5 @@ object Contact extends Schema[Contact] {
   val typ                    = required[UnitType]("type")
   val velocity               = required[Vec3]("velocity")
   val distance               = required[Float]("distance")
+  val timestamp              = required[Double]("timestamp", default = Instant.now.toEpochMilli.toDouble / 1000.0)
 }

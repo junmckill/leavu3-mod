@@ -25,6 +25,7 @@ object RenderContext
   font.setColor(RED)
 
   def symbolScale(implicit config: Configuration) = config.symbolScale * screen2World
+  def symbolScaleF(implicit config: Configuration) = symbolScale.toFloat
 
 
 }

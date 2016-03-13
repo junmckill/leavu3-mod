@@ -27,25 +27,25 @@ trait GdxImplicits { _: RenderContext.type =>
     }
     def drawRightOf(color: Color = null)(implicit configuration: Configuration): Unit = {
       transform(_
-        .scalexy(0.05f * symbolScale.toFloat / font.size)
+        .scalexy(0.05f * symbolScaleF / font.size)
         .rotate(-self.heading)) {
-        draw(xAlign = 0.5f, xRawOffs = 0.025f * screen2World, color = color)
+        draw(xAlign = 0.5f, xRawOffs = 0.025f * symbolScaleF, color = color)
       }
     }
 
     def drawLeftOf(color: Color = null)(implicit configuration: Configuration): Unit = {
       transform(_
-        .scalexy(0.05f * symbolScale.toFloat / font.size)
+        .scalexy(0.05f * symbolScaleF / font.size)
         .rotate(-self.heading)) {
-        draw(xAlign = -0.5f, xRawOffs = -0.025f * screen2World, color = color)
+        draw(xAlign = -0.5f, xRawOffs = -0.025f * symbolScaleF, color = color)
       }
     }
 
     def drawBelow(color: Color = null)(implicit configuration: Configuration): Unit = {
       transform(_
-        .scalexy(0.05f * symbolScale.toFloat / font.size)
+        .scalexy(0.05f * symbolScaleF / font.size)
         .rotate(-self.heading)) {
-        draw(yAlign = -0.5f, yRawOffs = -0.025f * screen2World, color = color)
+        draw(yAlign = -0.5f, yRawOffs = -0.025f * symbolScaleF, color = color)
       }
     }
 
