@@ -242,7 +242,6 @@ case class HsdPage(implicit config: Configuration) extends Page {
 
   def drawTdc(game: GameData): Unit = {
 
-
     val tdc = game.sensors.status.tdc
     val dist = (tdc.y + 1.0) * game.sensors.status.scale.distance * 0.5
     val halfWidth = game.sensors.status.scale.azimuth
@@ -251,12 +250,14 @@ case class HsdPage(implicit config: Configuration) extends Page {
     val x = dist * math.sin(angle.toRadians)
     val offset = Vec2(x,y)
 
-    val radius = 0.020 * symbolScale
-
-    at(self.position + offset) {
-      circle(radius = radius, typ = FILL, color = GREEN)
+    at(self.position + offset, self.heading) {
+      val hw = 0.02
+      val hh = hw
+      lines(Seq(
+        Vec2(-hw, -hh) -> Vec2(-hw, hh),
+        Vec2( hw, -hh) -> Vec2( hw, hh)
+      ) * symbolScale, WHITE)
     }
-
   }
 
   def drawMenuItems(game: GameData): Unit = {
