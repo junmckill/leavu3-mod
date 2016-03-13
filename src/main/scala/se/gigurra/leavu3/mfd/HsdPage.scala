@@ -212,7 +212,7 @@ case class HsdPage(implicit config: Configuration) extends Page {
           }
         } else at(memberPosition) {
           val b = targetPosition - member.position: Vec2
-          lines(Seq(Vec2() -> b) * 10000.0, RED)
+          lines(Seq(Vec2() -> b) * 10000.0, contactColor(target, fromDatalink = true))
         }
       }
 
