@@ -90,7 +90,7 @@ case class HsdPage(implicit config: Configuration) extends Page {
       for (wp <- game.route.waypoints) {
         val text = if (wp.index > 0) (wp.index - 1).toString else "x"
         at(wp.position) {
-          text.drawRightOf(WHITE)
+          text.drawRightOf(scale = 0.75f, color = WHITE)
         }
       }
     }
@@ -119,8 +119,10 @@ case class HsdPage(implicit config: Configuration) extends Page {
     batched {
       for (wingman <- game.aiWingmen) {
         at(wingman.position) {
-          val text = (wingman.position.z * m_to_kft).round.toString
-          text.drawLeftOf(color = CYAN)
+          val altText = (wingman.position.z * m_to_kft).round.toString
+          altText.drawLeftOf(color = CYAN)
+          val nameText = "AI"
+          nameText.drawRightOf(scale = 0.5f, color = CYAN)
         }
       }
     }

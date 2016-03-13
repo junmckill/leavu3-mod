@@ -38,7 +38,7 @@ trait GdxImplicits { _: RenderContext.type =>
       transform(_
         .scalexy(scale * 0.05f * symbolScaleF / font.size)
         .rotate(-self.heading)) {
-        draw(xAlign = 0.5f, xRawOffs = 0.025f * symbolScaleF, color = color)
+        draw(xAlign = 0.5f, yAlign = -0.1f, xRawOffs = 0.025f * symbolScaleF, color = color)
       }
     }
 
@@ -46,7 +46,7 @@ trait GdxImplicits { _: RenderContext.type =>
       transform(_
         .scalexy(scale * 0.05f * symbolScaleF / font.size)
         .rotate(-self.heading)) {
-        draw(xAlign = -0.5f, xRawOffs = -0.025f * symbolScaleF, color = color)
+        draw(xAlign = -0.5f, yAlign = -0.1f, xRawOffs = -0.025f * symbolScaleF, color = color)
       }
     }
 
