@@ -38,7 +38,7 @@ object Configuration extends Schema[Configuration] with Logging {
   val x                 = required[Int]     ("x",                 default = 200)
   val y                 = required[Int]     ("y",                 default = 200)
   val width             = required[Int]     ("width",             default = 1024)
-  val height            = required[Int]     ("height",            default = 768)
+  val height            = required[Int]     ("height",            default = 1024)
   val forceExit         = required[Boolean] ("forceExit",         default = false)
   val vSyncEnabled      = required[Boolean] ("vSyncEnabled",      default = true)
   val foregroundFPS     = required[Int]     ("foregroundFPS",     default = 30)
