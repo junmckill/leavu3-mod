@@ -4,7 +4,7 @@ import java.time.Instant
 
 import se.gigurra.heisenberg.MapData._
 import se.gigurra.heisenberg.{Parsed, Schema}
-import se.gigurra.leavu3.util.{RestClient, SimpleTimer}
+import se.gigurra.leavu3.util.{CurTime, RestClient, SimpleTimer}
 import se.gigurra.serviceutils.json.JSON
 import se.gigurra.serviceutils.twitter.logging.Logging
 import se.gigurra.serviceutils.twitter.service.ServiceException
@@ -43,8 +43,8 @@ case class GameData(source: SourceData) extends Parsed[GameData.type] {
 
   def withRoute(newRoute: Route) = marshal(this, schema.route -> newRoute)
 
-  val timeStamp: Double = Instant.now.toEpochMilli.toDouble / 1000.0
-  def age: Double = Instant.now.toEpochMilli.toDouble / 1000.0 - timeStamp
+  val timeStamp: Double = CurTime.seconds
+  def age: Double = CurTime.seconds - timeStamp
 }
 
 object GameData extends Schema[GameData] with Logging {

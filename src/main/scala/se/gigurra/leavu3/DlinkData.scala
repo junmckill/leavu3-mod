@@ -1,11 +1,13 @@
 package se.gigurra.leavu3
 
-
 import java.time.Instant
 
 import se.gigurra.heisenberg.MapData._
-import se.gigurra.heisenberg.{Schema, Parsed}
-import se.gigurra.leavu3.externaldata.{Vec3, Target, SelfData, Version}
+import se.gigurra.heisenberg.{Parsed, Schema}
+import se.gigurra.leavu3.externaldata.{SelfData, Target, Vec3}
+import se.gigurra.leavu3.util.CurTime
+
+import scala.language.implicitConversions
 
 case class Member(source: SourceData = Map.empty) extends Parsed[Member.type] {
   val planeId   = parse(schema.planeId)
@@ -35,7 +37,9 @@ case class DlinkData(source: SourceData = Map.empty) extends Parsed[DlinkData.ty
 }
 
 object DlinkData extends Schema[DlinkData] {
-  val timestamp = required[Double]("timestamp", default = Instant.now.toEpochMilli.toDouble / 1000.0)
+  val timestamp = required[Double]("timestamp", default = CurTime.seconds)
   val age       = required[Double]("age", default = 0.0)
   val data      = required[Member]("data", default = Member())
+
+  implicit def toMember(d: DlinkData): Member = d.data
 }

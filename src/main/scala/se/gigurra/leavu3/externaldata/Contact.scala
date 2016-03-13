@@ -4,6 +4,7 @@ import java.time.Instant
 
 import se.gigurra.heisenberg.MapData._
 import se.gigurra.heisenberg.{Schema, Parsed}
+import se.gigurra.leavu3.util.CurTime
 
 object SensorFlags {
   val RADAR_VIEW   = 0x0002
@@ -52,7 +53,7 @@ case class Contact(source: SourceData) extends Parsed[Contact.type] {
 
 
   val timestamp              = parse(schema.timestamp)
-  def ageSeconds             = Instant.now.toEpochMilli.toDouble / 1000.0 - timestamp
+  def ageSeconds             = CurTime.seconds - timestamp
 
   def position               = spatial.position
   def pitch                  = spatial.pitch
@@ -84,5 +85,5 @@ object Contact extends Schema[Contact] {
   val typ                    = required[UnitType]("type")
   val velocity               = required[Vec3]("velocity")
   val distance               = required[Float]("distance")
-  val timestamp              = required[Double]("timestamp", default = Instant.now.toEpochMilli.toDouble / 1000.0)
+  val timestamp              = required[Double]("timestamp", default = CurTime.seconds)
 }

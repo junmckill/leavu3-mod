@@ -5,7 +5,7 @@ import java.time.Instant
 import com.badlogic.gdx.graphics.Color
 import se.gigurra.leavu3.externaldata._
 import se.gigurra.leavu3.gfx.RenderContext._
-import se.gigurra.leavu3.util.CircleBuffer
+import se.gigurra.leavu3.util.{CurTime, CircleBuffer}
 import se.gigurra.leavu3.{Configuration, DlinkData}
 
 import scala.collection.mutable
@@ -174,12 +174,11 @@ case class HsdPage(implicit config: Configuration) extends Page {
 
   def drawDlinkMembers(dlinkIn: Map[String, DlinkData]): Unit = {
 
-    for ((name, dlData) <- dlinkIn
-      .filter(m => m._2.data.planeId != self.planeId || m._1 != self.dlinkCallsign)) {
+    val membersOfInterest = dlinkIn.filter(m => m._2.data.planeId != self.planeId || m._1 != self.dlinkCallsign)
 
-      val member = dlData.data
+    for ((name, member) <- membersOfInterest) {
 
-      val lag = Instant.now.toEpochMilli.toDouble / 1000.0 - dlData.timestamp
+      val lag = CurTime.seconds - member.timestamp
       val position = member.position + member.velocity * lag
       val radius = 0.015 * symbolScale
 
