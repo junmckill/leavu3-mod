@@ -20,13 +20,17 @@ case class Configuration(source: SourceData = Map.empty) extends Parsed[Configur
   val foregroundFPS     = parse(schema.foregroundFPS)
   val backgroundFPS     = parse(schema.backgroundFPS)
   val gameDataFps       = parse(schema.gameDataFps)
-  val dlinkInFps        = parse(schema.dlinkInFps)
-  val dlinkOutFps       = parse(schema.dlinkOutFps)
   val dcsRemoteAddress  = parse(schema.dcsRemoteAddress)
   val dcsRemotePort     = parse(schema.dcsRemotePort)
   val aaSamples         = parse(schema.aaSamples)
   val instrument        = parse(schema.instrument)
   val symbolScale       = parse(schema.symbolScale)
+  val dlinkInFps        = parse(schema.dlinkInFps)
+  val dlinkOutFps       = parse(schema.dlinkOutFps)
+  val dlinkHost         = parse(schema.dlinkHost)
+  val dlinkPort         = parse(schema.dlinkPort)
+  val dlinkTeam         = parse(schema.dlinkTeam)
+  val dlinkCallsign     = parse(schema.dlinkCallsign)
 }
 
 object Configuration extends Schema[Configuration] with Logging {
@@ -40,13 +44,17 @@ object Configuration extends Schema[Configuration] with Logging {
   val foregroundFPS     = required[Int]     ("foregroundFPS",     default = 30)
   val backgroundFPS     = required[Int]     ("backgroundFPS",     default = 5)
   val gameDataFps       = required[Int]     ("gameDataFps",       default = 40)
-  val dlinkInFps        = required[Int]     ("dlinkInFps",        default = 5)
-  val dlinkOutFps       = required[Int]     ("dlinkOutFps",       default = 5)
   val dcsRemoteAddress  = required[String]  ("dcsRemoteAddress",  default = "127.0.0.1")
   val dcsRemotePort     = required[Int]     ("dcsRemotePort",     default = 12340)
   val aaSamples         = required[Int]     ("aaSamples",         default = 4)
   val instrument        = required[String]  ("instrument",        default = "se.gigurra.leavu3.mfd.Mfd")
   val symbolScale       = required[Double]  ("symbolScale",       default = 1.0)
+  val dlinkInFps        = required[Int]     ("dlinkInFps",        default = 5)
+  val dlinkOutFps       = required[Int]     ("dlinkOutFps",       default = 5)
+  val dlinkHost         = required[String]  ("dlinkHost",         default = "build.culvertsoft.se")
+  val dlinkPort         = required[Int]     ("dlinkPort",         default = 11337)
+  val dlinkTeam         = required[String]  ("dlinkTeam",         default = "BLUE_RABBIT")
+  val dlinkCallsign     = required[String]  ("dlinkCallsign",     default = "JarJar")
 
 
   def readFromFile(s: String = "leavu3-cfg.json"): Configuration = {

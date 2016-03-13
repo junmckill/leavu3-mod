@@ -9,11 +9,15 @@
   "foregroundFPS"    : 30,
   "backgroundFPS"    : 30,
   "gameDataFps"      : 40,
-  "dlinkInFps"       : 5,
-  "dlinkOutFps"      : 5,
   "dcsRemoteAddress" : "127.0.0.1",
   "dcsRemotePort"    : 12340,
   "aaSamples"        : 4,
   "instrument"       : "se.gigurra.leavu3.mfd.Mfd",
-  "symbolScale"      : 1.0
+  "symbolScale"      : 1.0,
+  "dlinkInFps"       : 5,
+  "dlinkOutFps"      : 5,
+  "dlinkHost"        : "build.culvertsoft.se",
+  "dlinkPort"        : 11337,
+  "dlinkTeam"        : "BLUE_RABBITS",
+  "dlinkCallsign"    : "JarJar"
 }
