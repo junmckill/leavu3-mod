@@ -84,6 +84,17 @@ trait RenderHelpers extends UnitConversions { _: RenderContext.type =>
     }
   }
 
+  def arc(radius: Number,
+          angle: Number,
+          at: Vector2 = Vector2.Zero,
+          steps: Int = 50,
+          direction: Number = 0.0f,
+          color: Color = null): Unit = {
+    shape(LINE, color) {
+      shapeRenderer.arc(at.x, at.y, radius.floatValue, -angle.floatValue/2.0f + 90.0f - direction.floatValue, angle.floatValue, steps)
+    }
+  }
+
   def lines(dashes: Seq[(Vector2, Vector2)], color: Color = null): Unit = {
     shape(LINE, color) {
       for ((p1, p2) <- dashes) {

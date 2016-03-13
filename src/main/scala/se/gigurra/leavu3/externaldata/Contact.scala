@@ -4,18 +4,35 @@ import java.time.Instant
 
 import se.gigurra.heisenberg.MapData._
 import se.gigurra.heisenberg.{Schema, Parsed}
-import RadarFlags._
 
-object RadarFlags {
-  val RADAR = 0x0002
-  val EOS   = 0x0004
+object SensorFlags {
+  val RADAR_VIEW   = 0x0002
+  val EOS_VIEW     = 0x0004
+  val RADAR_BUG    = 0x0008
+  val EOS_BUG      = 0x0010
+  val RADAR_TWS    = 0x0020
+  val EOS_TWS      = 0x0040
+  val HUMAN_PLANE  = 0x0200
+  val EASY_LOCK    = 0x0400
+  val RADAR_HOJ    = 0x0800
+}
 
+case class RadarFlags(flags: Int) {
+  def hasAnyOf(flag: Int): Boolean = {
+    (flags & flag) != 0
+  }
+  def hasAllOf(flag: Int): Boolean = {
+    (flags & flag) == flag
+  }
+  def hasNoneOf(flag: Int): Boolean = {
+    (flags & flag) == 0
+  }
 }
 
 case class Contact(source: SourceData) extends Parsed[Contact.type] {
   val id                     = parse(schema.id)
   val course                 = parse(schema.course).toDegrees
-  val flags                  = parse(schema.flags)
+  val flags                  = RadarFlags(parse(schema.flags))
   val aspect                 = parse(schema.aspect).toDegrees
   val verticalViewingAngle   = parse(schema.verticalViewingAngle).toDegrees
   val horizontalViewingAngle = parse(schema.horizontalViewingAngle).toDegrees
@@ -37,8 +54,14 @@ case class Contact(source: SourceData) extends Parsed[Contact.type] {
   val timestamp              = parse(schema.timestamp)
   def ageSeconds             = Instant.now.toEpochMilli.toDouble / 1000.0 - timestamp
 
- // def isDesignated           =
- // def positionKnown          =
+  def position               = spatial.position
+  def pitch                  = spatial.pitch
+  def roll                   = spatial.roll
+  def heading                = spatial.heading
+
+  import SensorFlags._
+  def isDesignated           = flags.hasAnyOf(RADAR_BUG | EOS_BUG | RADAR_HOJ)
+  def isPositionKnown        = flags.hasNoneOf(RADAR_HOJ)
 }
 
 object Contact extends Schema[Contact] {

@@ -14,6 +14,8 @@ case class SensorsStatus(source: SourceData = Map.empty) extends Parsed[SensorsS
   val tdc              = parse(schema.tdc)
   val scanZone         = parse(schema.scanZone)
   val prf              = parse(schema.prf)
+
+  def sensorOn: Boolean = radarOn || eosOn
 }
 
 object SensorsStatus extends Schema[SensorsStatus] {

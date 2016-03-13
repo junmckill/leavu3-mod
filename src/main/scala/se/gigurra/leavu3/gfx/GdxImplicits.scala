@@ -11,7 +11,7 @@ trait GdxImplicits { _: RenderContext.type =>
   }
 
   implicit class DrawableString(text: String) {
-    def draw(xAlign: Float = 0.0f,
+    private def draw(xAlign: Float = 0.0f,
              yAlign: Float = 0.0f,
              xRawOffs: Float = 0.0f,
              yRawOffs: Float = 0.0f,
@@ -25,25 +25,34 @@ trait GdxImplicits { _: RenderContext.type =>
         height * (yAlign + 0.5f) + yRawOffs
       )
     }
-    def drawRightOf(color: Color = null)(implicit configuration: Configuration): Unit = {
+
+    def drawCentered(color: Color = null, scale: Float = 1.0f)(implicit configuration: Configuration): Unit = {
       transform(_
-        .scalexy(0.05f * symbolScaleF / font.size)
+        .scalexy(scale * 0.05f * symbolScaleF / font.size)
+        .rotate(-self.heading)) {
+        draw(color = color, yAlign = -0.1f)
+      }
+    }
+
+    def drawRightOf(color: Color = null, scale: Float = 1.0f)(implicit configuration: Configuration): Unit = {
+      transform(_
+        .scalexy(scale * 0.05f * symbolScaleF / font.size)
         .rotate(-self.heading)) {
         draw(xAlign = 0.5f, xRawOffs = 0.025f * symbolScaleF, color = color)
       }
     }
 
-    def drawLeftOf(color: Color = null)(implicit configuration: Configuration): Unit = {
+    def drawLeftOf(color: Color = null, scale: Float = 1.0f)(implicit configuration: Configuration): Unit = {
       transform(_
-        .scalexy(0.05f * symbolScaleF / font.size)
+        .scalexy(scale * 0.05f * symbolScaleF / font.size)
         .rotate(-self.heading)) {
         draw(xAlign = -0.5f, xRawOffs = -0.025f * symbolScaleF, color = color)
       }
     }
 
-    def drawBelow(color: Color = null)(implicit configuration: Configuration): Unit = {
+    def drawBelow(color: Color = null, scale: Float = 1.0f)(implicit configuration: Configuration): Unit = {
       transform(_
-        .scalexy(0.05f * symbolScaleF / font.size)
+        .scalexy(scale * 0.05f * symbolScaleF / font.size)
         .rotate(-self.heading)) {
         draw(yAlign = -0.5f, yRawOffs = -0.025f * symbolScaleF, color = color)
       }

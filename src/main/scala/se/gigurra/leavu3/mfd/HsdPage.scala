@@ -5,6 +5,7 @@ import se.gigurra.leavu3.externaldata._
 import se.gigurra.leavu3.gfx.RenderContext._
 import se.gigurra.leavu3.util.CircleBuffer
 
+import scala.collection.mutable
 import scala.language.postfixOps
 
 /**
@@ -12,21 +13,32 @@ import scala.language.postfixOps
   */
 case class HsdPage(implicit config: Configuration) extends Page {
 
+  var shouldMatchIngameScale = true
   val distance = CircleBuffer(10 nmi, 20 nmi, 40 nmi, 80 nmi, 160 nmi).withDefaultValue(40 nmi)
   val deprFactor = CircleBuffer(0.0, 0.5).withDefaultValue(0.5)
 
   def update(game: GameData, dlinkIn: DlinkInData, dlinkOut: DlinkOutData): Unit = {
+    matchIngameScale(game)
     ppi_viewport(viewportSize = distance * 2.0, offs = Vec2(0.0, -distance * deprFactor), heading = self.heading) {
       drawSelf(game)
       drawHsi(game)
       drawWaypoints(game)
+      drawScanZone(game)
       drawAiWingmen(game)
       drawAiWingmenTargets(game)
       drawDlinkWingmen(dlinkIn)
       drawDlinkWingmenTargets(dlinkIn)
       drawLockedTargets(game)
+      drawTdc(game)
     }
     drawMenuItems(game)
+  }
+
+  def matchIngameScale(game: GameData) = {
+    if (shouldMatchIngameScale) {
+      val x = distance.items.minBy(x => math.abs(x - game.sensors.status.scale.distance))
+      distance.set(x)
+    }
   }
 
   def drawHsi(game: GameData): Unit = {
@@ -80,6 +92,16 @@ case class HsdPage(implicit config: Configuration) extends Page {
           text.drawRightOf(WHITE)
         }
       }
+    }
+  }
+
+  def drawScanZone(game: GameData): Unit = {
+    val sensors = game.sensors.status
+    if (sensors.sensorOn) {
+      val dist = sensors.scale.distance
+      val width = sensors.scanZone.size.azimuth
+      val direction = sensors.scanZone.direction.azimuth
+      arc(radius = dist, angle = width, direction = self.heading + direction, color = LIGHT_GRAY)
     }
   }
 
@@ -151,6 +173,54 @@ case class HsdPage(implicit config: Configuration) extends Page {
   }
 
   def drawLockedTargets(game: GameData): Unit = {
+
+    val radius = 0.020 * symbolScale
+
+    val contacts = new mutable.HashMap[Int, Contact] // id -> data
+    val order = new mutable.HashMap[Int, Int] // id -> index
+
+    implicit class ContactWithIndex(c: Contact) {
+      def index: Int = order(c.id)
+    }
+
+    import game.sensors.targets._
+    for {
+      collection <- Seq(detected, tws.map(_.contact), locked.map(_.contact))
+      (contact, i) <- collection.zipWithIndex
+    } {
+      order.put(contact.id, i)
+      contacts.put(contact.id, contact)
+    }
+
+    val sorted = contacts.values.toSeq
+      .filter(_.isDesignated)
+      .filter(_.isPositionKnown)
+      .sortBy(_.index)
+
+    for (contact <- sorted) {
+
+      at(contact.position) {
+        circle(radius = radius, typ = FILL, color = YELLOW)
+        rotatedTo(contact.heading) {
+          lines(Seq(Vec2(0.0, radius) -> Vec2(0.0, radius * 3)))
+        }
+      }
+    }
+
+    batched {
+      for (contact <- sorted) {
+        at(contact.position) {
+          val text = (contact.position.z * m_to_kft).round.toString
+          text.drawLeftOf(color = YELLOW)
+          (contact.index + 1).toString.drawCentered(scale = 0.75f, color = BLACK)
+        }
+      }
+    }
+
+  }
+
+  def drawTdc(game: GameData): Unit = {
+
   }
 
   def drawMenuItems(game: GameData): Unit = {

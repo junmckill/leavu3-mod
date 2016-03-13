@@ -24,6 +24,10 @@ case class CircleBuffer[T](item0: T, rest: T*) {
   def reset(): Unit = i = default
   def current: T = items(i)
   def get = current
+  def set(t: T): Unit = {
+    require(items.contains(t), s"CircleBuffer[..]: Cannot set to value $t which isn't contained")
+    i = items.indexOf(t)
+  }
   def size = items.size
 }
 
