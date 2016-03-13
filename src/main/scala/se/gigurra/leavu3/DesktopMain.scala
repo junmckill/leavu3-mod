@@ -12,10 +12,10 @@ object DesktopMain extends Logging {
     val lwjglConfig = loadLwjglConfig(config)
     new LwjglApplication(new GdxAppListener(config), lwjglConfig)
 
-    ScriptInjector.startInjecting(config.restAddress, config.restPort)
-    GameData.startPoller(config.gameDataFps, config.restAddress, config.restPort)
-    // DlinkInData.startPoller(config.dlinkInFps, config.restAddress, config.restPort)
-    // DlinkOutData.startPoller(config.dlinkOutFps, config.restAddress, config.restPort)
+    ScriptInjector.startInjecting(config.dcsRemoteAddress, config.dcsRemotePort)
+    GameData.startPoller(config.gameDataFps, config.dcsRemoteAddress, config.dcsRemotePort)
+    // DlinkInData.startPoller(config.dlinkInFps, config.dcsRemoteAddress, config.dcsRemotePort)
+    // DlinkOutData.startPoller(config.dlinkOutFps, config.dcsRemoteAddress, config.dcsRemotePort)
   }
 
   private def loadLwjglConfig(config: Configuration): LwjglApplicationConfiguration = {
