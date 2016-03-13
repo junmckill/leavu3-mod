@@ -6,6 +6,8 @@ import se.gigurra.heisenberg.{Schema, Parsed}
 case class AircraftMode(source: SourceData = Map.empty) extends Parsed[AircraftMode.type] {
   val submode = parse(schema.submode)
   val master  = parse(schema.master)
+
+  def isInCac: Boolean = master == "CAC"
 }
 
 object AircraftMode extends Schema[AircraftMode] {
