@@ -192,12 +192,17 @@ case class HsdPage(implicit config: Configuration) extends Page {
       contacts.put(contact.id, contact)
     }
 
-    val sorted = contacts.values.toSeq
+    val positionsDesignated = contacts.values.toSeq
       .filter(_.isDesignated)
       .filter(_.isPositionKnown)
       .sortBy(_.index)
 
-    for (contact <- sorted) {
+    val bearingsDesignated = contacts.values.toSeq
+      .filter(_.isDesignated)
+      .filterNot(_.isPositionKnown)
+      .sortBy(_.index)
+
+    for (contact <- positionsDesignated) {
 
       at(contact.position) {
         circle(radius = radius, typ = FILL, color = YELLOW)
@@ -207,8 +212,13 @@ case class HsdPage(implicit config: Configuration) extends Page {
       }
     }
 
+    for (contact <- bearingsDesignated) {
+      val offs = contact.position - self.position : Vec2
+      lines(Seq(Vec2() -> offs) * 10000.0, YELLOW)
+    }
+
     batched {
-      for (contact <- sorted) {
+      for (contact <- positionsDesignated) {
         at(contact.position) {
           val text = (contact.position.z * m_to_kft).round.toString
           text.drawLeftOf(color = YELLOW)
