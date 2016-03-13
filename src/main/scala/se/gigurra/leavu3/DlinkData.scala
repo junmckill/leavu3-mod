@@ -14,6 +14,9 @@ case class Member(source: SourceData = Map.empty) extends Parsed[Member.type] {
   val velocity  = parse(schema.velocity)
   val selfData  = parse(schema.selfData)
   val targets   = parse(schema.targets)
+  def pitch     = selfData.pitch
+  def roll      = selfData.roll
+  def heading   = selfData.heading
 }
 
 object Member extends Schema[Member] {

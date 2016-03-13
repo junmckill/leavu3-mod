@@ -27,8 +27,7 @@ case class HsdPage(implicit config: Configuration) extends Page {
       drawScanZone(game)
       drawAiWingmen(game)
       drawAiWingmenTargets(game)
-      drawDlinkWingmen(dlinkIn)
-      drawDlinkWingmenTargets(dlinkIn)
+      drawDlinkMembers(dlinkIn)
       drawLockedTargets(game)
       drawTdc(game)
     }
@@ -111,7 +110,6 @@ case class HsdPage(implicit config: Configuration) extends Page {
 
   def drawAiWingmen(game: GameData): Unit = {
     for (wingman <- game.aiWingmen) {
-      val p = (wingman.position - self.position).vec2
       val radius = 0.020 * symbolScale
       at(wingman.position, wingman.heading) {
         circle(radius = radius, color = CYAN)
@@ -172,10 +170,30 @@ case class HsdPage(implicit config: Configuration) extends Page {
     }
   }
 
-  def drawDlinkWingmen(dlinkIn: Map[String, DlinkData]): Unit = {
-  }
+  def drawDlinkMembers(dlinkIn: Map[String, DlinkData]): Unit = {
+    for ((name, member) <- dlinkIn
+      .mapValues(_.data)
+      .filter(_._2.planeId != self.planeId)) {
 
-  def drawDlinkWingmenTargets(dlinkIn: Map[String, DlinkData]): Unit = {
+      val lag = member.modelTime - self.modelTime
+      val position = member.position + member.velocity * lag
+      
+      val radius = 0.020 * symbolScale
+
+      at(position, member.heading) {
+        circle(radius = radius, color = CYAN)
+        lines(Seq(Vec2(0.0, radius) -> Vec2(0.0, radius * 3)))
+      }
+
+      batched {
+        at(position) {
+          val altText = (position.z * m_to_kft).round.toString
+          altText.drawPpiLeftOf(color = CYAN)
+          val nameText = name.take(2)
+          nameText.drawPpiRightOf(scale = 0.5f, color = CYAN)
+        }
+      }
+    }
   }
 
   def contactColor(contact: Contact, fromDatalink: Boolean): Color = {
