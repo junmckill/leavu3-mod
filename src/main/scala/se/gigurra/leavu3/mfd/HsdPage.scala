@@ -32,7 +32,7 @@ case class HsdPage(implicit config: Configuration) extends Page {
       drawLockedTargets(game)
       drawTdc(game)
     }
-    drawBullseyeNumbers(game)
+    drawBullsEyeNumbers(game)
     drawMenuItems(game)
   }
 
@@ -64,8 +64,8 @@ case class HsdPage(implicit config: Configuration) extends Page {
 
   def drawSelf(game: GameData): Unit = {
     transform(_.rotate(-self.heading)) {
-      lines(shapes.self.coords * symbolScale, LIGHT_GRAY)
-      circle(0.005 * symbolScale, color = LIGHT_GRAY, typ = FILL)
+      lines(shapes.self.coords * symbolScale, CYAN)
+      circle(0.005 * symbolScale, color = CYAN, typ = FILL)
     }
   }
 
@@ -91,7 +91,7 @@ case class HsdPage(implicit config: Configuration) extends Page {
       for (wp <- game.route.waypoints) {
         val text = if (wp.index > 0) (wp.index - 1).toString else "x"
         at(wp.position) {
-          text.drawRightOf(scale = 0.75f, color = WHITE)
+          text.drawPpiRightOf(scale = 0.75f, color = WHITE)
         }
       }
     }
@@ -121,9 +121,9 @@ case class HsdPage(implicit config: Configuration) extends Page {
       for (wingman <- game.aiWingmen) {
         at(wingman.position) {
           val altText = (wingman.position.z * m_to_kft).round.toString
-          altText.drawLeftOf(color = CYAN)
+          altText.drawPpiLeftOf(color = CYAN)
           val nameText = "AI"
-          nameText.drawRightOf(scale = 0.5f, color = CYAN)
+          nameText.drawPpiRightOf(scale = 0.5f, color = CYAN)
         }
       }
     }
@@ -159,7 +159,7 @@ case class HsdPage(implicit config: Configuration) extends Page {
       for (tgtPos <- game.aiWingmenTgts) {
         at(tgtPos) {
           val text = (tgtPos.z * m_to_kft).round.toString
-          text.drawLeftOf(color = RED)
+          text.drawPpiLeftOf(color = RED)
         }
       }
     }
@@ -235,8 +235,8 @@ case class HsdPage(implicit config: Configuration) extends Page {
       for (contact <- positionsDesignated) {
         at(contact.position) {
           val text = (contact.position.z * m_to_kft).round.toString
-          text.drawLeftOf(color = contactColor(contact, fromDatalink = false))
-          (contact.index + 1).toString.drawCentered(scale = 0.75f, color = BLACK)
+          text.drawPpiLeftOf(color = contactColor(contact, fromDatalink = false))
+          (contact.index + 1).toString.drawPpiCentered(scale = 0.75f, color = BLACK)
         }
       }
     }
@@ -282,26 +282,47 @@ case class HsdPage(implicit config: Configuration) extends Page {
 
 
 
-  def mkBraString(prefix: String, bra: Bra): String = s"$prefix : ${bra.brString}"
-  def mkBraString(prefix: String, bra: Option[Bra]): Option[String] = bra.map(mkBraString(prefix, _))
+  def drawBullsEyeNumbers(game: GameData) = {
 
-  def drawBullseyeNumbers(game: GameData) = {
+    def mkBraString(prefix: String, bra: Bra): String = s"$prefix : ${bra.brString}"
 
-    val bullseye = game.route.currentWaypoint
-    val selfBra = (self.position - bullseye.position).asBra
-    val tdcBra = game.tdcPosition.map(p => (p - bullseye.position).asBra)
-    val pdtBra = game.pdt.map(p => (p.position - bullseye.position).asBra)
+    val bullsEye = game.route.currentWaypoint
+    val selfBra = (self.position - bullsEye.position).asBra
+    val scale = config.symbolScale * 0.02 / font.getSpaceWidth
 
-    val beInfo  = s"bullseye : wp ${bullseye.index + 1}"
-    val selfStr = mkBraString("    self", selfBra)
-    val tdcStr  = mkBraString("     tdc", tdcBra)
-    val pdtStr  = mkBraString("     pdt", pdtBra)
+    batched {
 
-    println
-    println(beInfo)
-    println(selfStr)
-    println(tdcStr)
-    println(pdtStr)
+      transform(_
+        .translate(-0.9f, 0.9f)
+        .scalexy(scale)) {
+
+        val beStr = s"bullseye : wp ${bullsEye.index - 1}"
+        val selfStr = mkBraString("    self", selfBra)
+
+        var n = 0
+        def drawTextLine(str: String, color: Color): Unit = {
+          transform(_.translate(y = -n.toFloat * font.getLineHeight))(str.drawRaw(xAlign = 0.5f, color = color))
+          n += 1
+        }
+
+        drawTextLine(beStr, LIGHT_GRAY)
+        drawTextLine(selfStr, CYAN)
+
+        game.tdcPosition foreach { tdc =>
+          val tdcBra = (tdc - bullsEye.position).asBra
+          val tdcStr = mkBraString("     tdc", tdcBra)
+          drawTextLine(tdcStr, WHITE)
+        }
+
+        game.pdt foreach { pdt =>
+          val pdtBra = (pdt.position - bullsEye.position).asBra
+          val pdtStr = mkBraString("     pdt", pdtBra)
+          drawTextLine(pdtStr, contactColor(pdt, fromDatalink = false))
+        }
+
+      }
+
+    }
 
   }
 

@@ -11,7 +11,8 @@ trait GdxImplicits { _: RenderContext.type =>
   }
 
   implicit class DrawableString(text: String) {
-    private def draw(xAlign: Float = 0.0f,
+
+    def drawRaw(xAlign: Float = 0.0f,
              yAlign: Float = 0.0f,
              xRawOffs: Float = 0.0f,
              yRawOffs: Float = 0.0f,
@@ -26,35 +27,35 @@ trait GdxImplicits { _: RenderContext.type =>
       )
     }
 
-    def drawCentered(color: Color = null, scale: Float = 1.0f)(implicit configuration: Configuration): Unit = {
+    def drawPpiCentered(color: Color = null, scale: Float = 1.0f)(implicit configuration: Configuration): Unit = {
       transform(_
         .scalexy(scale * 0.05f * symbolScaleF / font.size)
         .rotate(-self.heading)) {
-        draw(color = color, yAlign = -0.1f)
+        drawRaw(color = color, yAlign = -0.1f)
       }
     }
 
-    def drawRightOf(color: Color = null, scale: Float = 1.0f)(implicit configuration: Configuration): Unit = {
+    def drawPpiRightOf(color: Color = null, scale: Float = 1.0f)(implicit configuration: Configuration): Unit = {
       transform(_
         .scalexy(scale * 0.05f * symbolScaleF / font.size)
         .rotate(-self.heading)) {
-        draw(xAlign = 0.5f, yAlign = -0.1f, xRawOffs = 0.025f * symbolScaleF, color = color)
+        drawRaw(xAlign = 0.5f, yAlign = -0.1f, xRawOffs = 0.025f * symbolScaleF, color = color)
       }
     }
 
-    def drawLeftOf(color: Color = null, scale: Float = 1.0f)(implicit configuration: Configuration): Unit = {
+    def drawPpiLeftOf(color: Color = null, scale: Float = 1.0f)(implicit configuration: Configuration): Unit = {
       transform(_
         .scalexy(scale * 0.05f * symbolScaleF / font.size)
         .rotate(-self.heading)) {
-        draw(xAlign = -0.5f, yAlign = -0.1f, xRawOffs = -0.025f * symbolScaleF, color = color)
+        drawRaw(xAlign = -0.5f, yAlign = -0.1f, xRawOffs = -0.025f * symbolScaleF, color = color)
       }
     }
 
-    def drawBelow(color: Color = null, scale: Float = 1.0f)(implicit configuration: Configuration): Unit = {
+    def drawPpiBelow(color: Color = null, scale: Float = 1.0f)(implicit configuration: Configuration): Unit = {
       transform(_
         .scalexy(scale * 0.05f * symbolScaleF / font.size)
         .rotate(-self.heading)) {
-        draw(yAlign = -0.5f, yRawOffs = -0.025f * symbolScaleF, color = color)
+        drawRaw(yAlign = -0.5f, yRawOffs = -0.025f * symbolScaleF, color = color)
       }
     }
 
