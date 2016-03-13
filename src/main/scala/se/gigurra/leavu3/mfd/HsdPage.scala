@@ -206,7 +206,7 @@ case class HsdPage(implicit config: Configuration) extends Page {
           lines(Seq(Vec2(0.0, radius) -> Vec2(0.0, radius * 3)))
           batched {
             val altText = (targetPosition.z * m_to_kft).round.toString
-            altText.drawPpiLeftOf(color = RED)
+            altText.drawPpiLeftOf(color = contactColor(target, fromDatalink = true))
             val nameText = name.take(2)
             nameText.drawPpiCentered(scale = 0.35f, color = BLACK)
           }
@@ -307,19 +307,6 @@ case class HsdPage(implicit config: Configuration) extends Page {
   }
 
   def drawMenuItems(game: GameData): Unit = {
-
-    /*
-    batched {
-      val text =
-        s"""
-           |Heading: ${self.heading}
-           |Velocity: ${self.velocity}
-           |nwps: ${game.route.waypoints.size}""".stripMargin
-
-      transform(_.scalexy(1.5f / text.width)) {
-        text.draw(color = RED)
-      }
-    }*/
   }
 
   def drawBullsEyeNumbers(game: GameData) = {
