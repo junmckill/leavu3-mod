@@ -8,6 +8,7 @@ case class AircraftMode(source: SourceData = Map.empty) extends Parsed[AircraftM
   val master  = parse(schema.master)
 
   def isInCac: Boolean = master == "CAC"
+  def isStt: Boolean = submode == "STT"
 }
 
 object AircraftMode extends Schema[AircraftMode] {
