@@ -244,22 +244,24 @@ case class HsdPage(implicit config: Configuration) extends Page {
   }
 
   def drawTdc(game: GameData): Unit = {
+    game.tdcPosition foreach { tdc =>
+      at(tdc, self.heading) {
+        val d = 0.02
+        lines(Seq(
+          Vec2(-d, -d) -> Vec2(-d, d),
+          Vec2( d, -d) -> Vec2( d, d)
+        ) * symbolScale, WHITE)
+      }
 
-    val tdc = game.sensors.status.tdc
-    val dist = (tdc.y + 1.0) * game.sensors.status.scale.distance * 0.5
-    val halfWidth = game.sensors.status.scale.azimuth
-    val angle = self.heading + halfWidth * tdc.x
-    val y = dist * math.cos(angle.toRadians)
-    val x = dist * math.sin(angle.toRadians)
-    val offset = Vec2(x,y)
-
-    at(self.position + offset, self.heading) {
-      val hw = 0.02
-      val hh = hw
-      lines(Seq(
-        Vec2(-hw, -hh) -> Vec2(-hw, hh),
-        Vec2( hw, -hh) -> Vec2( hw, hh)
-      ) * symbolScale, WHITE)
+      at(tdc) {
+        val coverage = game.sensors.status.scanZone.altitudeCoverage
+        val coverageText =
+          s"""${(coverage.max * m_to_kft).round}
+             |${(coverage.min * m_to_kft).round}""".stripMargin
+        batched {
+          coverageText.drawPpiRightOf(scale = 0.5f, color = WHITE)
+        }
+      }
     }
   }
 

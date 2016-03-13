@@ -4,6 +4,12 @@ import com.badlogic.gdx.graphics.Color
 import se.gigurra.leavu3.Configuration
 import se.gigurra.leavu3.externaldata.{Vec3, Vec2}
 
+object getLines {
+  def apply(s: String): Seq[String] = {
+    s.lines.toSeq
+  }
+}
+
 trait GdxImplicits { _: RenderContext.type =>
 
   implicit class RichGdxColor(val color: Color) {
@@ -12,17 +18,20 @@ trait GdxImplicits { _: RenderContext.type =>
 
   implicit class DrawableString(text: String) {
 
+    val lines = getLines(text)
+    val extraDownOffset = -0.1f / math.max(lines.size, 1).toFloat
+
     def drawRaw(xAlign: Float = 0.0f,
-             yAlign: Float = 0.0f,
-             xRawOffs: Float = 0.0f,
-             yRawOffs: Float = 0.0f,
-             color: Color = null): Unit = {
+               yAlign: Float = 0.0f,
+               xRawOffs: Float = 0.0f,
+               yRawOffs: Float = 0.0f,
+               color: Color = null): Unit = {
       if (color != null)
         font.setColor(color)
       font.draw(
         batch,
         text,
-        width * (xAlign - 0.5f) + xRawOffs,
+        width  * (xAlign - 0.5f) + xRawOffs,
         height * (yAlign + 0.5f) + yRawOffs
       )
     }
@@ -31,7 +40,7 @@ trait GdxImplicits { _: RenderContext.type =>
       transform(_
         .scalexy(scale * 0.05f * symbolScaleF / font.size)
         .rotate(-self.heading)) {
-        drawRaw(color = color, yAlign = -0.1f)
+        drawRaw(color = color, yAlign = extraDownOffset)
       }
     }
 
@@ -39,7 +48,7 @@ trait GdxImplicits { _: RenderContext.type =>
       transform(_
         .scalexy(scale * 0.05f * symbolScaleF / font.size)
         .rotate(-self.heading)) {
-        drawRaw(xAlign = 0.5f, yAlign = -0.1f, xRawOffs = 0.025f * symbolScaleF, color = color)
+        drawRaw(xAlign = 0.5f, yAlign = extraDownOffset, xRawOffs = 0.025f * symbolScaleF, color = color)
       }
     }
 
@@ -47,7 +56,7 @@ trait GdxImplicits { _: RenderContext.type =>
       transform(_
         .scalexy(scale * 0.05f * symbolScaleF / font.size)
         .rotate(-self.heading)) {
-        drawRaw(xAlign = -0.5f, yAlign = -0.1f, xRawOffs = -0.025f * symbolScaleF, color = color)
+        drawRaw(xAlign = -0.5f, yAlign = extraDownOffset, xRawOffs = -0.025f * symbolScaleF, color = color)
       }
     }
 
@@ -59,8 +68,8 @@ trait GdxImplicits { _: RenderContext.type =>
       }
     }
 
-    def width: Float = font.widthOf(text)
-    def height: Float = font.heightOf(text)
+    def width: Float = font.widthOf(lines)
+    def height: Float = font.heightOf(lines)
   }
 
 }
