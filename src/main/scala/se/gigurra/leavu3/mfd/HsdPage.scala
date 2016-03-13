@@ -1,5 +1,7 @@
 package se.gigurra.leavu3.mfd
 
+import java.time.Instant
+
 import com.badlogic.gdx.graphics.Color
 import se.gigurra.leavu3.externaldata._
 import se.gigurra.leavu3.gfx.RenderContext._
@@ -110,7 +112,7 @@ case class HsdPage(implicit config: Configuration) extends Page {
 
   def drawAiWingmen(game: GameData): Unit = {
     for (wingman <- game.aiWingmen) {
-      val radius = 0.020 * symbolScale
+      val radius = 0.015 * symbolScale
       at(wingman.position, wingman.heading) {
         circle(radius = radius, color = CYAN)
         lines(Seq(Vec2(0.0, radius) -> Vec2(0.0, radius * 3)))
@@ -133,7 +135,7 @@ case class HsdPage(implicit config: Configuration) extends Page {
   var wingmenTgtsLastTminus2 = Seq.empty[Vec3]
 
   def drawAiWingmenTargets(game: GameData): Unit = {
-    val radius = 0.020 * symbolScale
+    val radius = 0.015 * symbolScale
 
     // Hack in heading of tgts if possible
     val shouldDrawHeading =
@@ -171,17 +173,18 @@ case class HsdPage(implicit config: Configuration) extends Page {
   }
 
   def drawDlinkMembers(dlinkIn: Map[String, DlinkData]): Unit = {
-    for ((name, member) <- dlinkIn
-      .mapValues(_.data)
-      .filter(_._2.planeId != self.planeId)) {
 
-      val lag = member.modelTime - self.modelTime
+    for ((name, dlData) <- dlinkIn
+      .filter(m => m._2.data.planeId != self.planeId || m._1 != self.dlinkCallsign)) {
+
+      val member = dlData.data
+
+      val lag = Instant.now.toEpochMilli.toDouble / 1000.0 - dlData.timestamp
       val position = member.position + member.velocity * lag
-      
-      val radius = 0.020 * symbolScale
+      val radius = 0.015 * symbolScale
 
       at(position, member.heading) {
-        circle(radius = radius, color = CYAN)
+        circle(radius = radius, typ = FILL, color = CYAN)
         lines(Seq(Vec2(0.0, radius) -> Vec2(0.0, radius * 3)))
       }
 

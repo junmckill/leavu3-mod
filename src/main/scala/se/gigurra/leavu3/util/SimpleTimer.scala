@@ -6,14 +6,12 @@ import com.twitter.util.{Time, JavaTimer, Duration}
   * Created by kjolh on 3/10/2016.
   */
 class SimpleTimer(interval: Duration, op: () => Unit) {
-  SimpleTimer.timer.schedule(Time.now, interval) {
+  new JavaTimer(isDaemon = true).schedule(Time.now, interval) {
     op()
   }
 }
 
 object SimpleTimer {
-
-  private val timer = new JavaTimer(isDaemon = true)
 
   def apply(interval: Duration)(op: => Unit): SimpleTimer = {
     new SimpleTimer(interval, () => op)
