@@ -7,6 +7,8 @@ case class Targets(source: SourceData = Map.empty) extends Parsed[Targets.type] 
   val detected = parse(schema.detected)
   val tws      = parse(schema.tws)
   val locked   = parse(schema.locked)
+
+  def pdt: Option[Target] = locked.headOption
 }
 
 object Targets extends Schema[Targets] {

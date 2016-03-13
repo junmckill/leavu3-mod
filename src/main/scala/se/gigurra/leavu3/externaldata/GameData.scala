@@ -34,6 +34,9 @@ case class GameData(source: SourceData) extends Parsed[GameData.type] {
 
   def selfData: SelfData = metaData.selfData
 
+  def tdcPosition: Option[Vec2] = sensors.status.tdcPosition(selfData.heading, selfData.position)
+  def pdt: Option[Target] = sensors.pdt
+
   def withRoute(newRoute: Route) = marshal(this, schema.route -> newRoute)
 }
 

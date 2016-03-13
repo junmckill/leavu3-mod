@@ -32,6 +32,7 @@ case class HsdPage(implicit config: Configuration) extends Page {
       drawLockedTargets(game)
       drawTdc(game)
     }
+    drawBullseyeNumbers(game)
     drawMenuItems(game)
   }
 
@@ -277,4 +278,34 @@ case class HsdPage(implicit config: Configuration) extends Page {
       }
     }*/
   }
+
+
+
+  def mkBraString(prefix: String, bra: Bra): String = {
+    s"$prefix : ${bra.bearing.round} ${(bra.range * m_to_nmi).round}"
+  }
+  def mkBraString(prefix: String, bra: Option[Bra]): Option[String] = {
+    bra.map(mkBraString(prefix, _))
+  }
+
+  def drawBullseyeNumbers(game: GameData) = {
+
+    val bullseye = game.route.currentWaypoint
+    val selfBra = (self.position - bullseye.position).asBra
+    val tdcBra = game.tdcPosition.map(p => (p - bullseye.position).asBra)
+    val pdtBra = game.pdt.map(p => (p.position - bullseye.position).asBra)
+
+    val beInfo  = s"bullseye : wp ${bullseye.index + 1}"
+    val selfStr = mkBraString("    self", selfBra)
+    val tdcStr  = mkBraString("     tdc", tdcBra)
+    val pdtStr  = mkBraString("     pdt", pdtBra)
+
+    println
+    println(beInfo)
+    println(selfStr)
+    println(tdcStr)
+    println(pdtStr)
+
+  }
+
 }

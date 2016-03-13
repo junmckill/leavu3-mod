@@ -16,6 +16,21 @@ case class SensorsStatus(source: SourceData = Map.empty) extends Parsed[SensorsS
   val prf              = parse(schema.prf)
 
   def sensorOn: Boolean = radarOn || eosOn
+
+  def tdcBra(ownHeading: Double): Option[Bra] = {
+    if (sensorOn) {
+      val dist = (tdc.y + 1.0) * scale.distance * 0.5
+      val halfWidth = scale.azimuth
+      val bearing = ownHeading + halfWidth * tdc.x
+      Some(Bra(bearing, dist, 0.0))
+    } else {
+      None
+    }
+  }
+
+  def tdcPosition(ownHeading: Double, ownPosition: Vec2): Option[Vec2] = {
+    tdcBra(ownHeading).map(_.toOffset + ownPosition)
+  }
 }
 
 object SensorsStatus extends Schema[SensorsStatus] {
