@@ -1,10 +1,10 @@
 package se.gigurra.leavu3.mfd
 
 import com.badlogic.gdx.graphics.Color
-import se.gigurra.leavu3.Configuration
 import se.gigurra.leavu3.externaldata._
 import se.gigurra.leavu3.gfx.RenderContext._
 import se.gigurra.leavu3.util.CircleBuffer
+import se.gigurra.leavu3.{Configuration, DlinkData}
 
 import scala.collection.mutable
 import scala.language.postfixOps
@@ -18,7 +18,7 @@ case class HsdPage(implicit config: Configuration) extends Page {
   val distance = CircleBuffer(10 nmi, 20 nmi, 40 nmi, 80 nmi, 160 nmi).withDefaultValue(40 nmi)
   val deprFactor = CircleBuffer(0.0, 0.5).withDefaultValue(0.5)
 
-  def update(game: GameData, dlinkIn: DlinkInData, dlinkOut: DlinkOutData): Unit = {
+  def update(game: GameData, dlinkIn: Map[String, DlinkData]): Unit = {
     matchIngameScale(game)
     ppi_viewport(viewportSize = distance * 2.0, offs = Vec2(0.0, -distance * deprFactor), heading = self.heading) {
       drawSelf(game)
@@ -172,10 +172,10 @@ case class HsdPage(implicit config: Configuration) extends Page {
     }
   }
 
-  def drawDlinkWingmen(dlinkIn: DlinkInData): Unit = {
+  def drawDlinkWingmen(dlinkIn: Map[String, DlinkData]): Unit = {
   }
 
-  def drawDlinkWingmenTargets(dlinkIn: DlinkInData): Unit = {
+  def drawDlinkWingmenTargets(dlinkIn: Map[String, DlinkData]): Unit = {
   }
 
   def contactColor(contact: Contact, fromDatalink: Boolean): Color = {

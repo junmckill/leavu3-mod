@@ -134,6 +134,7 @@ trait RenderHelpers extends UnitConversions { _: RenderContext.type =>
   }
 
   object self {
+    def modelTime: Double = ExternalData.gameData.metaData.modelTime
     def coalition: Int = ExternalData.gameData.selfData.coalitionId
     def pitch: Float = ExternalData.gameData.selfData.pitch
     def roll: Float = ExternalData.gameData.selfData.roll

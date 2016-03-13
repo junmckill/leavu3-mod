@@ -31,11 +31,7 @@ case class GdxAppListener(initialConfiguration: Configuration) extends Applicati
   }
 
   override def render(): Unit = {
-    val t0 = System.currentTimeMillis()
-    instrument.update(ExternalData.gameData, ExternalData.dlinkIn, ExternalData.dlinkOut)
-    val t1 = System.currentTimeMillis()
-    val dt = t1 - t0
-    //println(s"Render time: $dt")
+    instrument.update(ExternalData.gameData, ExternalData.dlinkIn)
   }
 
   override def resume(): Unit = {

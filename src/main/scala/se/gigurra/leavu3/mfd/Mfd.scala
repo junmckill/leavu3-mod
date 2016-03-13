@@ -1,13 +1,14 @@
 package se.gigurra.leavu3.mfd
 
-import se.gigurra.leavu3.{Configuration, Instrument}
-import se.gigurra.leavu3.externaldata.{DlinkInData, DlinkOutData, GameData}
+import se.gigurra.leavu3.externaldata.GameData
 import se.gigurra.leavu3.gfx.RenderContext._
+import se.gigurra.leavu3.{Configuration, DlinkData, Instrument}
+
 import scala.language.postfixOps
 
-case class Mfd(config: Configuration) extends Instrument(config) {
+case class Mfd(implicit config: Configuration) extends Instrument(config) {
 
-  val hsd = HsdPage(config)
+  val hsd = HsdPage()
   val rwr = RwrPage()
   val sms = SmsPage()
   val fcr = FcrPage()
@@ -18,8 +19,8 @@ case class Mfd(config: Configuration) extends Instrument(config) {
 
   def currentPage: Option[Page] = qPages.get(iQPage)
 
-  def updatePage(game: GameData, dlinkIn: DlinkInData, dlinkOut: DlinkOutData): Unit = {
-    currentPage.foreach(_.update(game, dlinkIn, dlinkOut))
+  def updatePage(game: GameData, dlinkIn: Map[String, DlinkData]): Unit = {
+    currentPage.foreach(_.update(game, dlinkIn))
   }
 
   def drawMainMenuIfOpen(): Unit = {
@@ -28,8 +29,8 @@ case class Mfd(config: Configuration) extends Instrument(config) {
     }
   }
 
-  def update(game: GameData, dlinkIn: DlinkInData, dlinkOut: DlinkOutData): Unit = frame {
-    updatePage(game, dlinkIn, dlinkOut)
+  def update(game: GameData, dlinkIn: Map[String, DlinkData]): Unit = frame {
+    updatePage(game, dlinkIn)
     drawMainMenuIfOpen()
   }
 

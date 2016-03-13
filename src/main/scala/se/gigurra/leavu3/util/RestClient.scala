@@ -37,6 +37,19 @@ case class RestClient(addr: String, port: Int) {
   def postBlocking(path: String, data: String, timeout: Duration = Duration.fromSeconds(3)): Unit = {
     Await.result(post(path, data), timeout)
   }
+
+  def put(path: String, data: String): Future[Unit] = {
+    val request = Request(Version.Http11, Method.Put, path)
+    request.setContentString(data)
+    client.apply(request) flatMap {
+      case OkResponse(response)  => Future.Unit
+      case BadResponse(response) => Future.exception(ServiceException(response))
+    }
+  }
+
+  def putBlocking(path: String, data: String, timeout: Duration = Duration.fromSeconds(3)): Unit = {
+    Await.result(put(path, data), timeout)
+  }
 }
 
 object OkResponse {

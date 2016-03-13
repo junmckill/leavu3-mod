@@ -14,8 +14,9 @@ object DesktopMain extends Logging {
 
     ScriptInjector.startInjecting(config.dcsRemoteAddress, config.dcsRemotePort)
     GameData.startPoller(config.gameDataFps, config.dcsRemoteAddress, config.dcsRemotePort)
+    DlinkOutData.startPoller(config)
     // DlinkInData.startPoller(config.dlinkInFps, config.dcsRemoteAddress, config.dcsRemotePort)
-    // DlinkOutData.startPoller(config.dlinkOutFps, config.dcsRemoteAddress, config.dcsRemotePort)
+    //
   }
 
   private def loadLwjglConfig(config: Configuration): LwjglApplicationConfiguration = {

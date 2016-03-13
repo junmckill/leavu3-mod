@@ -14,10 +14,10 @@
   "aaSamples"        : 4,
   "instrument"       : "se.gigurra.leavu3.mfd.Mfd",
   "symbolScale"      : 1.0,
-  "dlinkInFps"       : 5,
-  "dlinkOutFps"      : 5,
+  "dlinkInFps"       : 2,
+  "dlinkOutFps"      : 1,
   "dlinkHost"        : "build.culvertsoft.se",
-  "dlinkPort"        : 11337,
+  "dlinkPort"        : 12340,
   "dlinkTeam"        : "BLUE_RABBITS",
   "dlinkCallsign"    : "JarJar"
 }

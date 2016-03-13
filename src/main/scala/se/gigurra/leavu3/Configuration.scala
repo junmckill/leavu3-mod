@@ -52,7 +52,7 @@ object Configuration extends Schema[Configuration] with Logging {
   val dlinkInFps        = required[Int]     ("dlinkInFps",        default = 5)
   val dlinkOutFps       = required[Int]     ("dlinkOutFps",       default = 5)
   val dlinkHost         = required[String]  ("dlinkHost",         default = "build.culvertsoft.se")
-  val dlinkPort         = required[Int]     ("dlinkPort",         default = 11337)
+  val dlinkPort         = required[Int]     ("dlinkPort",         default = 12340)
   val dlinkTeam         = required[String]  ("dlinkTeam",         default = "BLUE_RABBIT")
   val dlinkCallsign     = required[String]  ("dlinkCallsign",     default = "JarJar")
 

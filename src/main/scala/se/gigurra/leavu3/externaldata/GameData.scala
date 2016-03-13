@@ -1,5 +1,7 @@
 package se.gigurra.leavu3.externaldata
 
+import java.time.Instant
+
 import se.gigurra.heisenberg.MapData._
 import se.gigurra.heisenberg.{Parsed, Schema}
 import se.gigurra.leavu3.util.{RestClient, SimpleTimer}
@@ -40,6 +42,9 @@ case class GameData(source: SourceData) extends Parsed[GameData.type] {
   def aircraftMode: AircraftMode = indicators.nav.mode
 
   def withRoute(newRoute: Route) = marshal(this, schema.route -> newRoute)
+
+  val timeStamp: Double = Instant.now.toEpochMilli.toDouble / 1000.0
+  def age: Double = Instant.now.toEpochMilli.toDouble / 1000.0 - timeStamp
 }
 
 object GameData extends Schema[GameData] with Logging {

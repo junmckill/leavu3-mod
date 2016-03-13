@@ -1,25 +1,21 @@
 package se.gigurra.leavu3.externaldata
 
-import se.gigurra.heisenberg.MapData._
-import se.gigurra.heisenberg.{Schema, Parsed}
+import se.gigurra.leavu3.{Configuration, DlinkData}
 import se.gigurra.leavu3.util.{RestClient, SimpleTimer}
 import se.gigurra.serviceutils.json.JSON
 
-/**
-  * Created by kjolh on 3/10/2016.
-  */
-case class DlinkInData(source: SourceData) extends Parsed[DlinkInData.type] {
+object DlinkInData {
 
-}
+  def startPoller(config: Configuration): Unit = {
 
-object DlinkInData extends Schema[DlinkInData] {
+    val client = RestClient(config.dlinkHost, config.dlinkPort)
 
-  def startPoller(fps: Int, addr: String, port: Int): Unit = {
-
-    val client = RestClient(addr, port)
-
-    SimpleTimer.fromFps(fps) {
-      ExternalData.dlinkIn = JSON.read(client.getBlocking("/dlink/in", cacheMaxAgeMillis = Some(10000L)))
+    SimpleTimer.fromFps(config.dlinkInFps) {
+      val rawData = JSON.readMap(client.getBlocking(config.dlinkTeam, cacheMaxAgeMillis = Some(10000L)))
+      rawData.map {
+        case (id, raw) => ???
+      }
+      ???
     }
   }
 }
