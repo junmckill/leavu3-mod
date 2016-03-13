@@ -4,10 +4,14 @@ import se.gigurra.heisenberg.MapData._
 import se.gigurra.heisenberg.{Schema, Parsed}
 
 case class Spatial(source: SourceData = Map.empty) extends Parsed[Spatial.type] {
-  val rwing    = parse(schema.x)
-  val nose     = parse(schema.y)
-  val up       = parse(schema.z)
-  val position = parse(schema.position)
+   val fwd     = parse(schema.x)
+   val up      = parse(schema.y)
+   val rwing   = parse(schema.z)
+   val position = parse(schema.position)
+
+  val pitch    = math.asin(fwd.z).toDegrees
+  val roll     = math.atan2(up.x, up.z).toDegrees
+  val heading  = math.atan2(fwd.x, fwd.y).toDegrees
 }
 
 object Spatial extends Schema[Spatial] {

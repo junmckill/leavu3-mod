@@ -44,4 +44,5 @@ object Vec3 {
 
 object Vec2 {
   implicit def v22gdxv2(a: Vec2): Vector2 = new Vector2(a.x.toFloat, a.y.toFloat)
+  implicit def v22gdxv3(a: Vec2): Vector3 = new Vector3(a.x.toFloat, a.y.toFloat, 0.0f)
 }

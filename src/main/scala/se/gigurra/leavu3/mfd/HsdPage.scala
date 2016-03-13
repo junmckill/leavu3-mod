@@ -5,6 +5,7 @@ import se.gigurra.leavu3.externaldata._
 import se.gigurra.leavu3.gfx.RenderContext._
 import se.gigurra.leavu3.util.CircleBuffer
 
+import scala.collection.mutable.ArrayBuffer
 import scala.language.postfixOps
 
 /**
@@ -21,6 +22,7 @@ case class HsdPage(implicit config: Configuration) extends Page {
       drawHsi(game)
       drawWaypoints(game)
       drawAiWingmen(game)
+      drawAiWingmenTargets(game)
       drawDlinkWingmen(dlinkIn)
       drawDlinkWingmenTargets(dlinkIn)
       drawLockedTargets(game)
@@ -50,6 +52,7 @@ case class HsdPage(implicit config: Configuration) extends Page {
   def drawSelf(game: GameData): Unit = {
     transform(_.rotate(-self.heading)) {
       lines(shapes.self.coords * symbolScale, LIGHT_GRAY)
+      circle(0.005 * symbolScale, color = LIGHT_GRAY, typ = FILL)
     }
   }
 
@@ -74,14 +77,62 @@ case class HsdPage(implicit config: Configuration) extends Page {
     batched {
       for (wp <- game.route.waypoints) {
         val text = if (wp.index > 0) (wp.index - 1).toString else "x"
-        text.drawNextToTarget(wp.position, WHITE)
+        at(wp.position) {
+          text.drawRightOf(WHITE)
+        }
       }
     }
   }
 
   def drawAiWingmen(game: GameData): Unit = {
-    game.aiWingmen foreach { wingman =>
-      circle(at = wingman.position - self.position, radius = 0.025 * symbolScale, color = CYAN)
+    for (wingman <- game.aiWingmen) {
+      val p = (wingman.position - self.position).vec2
+      val radius = 0.020 * symbolScale
+      at(wingman.position, wingman.heading) {
+        circle(radius = radius, color = CYAN)
+        lines(Seq(Vec2(0.0, radius) -> Vec2(0.0, radius * 3)))
+      }
+    }
+  }
+
+  var wingmenTgtsLastTminus1 = Seq.empty[Vec3]
+  var wingmenTgtsLastTminus2 = Seq.empty[Vec3]
+
+  def drawAiWingmenTargets(game: GameData): Unit = {
+    val radius = 0.020 * symbolScale
+
+    // Hack in heading of tgts if possible
+    val shouldDrawHeading =
+      game.aiWingmenTgts.size == wingmenTgtsLastTminus1.size &&
+      game.aiWingmenTgts.size == wingmenTgtsLastTminus2.size
+
+    for ((tgtPos, i) <- game.aiWingmenTgts.zipWithIndex) {
+      at(tgtPos) {
+        circle(radius = radius, color = RED)
+        if (shouldDrawHeading) {
+          val tMinus1 = wingmenTgtsLastTminus1(i)
+          val tMinus2 = wingmenTgtsLastTminus2(i)
+          val delta = tMinus1 - tMinus2
+          val heading = math.atan2(delta.x, delta.y).toDegrees
+          rotatedTo(heading) {
+            lines(Seq(Vec2(0.0, radius) -> Vec2(0.0, radius * 3)))
+          }
+        }
+      }
+    }
+
+    batched {
+      for (tgtPos <- game.aiWingmenTgts) {
+        at(tgtPos) {
+          val text = (tgtPos.z * m_to_kft).round.toString
+          text.drawLeftOf(color = RED)
+        }
+      }
+    }
+
+    if (wingmenTgtsLastTminus1 != game.aiWingmenTgts) {
+      wingmenTgtsLastTminus2 = wingmenTgtsLastTminus1
+      wingmenTgtsLastTminus1 = game.aiWingmenTgts
     }
   }
 

@@ -32,8 +32,8 @@ case class Font(font: BitmapFont, size: Float)
   }
 
   def widthOf(s: String): Float = {
-    val longestLine = s.lines.maxBy(_.size)
-    font.getSpaceWidth * longestLine.size.toFloat
+    val longestLine = s.lines.maxBy(_.length)
+    font.getSpaceWidth * longestLine.length.toFloat
   }
 
   def heightOf(s: String): Float = {

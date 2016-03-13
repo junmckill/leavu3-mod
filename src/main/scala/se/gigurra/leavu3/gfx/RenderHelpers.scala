@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.GL20._
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType
 import com.badlogic.gdx.math.{Vector2, Vector3}
-import se.gigurra.leavu3.externaldata.{Vec3, ExternalData}
+import se.gigurra.leavu3.externaldata.{Vec2, Vec3, ExternalData}
 import se.gigurra.leavu3.math.UnitConversions
 
 trait RenderHelpers extends UnitConversions { _: RenderContext.type =>
@@ -100,6 +100,21 @@ trait RenderHelpers extends UnitConversions { _: RenderContext.type =>
       } {
         shapeRenderer.line(p1, p2)
       }
+    }
+  }
+
+  def at(position: Vec2, heading: Double = 0.0)(f: => Unit): Unit = {
+    transform(_
+      .translate(position - self.position)
+      .rotate(-heading)) {
+        f
+    }
+  }
+
+  def rotatedTo(heading: Double)(f: => Unit): Unit = {
+    transform(_
+      .rotate(-heading)) {
+      f
     }
   }
 

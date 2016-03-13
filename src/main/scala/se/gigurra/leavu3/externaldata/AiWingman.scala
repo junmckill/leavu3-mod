@@ -12,6 +12,9 @@ case class AiWingman(source: SourceData) extends Parsed[AiWingman.type] {
   val orderedTarget   = parse(schema.orderedTarget)
 
   def position = spatial.position
+  def pitch = spatial.pitch
+  def roll = spatial.roll
+  def heading = spatial.heading
 }
 
 object AiWingman extends Schema[AiWingman] {

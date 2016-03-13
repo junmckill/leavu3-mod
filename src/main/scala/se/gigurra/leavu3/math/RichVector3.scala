@@ -32,6 +32,9 @@ trait RichVector3Implicits {
   implicit def tuplevSeq32tuplev2v2(t: Seq[(Vec2, Vec2)]): Seq[(Vector2, Vector2)]= t.map(tuplev32tuplev2v2)
   implicit def tuplevSeq32tuplev2v23(t: Seq[(Vec3, Vec3)]): Seq[(Vector2, Vector2)]= t.map(tuplev32tuplev2v33)
 
+  implicit def vector22vector3(v: Vector2): Vector3 = new Vector3(v.x, v.y, 0.0f)
+  implicit def vector32vector2(v: Vector3): Vector2 = new Vector2(v.x, v.y)
+
   implicit class RichTupleVec2(vv: (Vec2, Vec2)) {
     def *(const: Double): (Vec2, Vec2) = (vv._1 * const, vv._2 * const)
     def /(const: Double): (Vec2, Vec2) = (vv._1 / const, vv._2 / const)

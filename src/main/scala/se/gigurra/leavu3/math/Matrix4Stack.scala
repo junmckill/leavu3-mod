@@ -2,10 +2,11 @@ package se.gigurra.leavu3.math
 
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.GlyphLayout
-import com.badlogic.gdx.math.{Matrix4, Vector3}
+import com.badlogic.gdx.math.{Vector2, Matrix4, Vector3}
 
 import scala.language.implicitConversions
 
+import se.gigurra.leavu3.gfx.RenderContext._
 
 case class Matrix4Stack(depth: Int, uploader: Matrix4 => Unit) {
   private val stack = (0 until depth).map(_ => new Matrix4).toArray
@@ -56,15 +57,17 @@ case class Matrix4Stack(depth: Int, uploader: Matrix4 => Unit) {
   }
 
   def upload(): this.type = { uploader(current); this }
-  def transform(f: Matrix4 => Unit) = { f(current); upload() }
-  def translate(t: Vector3) = transform(_.translate(t))
-  def translate(x: Float = 0.0f, y: Float = 0.0f, z: Float = 0.0f) = transform(_.translate(x, y, z))
-  def scale(t: Vector3) = transform(_.scale(t.x, t.y, t.z))
-  def scale(x: Float = 1.0f, y: Float = 1.0f, z: Float = 1.0f) = transform(_.scale(x, y, z))
-  def scalexy(s: Float) = scale(x = s, y = s)
-  def inverseScaleXY() = scale(1.0f / current.getScaleX, 1.0f / current.getScaleY)
-  def overrideScaleXY(s: Float) = scale(x = s / current.getScaleX, y = s / current.getScaleY)
-  def rotate(angle: Float, x: Float = 0.0f, y: Float = 0.0f, z: Float = 0.0f) = transform(_.rotate(angle, x, y, z))
-  def rotate(angle: Float, axis: Vector3) = transform(_.rotate(axis, angle))
-  def rotate(angle: Float) = transform(_.rotate(Vector3.Z, angle))
+  def transform(f: Matrix4 => Unit): this.type = { f(current); upload() }
+  def translate(t: Vector3): this.type = transform(_.translate(t))
+  def translate(x: Float = 0.0f, y: Float = 0.0f, z: Float = 0.0f): this.type = transform(_.translate(x, y, z))
+  def scale(t: Vector3): this.type = transform(_.scale(t.x, t.y, t.z))
+  def scale(x: Float = 1.0f, y: Float = 1.0f, z: Float = 1.0f): this.type = transform(_.scale(x, y, z))
+  def scalexy(s: Float): this.type = scale(x = s, y = s)
+  def scalexy(s: Double): this.type = scalexy(s.toFloat)
+  def inverseScaleXY(): this.type = scale(1.0f / current.getScaleX, 1.0f / current.getScaleY)
+  def overrideScaleXY(s: Float): this.type = scale(x = s / current.getScaleX, y = s / current.getScaleY)
+  def rotate(angle: Float, x: Float = 0.0f, y: Float = 0.0f, z: Float = 0.0f): this.type = transform(_.rotate(angle, x, y, z))
+  def rotate(angle: Float, axis: Vector3): this.type = transform(_.rotate(axis, angle))
+  def rotate(angle: Float): this.type = transform(_.rotate(Vector3.Z, angle))
+  def rotate(angle: Double): this.type = rotate(angle.toFloat)
 }

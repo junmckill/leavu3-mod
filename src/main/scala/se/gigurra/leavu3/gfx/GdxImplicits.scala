@@ -11,19 +11,44 @@ trait GdxImplicits { _: RenderContext.type =>
   }
 
   implicit class DrawableString(text: String) {
-    def draw(wOffs: Float = 0.5f, hOffs: Float = 0.5f, color: Color = null): Unit = {
+    def draw(xAlign: Float = 0.0f,
+             yAlign: Float = 0.0f,
+             xCharOffs: Float = 0.0f,
+             yCharOffs: Float = 0.0f,
+             color: Color = null): Unit = {
       if (color != null)
         font.setColor(color)
-      font.draw(batch, text, width * (wOffs - 1.0f), height * hOffs)
+      font.draw(
+        batch,
+        text,
+        width * (xAlign - 0.5f) + xCharOffs * font.getSpaceWidth,
+        height * (yAlign + 0.5f) + yCharOffs * font.size
+      )
     }
-    def drawNextToTarget(target: Vec3, color: Color = null)(implicit configuration: Configuration): Unit = {
+    def drawRightOf(color: Color = null)(implicit configuration: Configuration): Unit = {
       transform(_
-        .translate((target - self.position).withZeroZ)
         .scalexy(0.05f * symbolScale.toFloat / font.size)
         .rotate(-self.heading)) {
-        draw(wOffs = 1.75f, color = color)
+        draw(xAlign = 0.5f, color = color)
       }
     }
+
+    def drawLeftOf(color: Color = null)(implicit configuration: Configuration): Unit = {
+      transform(_
+        .scalexy(0.05f * symbolScale.toFloat / font.size)
+        .rotate(-self.heading)) {
+        draw(xAlign = -0.5f, color = color)
+      }
+    }
+
+    def drawBelow(color: Color = null)(implicit configuration: Configuration): Unit = {
+      transform(_
+        .scalexy(0.05f * symbolScale.toFloat / font.size)
+        .rotate(-self.heading)) {
+        draw(yAlign = -0.5f, color = color)
+      }
+    }
+
     def width: Float = font.widthOf(text)
     def height: Float = font.heightOf(text)
   }
