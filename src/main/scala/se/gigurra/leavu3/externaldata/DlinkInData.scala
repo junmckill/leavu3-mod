@@ -1,8 +1,8 @@
 package se.gigurra.leavu3.externaldata
 
-import se.gigurra.leavu3.externaldata.DlinkOutData._
-import se.gigurra.leavu3.{Configuration, DlinkData}
+import se.gigurra.heisenberg.MapDataParser
 import se.gigurra.leavu3.util.{RestClient, SimpleTimer}
+import se.gigurra.leavu3.{Configuration, DlinkData}
 import se.gigurra.serviceutils.json.JSON
 import se.gigurra.serviceutils.twitter.logging.Logging
 import se.gigurra.serviceutils.twitter.service.ServiceException
@@ -18,9 +18,9 @@ object DlinkInData extends Logging {
     SimpleTimer.fromFps(config.dlinkInFps) {
       Try {
         val rawData = JSON.readMap(client.getBlocking(config.dlinkTeam, cacheMaxAgeMillis = Some(10000L)))
-        rawData.foreach {
+        ExternalData.dlinkIn = rawData.map {
           case (id, raw) =>
-           // println(s"$id -> $raw")
+            id -> implicitly[MapDataParser[DlinkData]].parse(raw)
         }
       } match {
         case Success(_) =>
