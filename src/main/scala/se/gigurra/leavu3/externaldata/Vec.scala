@@ -1,14 +1,38 @@
 package se.gigurra.leavu3.externaldata
 
 import com.badlogic.gdx.math.{Vector2, Vector3}
+import se.gigurra.leavu3.math.UnitConversions
 import scala.language.implicitConversions
 
-case class Bra(bearing: Double, range: Double, deltaAltitude: Double) {
+case class Bra(bearing: Double, range: Double, deltaAltitude: Double) extends UnitConversions {
   def toOffset: Vec3 = {
     val scale = math.cos(deltaAltitude / range)
     val y = range * math.cos(bearing.toRadians) * scale
     val x = range * math.sin(bearing.toRadians) * scale
     Vec3(x, y, deltaAltitude)
+  }
+
+  def bearingString: String = {
+
+    def padBearing(in: String): String = {
+      in.length match {
+        case 0 => "000"
+        case 1 => "00" + in
+        case 2 => "0" + in
+        case _ =>  in
+      }
+    }
+
+    val bearingRaw = this.bearing.round
+    padBearing((if (bearingRaw < 0) bearingRaw + 360 else bearingRaw).toString)
+  }
+
+  def distString: String = {
+    (range * m_to_nmi).round.toString
+  }
+
+  def brString: String = {
+    s"$bearingString $distString"
   }
 }
 

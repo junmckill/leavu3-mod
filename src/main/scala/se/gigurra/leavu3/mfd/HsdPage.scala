@@ -281,12 +281,9 @@ case class HsdPage(implicit config: Configuration) extends Page {
 
 
 
-  def mkBraString(prefix: String, bra: Bra): String = {
-    s"$prefix : ${bra.bearing.round} ${(bra.range * m_to_nmi).round}"
-  }
-  def mkBraString(prefix: String, bra: Option[Bra]): Option[String] = {
-    bra.map(mkBraString(prefix, _))
-  }
+
+  def mkBraString(prefix: String, bra: Bra): String = s"$prefix : ${bra.brString}"
+  def mkBraString(prefix: String, bra: Option[Bra]): Option[String] = bra.map(mkBraString(prefix, _))
 
   def drawBullseyeNumbers(game: GameData) = {
 
