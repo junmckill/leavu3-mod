@@ -1,7 +1,7 @@
 {
   "title"         : "Leavu 3",
-  "x"             : 300,
-  "y"             : 300,
+  "x"             : 200,
+  "y"             : 200,
   "width"         : 1024,
   "height"        : 1024,
   "forceExit"     : true,

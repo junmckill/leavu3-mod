@@ -1,5 +1,6 @@
 package se.gigurra.leavu3.mfd
 
+import com.badlogic.gdx.graphics.Color
 import se.gigurra.leavu3.Configuration
 import se.gigurra.leavu3.externaldata._
 import se.gigurra.leavu3.gfx.RenderContext._
@@ -172,6 +173,16 @@ case class HsdPage(implicit config: Configuration) extends Page {
   def drawDlinkWingmenTargets(dlinkIn: DlinkInData): Unit = {
   }
 
+  def contactColor(contact: Contact, fromDatalink: Boolean): Color = {
+    if (self.coalition == contact.country) {
+      GREEN
+    } else if (fromDatalink) {
+      RED
+    } else {
+      YELLOW
+    }
+  }
+
   def drawLockedTargets(game: GameData): Unit = {
 
     val radius = 0.020 * symbolScale
@@ -205,7 +216,7 @@ case class HsdPage(implicit config: Configuration) extends Page {
     for (contact <- positionsDesignated) {
 
       at(contact.position) {
-        circle(radius = radius, typ = FILL, color = YELLOW)
+        circle(radius = radius, typ = FILL, color = contactColor(contact, fromDatalink = false))
         rotatedTo(contact.heading) {
           lines(Seq(Vec2(0.0, radius) -> Vec2(0.0, radius * 3)))
         }
@@ -221,7 +232,7 @@ case class HsdPage(implicit config: Configuration) extends Page {
       for (contact <- positionsDesignated) {
         at(contact.position) {
           val text = (contact.position.z * m_to_kft).round.toString
-          text.drawLeftOf(color = YELLOW)
+          text.drawLeftOf(color = contactColor(contact, fromDatalink = false))
           (contact.index + 1).toString.drawCentered(scale = 0.75f, color = BLACK)
         }
       }
@@ -230,6 +241,21 @@ case class HsdPage(implicit config: Configuration) extends Page {
   }
 
   def drawTdc(game: GameData): Unit = {
+
+
+    val tdc = game.sensors.status.tdc
+    val dist = (tdc.y + 1.0) * game.sensors.status.scale.distance * 0.5
+    val halfWidth = game.sensors.status.scale.azimuth
+    val angle = self.heading + halfWidth * tdc.x
+    val y = dist * math.cos(angle.toRadians)
+    val x = dist * math.sin(angle.toRadians)
+    val offset = Vec2(x,y)
+
+    val radius = 0.020 * symbolScale
+
+    at(self.position + offset) {
+      circle(radius = radius, typ = FILL, color = GREEN)
+    }
 
   }
 
