@@ -5,7 +5,6 @@ import se.gigurra.leavu3.externaldata._
 import se.gigurra.leavu3.gfx.RenderContext._
 import se.gigurra.leavu3.util.CircleBuffer
 
-import scala.collection.mutable.ArrayBuffer
 import scala.language.postfixOps
 
 /**
@@ -91,6 +90,15 @@ case class HsdPage(implicit config: Configuration) extends Page {
       at(wingman.position, wingman.heading) {
         circle(radius = radius, color = CYAN)
         lines(Seq(Vec2(0.0, radius) -> Vec2(0.0, radius * 3)))
+      }
+    }
+
+    batched {
+      for (wingman <- game.aiWingmen) {
+        at(wingman.position) {
+          val text = (wingman.position.z * m_to_kft).round.toString
+          text.drawLeftOf(color = CYAN)
+        }
       }
     }
   }

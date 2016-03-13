@@ -13,23 +13,23 @@ trait GdxImplicits { _: RenderContext.type =>
   implicit class DrawableString(text: String) {
     def draw(xAlign: Float = 0.0f,
              yAlign: Float = 0.0f,
-             xCharOffs: Float = 0.0f,
-             yCharOffs: Float = 0.0f,
+             xRawOffs: Float = 0.0f,
+             yRawOffs: Float = 0.0f,
              color: Color = null): Unit = {
       if (color != null)
         font.setColor(color)
       font.draw(
         batch,
         text,
-        width * (xAlign - 0.5f) + xCharOffs * font.getSpaceWidth,
-        height * (yAlign + 0.5f) + yCharOffs * font.size
+        width * (xAlign - 0.5f) + xRawOffs,
+        height * (yAlign + 0.5f) + yRawOffs
       )
     }
     def drawRightOf(color: Color = null)(implicit configuration: Configuration): Unit = {
       transform(_
         .scalexy(0.05f * symbolScale.toFloat / font.size)
         .rotate(-self.heading)) {
-        draw(xAlign = 0.5f, color = color)
+        draw(xAlign = 0.5f, xRawOffs = 0.025f * screen2World, color = color)
       }
     }
 
@@ -37,7 +37,7 @@ trait GdxImplicits { _: RenderContext.type =>
       transform(_
         .scalexy(0.05f * symbolScale.toFloat / font.size)
         .rotate(-self.heading)) {
-        draw(xAlign = -0.5f, color = color)
+        draw(xAlign = -0.5f, xRawOffs = -0.025f * screen2World, color = color)
       }
     }
 
@@ -45,7 +45,7 @@ trait GdxImplicits { _: RenderContext.type =>
       transform(_
         .scalexy(0.05f * symbolScale.toFloat / font.size)
         .rotate(-self.heading)) {
-        draw(yAlign = -0.5f, color = color)
+        draw(yAlign = -0.5f, yRawOffs = -0.025f * screen2World, color = color)
       }
     }
 
