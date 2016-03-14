@@ -5,12 +5,7 @@ package se.gigurra.leavu3.util
   */
 object Resource2String {
   def apply(path: String, enc: String = "UTF-8"): String = {
-
-    val url = getClass.getClassLoader.getResource(path).toURI
-    if (url == null) {
-      throw new RuntimeException("Resource not found: " + path)
-    } else {
-      scala.io.Source.fromFile(url, enc).mkString
-     }
+    val stream = getClass.getClassLoader.getResourceAsStream(path)
+    scala.io.Source.fromInputStream(stream, enc).mkString
   }
 }
