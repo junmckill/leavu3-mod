@@ -13,11 +13,5 @@
   "dcsRemotePort"    : 12340,
   "aaSamples"        : 4,
   "instrument"       : "se.gigurra.leavu3.mfd.Mfd",
-  "symbolScale"      : 1.0,
-  "dlinkInFps"       : 2,
-  "dlinkOutFps"      : 1,
-  "dlinkHost"        : "build.culvertsoft.se",
-  "dlinkPort"        : 12340,
-  "dlinkTeam"        : "BLUE_RABBITS",
-  "dlinkCallsign"    : "JarJar"
+  "symbolScale"      : 1.0
 }

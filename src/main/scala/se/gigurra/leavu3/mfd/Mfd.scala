@@ -2,11 +2,11 @@ package se.gigurra.leavu3.mfd
 
 import se.gigurra.leavu3.externaldata.GameData
 import se.gigurra.leavu3.gfx.RenderContext._
-import se.gigurra.leavu3.{Configuration, DlinkData, Instrument}
+import se.gigurra.leavu3.{DlinkSettings, Configuration, DlinkData, Instrument}
 
 import scala.language.postfixOps
 
-case class Mfd(implicit config: Configuration) extends Instrument(config) {
+case class Mfd(implicit config: Configuration, dlinkSettings: DlinkSettings) extends Instrument(config, dlinkSettings) {
 
   val hsd = HsdPage()
   val rwr = RwrPage()

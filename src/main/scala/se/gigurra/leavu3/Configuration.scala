@@ -25,12 +25,6 @@ case class Configuration(source: SourceData = Map.empty) extends Parsed[Configur
   val aaSamples         = parse(schema.aaSamples)
   val instrument        = parse(schema.instrument)
   val symbolScale       = parse(schema.symbolScale)
-  val dlinkInFps        = parse(schema.dlinkInFps)
-  val dlinkOutFps       = parse(schema.dlinkOutFps)
-  val dlinkHost         = parse(schema.dlinkHost)
-  val dlinkPort         = parse(schema.dlinkPort)
-  val dlinkTeam         = parse(schema.dlinkTeam)
-  val dlinkCallsign     = parse(schema.dlinkCallsign)
 }
 
 object Configuration extends Schema[Configuration] with Logging {
@@ -49,12 +43,6 @@ object Configuration extends Schema[Configuration] with Logging {
   val aaSamples         = required[Int]     ("aaSamples",         default = 4)
   val instrument        = required[String]  ("instrument",        default = "se.gigurra.leavu3.mfd.Mfd")
   val symbolScale       = required[Double]  ("symbolScale",       default = 1.0)
-  val dlinkInFps        = required[Int]     ("dlinkInFps",        default = 5)
-  val dlinkOutFps       = required[Int]     ("dlinkOutFps",       default = 5)
-  val dlinkHost         = required[String]  ("dlinkHost",         default = "build.culvertsoft.se")
-  val dlinkPort         = required[Int]     ("dlinkPort",         default = 12340)
-  val dlinkTeam         = required[String]  ("dlinkTeam",         default = "BLUE_RABBITS")
-  val dlinkCallsign     = required[String]  ("dlinkCallsign",     default = "JarJar")
 
 
   def readFromFile(s: String = "leavu3-cfg.json"): Configuration = {
@@ -69,4 +57,22 @@ object Configuration extends Schema[Configuration] with Logging {
         throw e
     }
   }
+}
+
+case class DlinkSettings(source: SourceData = Map.empty) extends Parsed[DlinkSettings.type] {
+  val host         = parse(schema.host)
+  val port         = parse(schema.port)
+  val team         = parse(schema.team)
+  val callsign     = parse(schema.callsign)
+  val inFps        = parse(schema.inFps)
+  val outFps       = parse(schema.outFps)
+}
+
+object DlinkSettings extends Schema[DlinkSettings] {
+  val host         = required[String]  ("host",         default = "build.culvertsoft.se")
+  val port         = required[Int]     ("port",         default = 12340)
+  val team         = required[String]  ("team",         default = "BLUE_RABBITS")
+  val callsign     = required[String]  ("callsign",     default = "JarJar")
+  val inFps        = required[Int]     ("inFps",        default = 1)
+  val outFps       = required[Int]     ("outFps",       default = 2)
 }

@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.GL20._
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType
 import com.badlogic.gdx.math.{Vector2, Vector3}
-import se.gigurra.leavu3.Configuration
+import se.gigurra.leavu3.{DlinkSettings, Configuration}
 import se.gigurra.leavu3.externaldata.{Vec2, Vec3, ExternalData}
 import se.gigurra.leavu3.math.UnitConversions
 
@@ -135,7 +135,7 @@ trait RenderHelpers extends UnitConversions { _: RenderContext.type =>
   }
 
   object self {
-    def dlinkCallsign(implicit c: Configuration): String = c.dlinkCallsign
+    def dlinkCallsign(implicit c: DlinkSettings): String = c.callsign
     def planeId: Int = ExternalData.gameData.metaData.planeId
     def modelTime: Double = ExternalData.gameData.metaData.modelTime
     def coalition: Int = ExternalData.gameData.selfData.coalitionId

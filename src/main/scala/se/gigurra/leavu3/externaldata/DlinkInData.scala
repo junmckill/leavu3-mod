@@ -2,7 +2,7 @@ package se.gigurra.leavu3.externaldata
 
 import se.gigurra.heisenberg.MapDataParser
 import se.gigurra.leavu3.util.{RestClient, SimpleTimer}
-import se.gigurra.leavu3.{Configuration, DlinkData}
+import se.gigurra.leavu3.{DlinkSettings, Configuration, DlinkData}
 import se.gigurra.serviceutils.json.JSON
 import se.gigurra.serviceutils.twitter.logging.Logging
 import se.gigurra.serviceutils.twitter.service.ServiceException
@@ -11,16 +11,15 @@ import scala.util.{Failure, Success, Try}
 
 object DlinkInData extends Logging {
 
-  def startPoller(config: Configuration): Unit = {
+  def startPoller(config: DlinkSettings): Unit = {
 
-    val client = RestClient(config.dlinkHost, config.dlinkPort)
+    val client = RestClient(config.host, config.port)
 
-    SimpleTimer.fromFps(config.dlinkInFps) {
+    SimpleTimer.fromFps(config.inFps) {
       Try {
-        val rawData = JSON.readMap(client.getBlocking(config.dlinkTeam, cacheMaxAgeMillis = Some(10000L)))
-        ExternalData.dlinkIn = rawData.map {
-          case (id, raw) =>
-            id -> implicitly[MapDataParser[DlinkData]].parse(raw)
+        val rawData = JSON.readMap(client.getBlocking(config.team, cacheMaxAgeMillis = Some(10000L)))
+        ExternalData.dlinkIn = rawData.collect {
+          case ValidDlinkData(id, dlinkData) => id -> dlinkData
         }
       } match {
         case Success(_) =>
@@ -31,4 +30,18 @@ object DlinkInData extends Logging {
       }
     }
   }
+
+  object ValidDlinkData {
+    def unapply(callsignAndData: (String, Any)): Option[(String, DlinkData)] = {
+      val callsign = callsignAndData._1
+      val raw = callsignAndData._2
+      Try(implicitly[MapDataParser[DlinkData]].parse(raw)) match {
+        case Success(dlinkData) => Some(callsign, dlinkData)
+        case Failure(e) =>
+          logger.warning(s"Failed to read dlink data from $callsign")
+          None
+      }
+    }
+  }
+
 }

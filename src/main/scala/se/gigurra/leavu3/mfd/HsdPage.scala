@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.Color
 import se.gigurra.leavu3.externaldata._
 import se.gigurra.leavu3.gfx.RenderContext._
 import se.gigurra.leavu3.util.{CurTime, CircleBuffer}
-import se.gigurra.leavu3.{Configuration, DlinkData}
+import se.gigurra.leavu3.{DlinkSettings, Configuration, DlinkData}
 
 import scala.collection.mutable
 import scala.language.postfixOps
@@ -14,7 +14,7 @@ import scala.language.postfixOps
 /**
   * Created by kjolh on 3/12/2016.
   */
-case class HsdPage(implicit config: Configuration) extends Page {
+case class HsdPage(implicit config: Configuration, dlinkSettings: DlinkSettings) extends Page {
 
   var shouldMatchIngameScale = true
   val distance = CircleBuffer(10 nmi, 20 nmi, 40 nmi, 80 nmi, 160 nmi).withDefaultValue(40 nmi)

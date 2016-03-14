@@ -1,6 +1,6 @@
 package se.gigurra.leavu3.externaldata
 
-import se.gigurra.leavu3.{Member, Configuration}
+import se.gigurra.leavu3.{DlinkSettings, Member, Configuration}
 import se.gigurra.leavu3.util.{RestClient, SimpleTimer}
 import se.gigurra.serviceutils.json.JSON
 import se.gigurra.serviceutils.twitter.logging.Logging
@@ -10,11 +10,11 @@ import scala.util.{Failure, Success, Try}
 
 object DlinkOutData extends Logging {
 
-  def startPoller(config: Configuration): Unit = {
+  def startPoller(config: DlinkSettings): Unit = {
 
-    val client = RestClient(config.dlinkHost, config.dlinkPort)
+    val client = RestClient(config.host, config.port)
 
-    SimpleTimer.fromFps(config.dlinkOutFps) {
+    SimpleTimer.fromFps(config.outFps) {
       val source = ExternalData.gameData
       if (source.err.isEmpty && source.age < 3.0) {
         val self = Member.marshal(
@@ -26,7 +26,7 @@ object DlinkOutData extends Logging {
           Member.selfData -> source.metaData.selfData
         )
         val json = JSON.write(self)
-        Try(client.putBlocking(s"${config.dlinkTeam}/${config.dlinkCallsign}", json)) match {
+        Try(client.putBlocking(s"${config.team}/${config.callsign}", json)) match {
           case Success(_) =>
           case Failure(e: ServiceException) =>
             logger.error(s"Data link host replied with an error: $e")

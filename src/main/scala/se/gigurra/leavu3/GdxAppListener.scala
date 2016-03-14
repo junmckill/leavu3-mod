@@ -7,7 +7,7 @@ import se.gigurra.serviceutils.twitter.logging.Logging
 
 import scala.util.{Failure, Success, Try}
 
-case class GdxAppListener(initialConfiguration: Configuration) extends ApplicationListener with Logging{
+case class GdxAppListener(initialConfiguration: Configuration, dlinkSettings: DlinkSettings) extends ApplicationListener with Logging{
 
   val instrumentClassName = initialConfiguration.instrument
   val instrumentClass: Class[Instrument] =
@@ -19,7 +19,7 @@ case class GdxAppListener(initialConfiguration: Configuration) extends Applicati
         throw e
     }
   logger.info(s"Creating instrument: $instrumentClass")
-  lazy val instrument = instrumentClass.getConstructor(classOf[Configuration]).newInstance(initialConfiguration)
+  lazy val instrument = instrumentClass.getConstructor(classOf[Configuration], classOf[DlinkSettings]).newInstance(initialConfiguration, dlinkSettings)
 
   override def resize(width: Int, height: Int): Unit = {
   }
