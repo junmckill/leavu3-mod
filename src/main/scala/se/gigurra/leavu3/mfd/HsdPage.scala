@@ -1,7 +1,5 @@
 package se.gigurra.leavu3.mfd
 
-import java.time.Instant
-
 import com.badlogic.gdx.graphics.Color
 import se.gigurra.leavu3.externaldata._
 import se.gigurra.leavu3.gfx.RenderContext._
@@ -19,6 +17,7 @@ case class HsdPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
   var shouldMatchIngameScale = true
   val distance = CircleBuffer(10 nmi, 20 nmi, 40 nmi, 80 nmi, 160 nmi).withDefaultValue(40 nmi)
   val deprFactor = CircleBuffer(0.0, 0.5).withDefaultValue(0.5)
+  val stdTextSize = 0.75f
 
   def update(game: GameData, dlinkIn: Map[String, DlinkData]): Unit = {
     matchIngameScale(game)
@@ -92,7 +91,7 @@ case class HsdPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
       for (wp <- game.route.waypoints) {
         val text = if (wp.index > 0) (wp.index - 1).toString else "x"
         at(wp.position) {
-          text.drawPpiRightOf(scale = 0.75f, color = WHITE)
+          text.drawPpiRightOf(scale = stdTextSize, color = WHITE)
         }
       }
     }
@@ -123,9 +122,9 @@ case class HsdPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
       for (wingman <- game.aiWingmen) {
         at(wingman.position) {
           val altText = (wingman.position.z * m_to_kft).round.toString
-          altText.drawPpiLeftOf(color = CYAN)
+          altText.drawPpiLeftOf(scale = stdTextSize, color = CYAN)
           val nameText = "AI"
-          nameText.drawPpiRightOf(scale = 0.5f, color = CYAN)
+          nameText.drawPpiRightOf(scale = stdTextSize * 0.8f, color = CYAN)
         }
       }
     }
@@ -161,7 +160,7 @@ case class HsdPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
       for (tgtPos <- game.aiWingmenTgts) {
         at(tgtPos) {
           val text = (tgtPos.z * m_to_kft).round.toString
-          text.drawPpiLeftOf(color = RED)
+          text.drawPpiLeftOf(scale = stdTextSize, color = RED)
         }
       }
     }
@@ -191,9 +190,9 @@ case class HsdPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
       batched {
         at(memberPosition) {
           val altText = (memberPosition.z * m_to_kft).round.toString
-          altText.drawPpiLeftOf(color = CYAN)
+          altText.drawPpiLeftOf(scale = stdTextSize, color = CYAN)
           val nameText = name.take(2)
-          nameText.drawPpiRightOf(scale = 0.5f, color = CYAN)
+          nameText.drawPpiRightOf(scale = stdTextSize, color = CYAN)
         }
       }
 
@@ -201,14 +200,18 @@ case class HsdPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
 
         val targetPosition = target.position + target.velocity * lag
 
-        if (target.isPositionKnown) at(targetPosition, heading = target.heading) {
-          circle(radius = radius, typ = FILL, color = contactColor(target, fromDatalink = true))
-          lines(Seq(Vec2(0.0, radius) -> Vec2(0.0, radius * 3)))
-          batched {
-            val altText = (targetPosition.z * m_to_kft).round.toString
-            altText.drawPpiLeftOf(color = contactColor(target, fromDatalink = true))
-            val nameText = name.take(2)
-            nameText.drawPpiCentered(scale = 0.35f, color = BLACK)
+        if (target.isPositionKnown) {
+          at(targetPosition, heading = target.heading) {
+            circle(radius = radius, typ = FILL, color = contactColor(target, fromDatalink = true))
+            lines(Seq(Vec2(0.0, radius) -> Vec2(0.0, radius * 3)))
+          }
+          at(targetPosition) {
+            batched {
+              val altText = (targetPosition.z * m_to_kft).round.toString
+              altText.drawPpiLeftOf(scale = stdTextSize, color = contactColor(target, fromDatalink = true))
+              val nameText = name.take(2)
+              nameText.drawPpiCentered(scale = 0.45f, color = BLACK)
+            }
           }
         } else at(memberPosition) {
           val b = targetPosition - member.position: Vec2
@@ -276,8 +279,8 @@ case class HsdPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
       for (contact <- positionsDesignated) {
         at(contact.position) {
           val text = (contact.position.z * m_to_kft).round.toString
-          text.drawPpiLeftOf(color = contactColor(contact, fromDatalink = false))
-          (contact.index + 1).toString.drawPpiCentered(scale = 0.75f, color = BLACK)
+          text.drawPpiLeftOf(scale = stdTextSize, color = contactColor(contact, fromDatalink = false))
+          (contact.index + 1).toString.drawPpiCentered(scale = stdTextSize, color = BLACK)
         }
       }
     }
