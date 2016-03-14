@@ -5,7 +5,7 @@ import se.gigurra.heisenberg.{Schema, Parsed}
 
 import scala.language.implicitConversions
 
-case class Target(source: SourceData) extends Parsed[Target.type] {
+case class Target(source: SourceData) extends SafeParsed[Target.type] {
   val contact = parse(schema.contact)
   val dlz     = parse(schema.dlz)
 }

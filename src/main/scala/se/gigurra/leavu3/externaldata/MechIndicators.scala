@@ -3,7 +3,7 @@ package se.gigurra.leavu3.externaldata
 import se.gigurra.heisenberg.MapData._
 import se.gigurra.heisenberg.{Schema, Parsed}
 
-case class MechIndicators(source: SourceData = Map.empty) extends Parsed[MechIndicators.type] {
+case class MechIndicators(source: SourceData = Map.empty) extends SafeParsed[MechIndicators.type] {
   val wheelbrakes     = parse(schema.wheelbrakes)
   val wing            = parse(schema.wing)
   val gear            = parse(schema.gear)

@@ -3,7 +3,7 @@ package se.gigurra.leavu3.externaldata
 import se.gigurra.heisenberg.MapData._
 import se.gigurra.heisenberg.{Schema, Parsed}
 
-case class NavIndicators(source: SourceData = Map.empty) extends Parsed[NavIndicators.type] {
+case class NavIndicators(source: SourceData = Map.empty) extends SafeParsed[NavIndicators.type] {
   val requirements = parse(schema.requirements)
   val acs          = parse(schema.acs)
   val mode         = parse(schema.mode)

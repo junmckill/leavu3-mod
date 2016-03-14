@@ -3,7 +3,7 @@ package se.gigurra.leavu3.externaldata
 import se.gigurra.heisenberg.MapData._
 import se.gigurra.heisenberg.{Schema, Parsed}
 
-case class LeftRight(source: SourceData = Map.empty) extends Parsed[LeftRight.type] {
+case class LeftRight(source: SourceData = Map.empty) extends SafeParsed[LeftRight.type] {
   val left  = parse(schema.left)
   val right = parse(schema.right)
 }

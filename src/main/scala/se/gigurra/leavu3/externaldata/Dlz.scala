@@ -3,7 +3,7 @@ package se.gigurra.leavu3.externaldata
 import se.gigurra.heisenberg.MapData._
 import se.gigurra.heisenberg.{Schema, Parsed}
 
-case class Dlz(source: SourceData = Map.empty) extends Parsed[Dlz.type] {
+case class Dlz(source: SourceData = Map.empty) extends SafeParsed[Dlz.type] {
   val rAero = parse(schema.rAero)
   val rMin  = parse(schema.rMin)
   val rPi   = parse(schema.rPi)

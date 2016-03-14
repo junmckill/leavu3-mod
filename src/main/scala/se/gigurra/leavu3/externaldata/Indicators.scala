@@ -4,7 +4,7 @@ import se.gigurra.heisenberg.MapData._
 import se.gigurra.heisenberg.{Schema, Parsed}
 
 
-case class Indicators(source: SourceData = Map.empty) extends Parsed[Indicators.type] {
+case class Indicators(source: SourceData = Map.empty) extends SafeParsed[Indicators.type] {
   val nav               = parse(schema.nav)
   val beacons           = parse(schema.beacons)
   val engines           = parse(schema.engines)

@@ -3,7 +3,7 @@ package se.gigurra.leavu3.externaldata
 import se.gigurra.heisenberg.MapData._
 import se.gigurra.heisenberg.{Schema, Parsed}
 
-case class PayloadStation(source: SourceData) extends Parsed[PayloadStation.type] {
+case class PayloadStation(source: SourceData) extends SafeParsed[PayloadStation.type] {
   val clsid       = parse(schema.clsid)
   val isContainer = parse(schema.isContainer)
   val count       = parse(schema.count)

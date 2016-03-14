@@ -5,7 +5,7 @@ import se.gigurra.heisenberg.{Parsed, Schema}
 
 import scala.language.implicitConversions
 
-case class NavRequirements(source: SourceData = Map.empty) extends Parsed[NavRequirements.type] {
+case class NavRequirements(source: SourceData = Map.empty) extends SafeParsed[NavRequirements.type] {
   val altitude      = parse(schema.altitude)
   val verticalSpeed = parse(schema.verticalSpeed)
   val roll          = parse(schema.roll).toDegrees

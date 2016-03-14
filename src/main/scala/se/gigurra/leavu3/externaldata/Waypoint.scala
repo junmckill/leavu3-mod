@@ -3,7 +3,7 @@ package se.gigurra.leavu3.externaldata
 import se.gigurra.heisenberg.MapData._
 import se.gigurra.heisenberg.{Schema, Parsed}
 
-case class Waypoint(source: SourceData = Map.empty) extends Parsed[Waypoint.type] {
+case class Waypoint(source: SourceData = Map.empty) extends SafeParsed[Waypoint.type] {
   val position      = parse(schema.position)
   val estimatedTime = parse(schema.estimatedTime)
   val speedReq      = parse(schema.speedReq)

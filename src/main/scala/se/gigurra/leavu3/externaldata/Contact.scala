@@ -30,7 +30,7 @@ case class RadarFlags(flags: Int) {
   }
 }
 
-case class Contact(source: SourceData) extends Parsed[Contact.type] {
+case class Contact(source: SourceData) extends SafeParsed[Contact.type] {
   val id                     = parse(schema.id)
   val course                 = parse(schema.course).toDegrees
   val flags                  = RadarFlags(parse(schema.flags))

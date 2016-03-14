@@ -3,7 +3,7 @@ package se.gigurra.leavu3.externaldata
 import se.gigurra.heisenberg.MapData._
 import se.gigurra.heisenberg.{Schema, Parsed}
 
-case class ControlSurfaces(source: SourceData = Map.empty) extends Parsed[ControlSurfaces.type] {
+case class ControlSurfaces(source: SourceData = Map.empty) extends SafeParsed[ControlSurfaces.type] {
   val aileron  = parse(schema.aileron)
   val elevator = parse(schema.elevator)
   val rudder   = parse(schema.rudder)

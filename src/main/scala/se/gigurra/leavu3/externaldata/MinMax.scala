@@ -3,7 +3,7 @@ package se.gigurra.leavu3.externaldata
 import se.gigurra.heisenberg.MapData._
 import se.gigurra.heisenberg.{Schema, Parsed}
 
-case class MinMax(source: SourceData = Map.empty) extends Parsed[MinMax.type] {
+case class MinMax(source: SourceData = Map.empty) extends SafeParsed[MinMax.type] {
   val min = parse(schema.min)
   val max = parse(schema.max)
 }

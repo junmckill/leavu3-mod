@@ -3,7 +3,7 @@ package se.gigurra.leavu3.externaldata
 import se.gigurra.heisenberg.MapData._
 import se.gigurra.heisenberg.{Schema, Parsed}
 
-case class Route(source: SourceData = Map.empty) extends Parsed[Route.type] {
+case class Route(source: SourceData = Map.empty) extends SafeParsed[Route.type] {
   val waypoints       = parse(schema.waypoints)
   val currentWaypoint = parse(schema.currentWaypoint)
 

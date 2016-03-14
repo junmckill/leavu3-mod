@@ -3,7 +3,7 @@ package se.gigurra.leavu3.externaldata
 import se.gigurra.heisenberg.MapData._
 import se.gigurra.heisenberg.{Schema, Parsed}
 
-case class SelfData(source: SourceData = Map.empty) extends Parsed[SelfData.type] {
+case class SelfData(source: SourceData = Map.empty) extends SafeParsed[SelfData.type] {
   val statusFlags  = parse(schema.statusFlags)
   val callsign     = parse(schema.callsign)
   val aircraftName = parse(schema.aircraftName)

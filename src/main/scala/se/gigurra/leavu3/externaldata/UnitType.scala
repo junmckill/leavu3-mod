@@ -3,7 +3,7 @@ package se.gigurra.leavu3.externaldata
 import se.gigurra.heisenberg.MapData._
 import se.gigurra.heisenberg.{Schema, Parsed}
 
-case class UnitType(source: SourceData = Map.empty) extends Parsed[UnitType.type] {
+case class UnitType(source: SourceData = Map.empty) extends SafeParsed[UnitType.type] {
   val level1 = parse(schema.level1)
   val level2 = parse(schema.level2)
   val level3 = parse(schema.level3)

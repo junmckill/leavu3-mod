@@ -3,7 +3,7 @@ package se.gigurra.leavu3.externaldata
 import se.gigurra.heisenberg.MapData._
 import se.gigurra.heisenberg.{Schema, Parsed}
 
-case class BeaconIndicators(source: SourceData = Map.empty) extends Parsed[BeaconIndicators.type] {
+case class BeaconIndicators(source: SourceData = Map.empty) extends SafeParsed[BeaconIndicators.type] {
   val glideSlope  = parse(schema.glideslope)
   val localizer   = parse(schema.localizer)
   val outerMarker = parse(schema.outerMarker)

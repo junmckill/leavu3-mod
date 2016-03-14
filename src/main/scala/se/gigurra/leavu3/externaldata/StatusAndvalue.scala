@@ -3,7 +3,7 @@ package se.gigurra.leavu3.externaldata
 import se.gigurra.heisenberg.MapData._
 import se.gigurra.heisenberg.{Schema, Parsed}
 
-case class StatusAndValue(source: SourceData = Map.empty) extends Parsed[StatusAndValue.type] {
+case class StatusAndValue(source: SourceData = Map.empty) extends SafeParsed[StatusAndValue.type] {
   val status = parse(schema.status)
   val value  = parse(schema.value)
 }

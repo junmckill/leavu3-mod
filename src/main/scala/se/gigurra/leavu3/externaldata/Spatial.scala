@@ -3,7 +3,7 @@ package se.gigurra.leavu3.externaldata
 import se.gigurra.heisenberg.MapData._
 import se.gigurra.heisenberg.{Schema, Parsed}
 
-case class Spatial(source: SourceData = Map.empty) extends Parsed[Spatial.type] {
+case class Spatial(source: SourceData = Map.empty) extends SafeParsed[Spatial.type] {
    val fwd     = parse(schema.x)
    val up      = parse(schema.y)
    val rwing   = parse(schema.z)

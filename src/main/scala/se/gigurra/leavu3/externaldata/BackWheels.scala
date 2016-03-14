@@ -3,7 +3,7 @@ package se.gigurra.leavu3.externaldata
 import se.gigurra.heisenberg.MapData._
 import se.gigurra.heisenberg.{Schema, Parsed}
 
-case class BackWheels(source: SourceData = Map.empty) extends Parsed[BackWheels.type] {
+case class BackWheels(source: SourceData = Map.empty) extends SafeParsed[BackWheels.type] {
   val left  = parse(schema.left)
   val right = parse(schema.right)
 }

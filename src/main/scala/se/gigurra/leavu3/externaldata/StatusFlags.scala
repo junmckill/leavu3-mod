@@ -3,7 +3,7 @@ package se.gigurra.leavu3.externaldata
 import se.gigurra.heisenberg.MapData._
 import se.gigurra.heisenberg.{Schema, Parsed}
 
-case class StatusFlags(source: SourceData = Map.empty) extends Parsed[StatusFlags.type] {
+case class StatusFlags(source: SourceData = Map.empty) extends SafeParsed[StatusFlags.type] {
   val aiOn        = parse(schema.aiOn)
   val jamming     = parse(schema.jamming)
   val born        = parse(schema.born)

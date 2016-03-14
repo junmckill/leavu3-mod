@@ -3,7 +3,7 @@ package se.gigurra.leavu3.externaldata
 import se.gigurra.heisenberg.MapData._
 import se.gigurra.heisenberg.{Schema, Parsed}
 
-case class FlightModel(source: SourceData = Map.empty) extends Parsed[FlightModel.type] {
+case class FlightModel(source: SourceData = Map.empty) extends SafeParsed[FlightModel.type] {
   val pitch             = parse(schema.pitch).toDegrees
   val roll              = parse(schema.roll).toDegrees
   val trueHeading       = parse(schema.trueHeading).toDegrees

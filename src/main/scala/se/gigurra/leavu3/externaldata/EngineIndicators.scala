@@ -3,7 +3,7 @@ package se.gigurra.leavu3.externaldata
 import se.gigurra.heisenberg.MapData._
 import se.gigurra.heisenberg.{Schema, Parsed}
 
-case class EngineIndicators(source: SourceData = Map.empty) extends Parsed[EngineIndicators.type] {
+case class EngineIndicators(source: SourceData = Map.empty) extends SafeParsed[EngineIndicators.type] {
   val engineStart       = parse(schema.engineStart)
   val hydraulicPressure = parse(schema.hydraulicPressure)
   val fuelConsumption   = parse(schema.fuelConsumption)

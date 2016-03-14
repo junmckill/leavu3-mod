@@ -3,7 +3,7 @@ package se.gigurra.leavu3.externaldata
 import se.gigurra.heisenberg.MapData._
 import se.gigurra.heisenberg.{Schema, Parsed}
 
-case class SensorsStatus(source: SourceData = Map.empty) extends Parsed[SensorsStatus.type] {
+case class SensorsStatus(source: SourceData = Map.empty) extends SafeParsed[SensorsStatus.type] {
   val manufacturer     = parse(schema.manufacturer)
   val launchAuthorized = parse(schema.launchAuthorized)
   val eosOn            = parse(schema.eosOn)

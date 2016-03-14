@@ -17,4 +17,4 @@ val leavu3 = Project(id = "leavu3", base = file("."))
     )
     
   )
-  .dependsOn(uri("git://github.com/GiGurra/service-utils.git#0.1.5"))
+  .dependsOn(uri("git://github.com/GiGurra/service-utils.git#0.1.6"))

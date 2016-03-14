@@ -3,7 +3,7 @@ package se.gigurra.leavu3.externaldata
 import se.gigurra.heisenberg.MapData._
 import se.gigurra.heisenberg.{Schema, Parsed}
 
-case class Targets(source: SourceData = Map.empty) extends Parsed[Targets.type] {
+case class Targets(source: SourceData = Map.empty) extends SafeParsed[Targets.type] {
   val detected = parse(schema.detected)
   val tws      = parse(schema.tws)
   val locked   = parse(schema.locked)

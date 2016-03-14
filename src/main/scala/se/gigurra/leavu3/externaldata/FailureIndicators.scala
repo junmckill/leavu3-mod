@@ -3,7 +3,7 @@ package se.gigurra.leavu3.externaldata
 import se.gigurra.heisenberg.MapData._
 import se.gigurra.heisenberg.{Schema, Parsed}
 
-case class FailureIndicators(source: SourceData = Map.empty) extends Parsed[FailureIndicators.type] {
+case class FailureIndicators(source: SourceData = Map.empty) extends SafeParsed[FailureIndicators.type] {
   val canopyOpen            = parse(schema.canopyOpen)
   val cannonFailure         = parse(schema.cannonFailure)
   val rightTailPlaneFailure = parse(schema.rightTailPlaneFailure)

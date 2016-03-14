@@ -3,7 +3,7 @@ package se.gigurra.leavu3.externaldata
 import se.gigurra.heisenberg.MapData._
 import se.gigurra.heisenberg.{Schema, Parsed}
 
-case class Version(source: SourceData = Map.empty) extends Parsed[Version.type] {
+case class Version(source: SourceData = Map.empty) extends SafeParsed[Version.type] {
   val productName    = parse(schema.productName)
   val fileVersion    = parse(schema.fileVersion).mkString(".")
   val productVersion = parse(schema.productVersion).mkString(".")

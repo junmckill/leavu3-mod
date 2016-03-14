@@ -3,7 +3,7 @@ package se.gigurra.leavu3.externaldata
 import se.gigurra.heisenberg.MapData._
 import se.gigurra.heisenberg.{Schema, Parsed}
 
-case class AircraftMode(source: SourceData = Map.empty) extends Parsed[AircraftMode.type] {
+case class AircraftMode(source: SourceData = Map.empty) extends SafeParsed[AircraftMode.type] {
   val submode = parse(schema.submode)
   val master  = parse(schema.master)
 

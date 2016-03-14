@@ -3,7 +3,7 @@ package se.gigurra.leavu3.externaldata
 import se.gigurra.heisenberg.MapData._
 import se.gigurra.heisenberg.{Schema, Parsed}
 
-case class Emitter(source: SourceData) extends Parsed[Emitter.type] {
+case class Emitter(source: SourceData) extends SafeParsed[Emitter.type] {
   val id          = parse(schema.id)
   val signalType  = parse(schema.signalType)
   val azimuth     = parse(schema.azimuth).toDegrees

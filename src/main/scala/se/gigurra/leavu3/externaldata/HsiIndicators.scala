@@ -4,7 +4,7 @@ package se.gigurra.leavu3.externaldata
 import se.gigurra.heisenberg.MapData._
 import se.gigurra.heisenberg.{Schema, Parsed}
 
-case class HsiIndicators(source: SourceData = Map.empty) extends Parsed[HsiIndicators.type] {
+case class HsiIndicators(source: SourceData = Map.empty) extends SafeParsed[HsiIndicators.type] {
   val rmiRaw          = parse(schema.rmiRaw).toDegrees
   val courseDeviation = parse(schema.courseDeviation).toDegrees
   val course          = parse(schema.course).toDegrees

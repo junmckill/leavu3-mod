@@ -3,7 +3,7 @@ package se.gigurra.leavu3.externaldata
 import se.gigurra.heisenberg.MapData._
 import se.gigurra.heisenberg.{Schema, Parsed}
 
-case class AiWingman(source: SourceData) extends Parsed[AiWingman.type] {
+case class AiWingman(source: SourceData) extends SafeParsed[AiWingman.type] {
   val orderedTask     = parse(schema.orderedTask)
   val currentTarget   = parse(schema.currentTarget)
   val currentTask     = parse(schema.currentTask)

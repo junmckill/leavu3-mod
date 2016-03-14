@@ -3,7 +3,7 @@ package se.gigurra.leavu3.externaldata
 import se.gigurra.heisenberg.MapData._
 import se.gigurra.heisenberg.{Schema, Parsed}
 
-case class MetaData(source: SourceData = Map.empty) extends Parsed[MetaData.type] {
+case class MetaData(source: SourceData = Map.empty) extends SafeParsed[MetaData.type] {
   val camera    = parse(schema.camera)
   val planeId   = parse(schema.planeId)
   val modelTime = parse(schema.modelTime)

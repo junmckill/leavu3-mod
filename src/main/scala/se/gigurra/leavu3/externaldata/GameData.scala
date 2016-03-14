@@ -14,7 +14,7 @@ import scala.language.implicitConversions
 
 import scala.util.{Success, Try}
 
-case class GameData(source: SourceData) extends Parsed[GameData.type] {
+case class GameData(source: SourceData) extends SafeParsed[GameData.type] {
 
   // DCS Remote Metadata
   val err       = parse(schema.err)

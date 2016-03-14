@@ -3,7 +3,7 @@ package se.gigurra.leavu3.externaldata
 import se.gigurra.heisenberg.MapData._
 import se.gigurra.heisenberg.{Schema, Parsed}
 
-case class ScanZone(source: SourceData = Map.empty) extends Parsed[ScanZone.type] {
+case class ScanZone(source: SourceData = Map.empty) extends SafeParsed[ScanZone.type] {
   val altitudeCoverage = parse(schema.altitudeCoverage)
   val size             = parse(schema.size)
   val direction        = parse(schema.direction)
