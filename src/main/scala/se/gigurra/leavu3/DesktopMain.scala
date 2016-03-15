@@ -4,13 +4,17 @@ import com.badlogic.gdx.backends.lwjgl.{LwjglApplication, LwjglApplicationConfig
 import se.gigurra.leavu3.externaldata.{ScriptInjector, DlinkOutData, DlinkInData, GameData}
 import se.gigurra.leavu3.util.RestClient
 import se.gigurra.serviceutils.json.JSON
-import se.gigurra.serviceutils.twitter.logging.Logging
+import se.gigurra.serviceutils.twitter.logging.{Capture, Logging}
 
 import scala.util.{Failure, Success, Try}
 
 object DesktopMain extends Logging {
 
   def main(args: Array[String]): Unit = {
+
+    Capture.stdOutToFile(s"leavu3-debug-log.txt", append = true)
+    Capture.stdErrToFile(s"leavu3-log.txt", append = true)
+
     val config = loadConfig(args.headOption.getOrElse("leavu3-cfg.json"))
     val dlinkConfig = downloadDlinkConfig(config)
     val lwjglConfig = loadLwjglConfig(config)
