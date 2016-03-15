@@ -31,7 +31,7 @@ object DlinkOutData extends Logging {
           case Failure(e: ServiceException) =>
             logger.error(s"Data link host replied with an error: $e")
           case Failure(e) =>
-            logger.error(s"Unexpected error when attempting to send to dlink: $e", e)
+            logger.error(e, s"Unexpected error when attempting to send to dlink")
         }
       }
     }

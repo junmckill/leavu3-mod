@@ -83,7 +83,7 @@ object GameData extends Schema[GameData] with Logging {
           val newData = JSON.read(stringData)
           ExternalData.gameData = process(newData)
         case Failure(e: ServiceException) => logger.warning(s"Dcs Remote replied: Could not fetch game data from Dcs Remote: $e")
-        case Failure(e) => logger.error(s"Could not fetch game data from Dcs Remote: $e", e)
+        case Failure(e) => logger.error(s"Could not fetch game data from Dcs Remote: $e")
       }
     }
   }

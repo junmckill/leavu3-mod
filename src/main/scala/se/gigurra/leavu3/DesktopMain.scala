@@ -1,5 +1,7 @@
 package se.gigurra.leavu3
 
+import javax.swing.JOptionPane
+
 import com.badlogic.gdx.backends.lwjgl.{LwjglApplication, LwjglApplicationConfiguration}
 import se.gigurra.leavu3.externaldata.{ScriptInjector, DlinkOutData, DlinkInData, GameData}
 import se.gigurra.leavu3.util.RestClient
@@ -10,7 +12,7 @@ import scala.util.{Failure, Success, Try}
 
 object DesktopMain extends Logging {
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit = Try {
 
     Capture.stdOutToFile(s"leavu3-debug-log.txt", append = true)
     Capture.stdErrToFile(s"leavu3-log.txt", append = true)
@@ -24,6 +26,12 @@ object DesktopMain extends Logging {
     GameData.startPoller(config.gameDataFps, config.dcsRemoteAddress, config.dcsRemotePort)
     DlinkOutData.startPoller(dlinkConfig)
     DlinkInData.startPoller(dlinkConfig)
+  } match {
+    case Success(_) =>
+    case Failure(e) =>
+      JOptionPane.showMessageDialog(null, e.getMessage, s"Leavu 3 failed", JOptionPane.ERROR_MESSAGE)
+      logger.error(e, s"Leavu 3 failed")
+      System.exit(1)
   }
 
   private def loadLwjglConfig(config: Configuration): LwjglApplicationConfiguration = {
@@ -57,8 +65,9 @@ object DesktopMain extends Logging {
         logger.info(s"Dlink settings downloaded:\n ${JSON.write(out)}")
         out
       case Failure(e) =>
-        logger.error(s"Unable to download dlink configuration from dcs-remote: $e", e)
-        throw e
+        val message = s"Could not connect to dcs-remote"
+        logger.error(message)
+        throw new RuntimeException(message, e)
     }
   }
 
