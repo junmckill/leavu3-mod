@@ -344,7 +344,7 @@ case class HsdPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
           drawTextLine(tdcStr, WHITE)
         }
 
-        game.pdt foreach { pdt =>
+        game.pdt.filter(_.isPositionKnown) foreach { pdt =>
           val pdtBra = (pdt.position - bullsEye.position).asBra
           val pdtStr = mkBraString("     pdt", pdtBra)
           drawTextLine(pdtStr, contactColor(pdt, fromDatalink = false))
