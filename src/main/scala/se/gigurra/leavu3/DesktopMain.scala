@@ -24,7 +24,7 @@ object DesktopMain extends Logging {
 
     ScriptInjector.startInjecting(config.dcsRemoteAddress, config.dcsRemotePort)
     GameData.startPoller(config.gameDataFps, config.dcsRemoteAddress, config.dcsRemotePort)
-    DlinkOutData.startPoller(dlinkConfig)
+    DlinkOutData.startPoller(config, dlinkConfig)
     DlinkInData.startPoller(dlinkConfig)
   } match {
     case Success(_) =>

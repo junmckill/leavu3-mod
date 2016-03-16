@@ -13,5 +13,6 @@
   "dcsRemotePort"    : 12340,
   "aaSamples"        : 4,
   "instrument"       : "se.gigurra.leavu3.mfd.Mfd",
-  "symbolScale"      : 1.0
+  "symbolScale"      : 1.0,
+  "relayDlink"       : true
 }

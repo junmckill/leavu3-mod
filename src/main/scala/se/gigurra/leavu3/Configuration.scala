@@ -25,6 +25,7 @@ case class Configuration(source: SourceData = Map.empty) extends Parsed[Configur
   val aaSamples         = parse(schema.aaSamples)
   val instrument        = parse(schema.instrument)
   val symbolScale       = parse(schema.symbolScale)
+  val relayDlink        = parse(schema.relayDlink)
 }
 
 object Configuration extends Schema[Configuration] with Logging {
@@ -43,6 +44,7 @@ object Configuration extends Schema[Configuration] with Logging {
   val aaSamples         = required[Int]     ("aaSamples",         default = 4)
   val instrument        = required[String]  ("instrument",        default = "se.gigurra.leavu3.mfd.Mfd")
   val symbolScale       = required[Double]  ("symbolScale",       default = 1.0)
+  val relayDlink        = required[Boolean] ("relayDlink",        default = true)
 
 
   def readFromFile(s: String = "leavu3-cfg.json"): Configuration = {
