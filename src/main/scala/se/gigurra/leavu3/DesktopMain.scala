@@ -35,6 +35,7 @@ object DesktopMain extends Logging {
   }
 
   private def loadLwjglConfig(config: Configuration): LwjglApplicationConfiguration = {
+    System.setProperty("org.lwjgl.opengl.Window.undecorated", config.borderless.toString)
     new LwjglApplicationConfiguration {
       title = s"${config.title} (${config.instrument.split('.').last})"
       x = config.x
@@ -46,6 +47,7 @@ object DesktopMain extends Logging {
       foregroundFPS = config.foregroundFPS.toInt
       backgroundFPS = config.backgroundFPS.toInt
       samples = config.aaSamples
+      resizable = !config.borderless
     }
   }
 

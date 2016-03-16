@@ -4,6 +4,7 @@
   "y"                : 200,
   "width"            : 1024,
   "height"           : 1024,
+  "borderless"       : false,
   "forceExit"        : true,
   "vSyncEnabled"     : true,
   "foregroundFPS"    : 30,
