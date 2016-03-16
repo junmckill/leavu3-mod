@@ -5,6 +5,8 @@
   "width"            : 1024,
   "height"           : 1024,
   "borderless"       : false,
+  "noFocusOnClick"   : false,
+  "alwaysOnTop"      : false,
   "forceExit"        : true,
   "vSyncEnabled"     : true,
   "foregroundFPS"    : 30,

@@ -27,6 +27,8 @@ case class Configuration(source: SourceData = Map.empty) extends Parsed[Configur
   val symbolScale       = parse(schema.symbolScale)
   val relayDlink        = parse(schema.relayDlink)
   val borderless        = parse(schema.borderless)
+  val noFocusOnClick    = parse(schema.noFocusOnClick)
+  val alwaysOnTop       = parse(schema.alwaysOnTop)
 }
 
 object Configuration extends Schema[Configuration] with Logging {
@@ -47,6 +49,8 @@ object Configuration extends Schema[Configuration] with Logging {
   val symbolScale       = required[Double]  ("symbolScale",       default = 1.0)
   val relayDlink        = required[Boolean] ("relayDlink",        default = true)
   val borderless        = required[Boolean] ("borderless",        default = false)
+  val noFocusOnClick    = required[Boolean] ("noFocusOnClick",    default = false)
+  val alwaysOnTop       = required[Boolean] ("alwaysOnTop",       default = false)
 
   def readFromFile(s: String = "leavu3-cfg.json"): Configuration = {
     logger.info(s"Loading configuration file: $s")

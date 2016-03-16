@@ -5,6 +5,7 @@ import javax.swing.JOptionPane
 import com.badlogic.gdx.backends.lwjgl.{LwjglApplication, LwjglApplicationConfiguration}
 import se.gigurra.leavu3.externaldata.{ScriptInjector, DlinkOutData, DlinkInData, GameData}
 import se.gigurra.leavu3.util.RestClient
+import se.gigurra.leavu3.windowstweaks.WindowTweaks
 import se.gigurra.serviceutils.json.JSON
 import se.gigurra.serviceutils.twitter.logging.{Capture, Logging}
 
@@ -20,18 +21,23 @@ object DesktopMain extends Logging {
     val config = loadConfig(args.headOption.getOrElse("leavu3-cfg.json"))
     val dlinkConfig = downloadDlinkConfig(config)
     val lwjglConfig = loadLwjglConfig(config)
-    new LwjglApplication(new GdxAppListener(config, dlinkConfig), lwjglConfig)
+    new LwjglApplication(new GdxAppListener(config, dlinkConfig, () => onInitDispaly(config)), lwjglConfig)
 
     ScriptInjector.startInjecting(config.dcsRemoteAddress, config.dcsRemotePort)
     GameData.startPoller(config.gameDataFps, config.dcsRemoteAddress, config.dcsRemotePort)
     DlinkOutData.startPoller(config, dlinkConfig)
     DlinkInData.startPoller(dlinkConfig)
+
   } match {
     case Success(_) =>
     case Failure(e) =>
       JOptionPane.showMessageDialog(null, e.getMessage, s"Leavu 3 failed", JOptionPane.ERROR_MESSAGE)
       logger.error(e, s"Leavu 3 failed")
       System.exit(1)
+  }
+
+  private def onInitDispaly(config: Configuration): Unit = {
+    WindowTweaks.apply(config)
   }
 
   private def loadLwjglConfig(config: Configuration): LwjglApplicationConfiguration = {

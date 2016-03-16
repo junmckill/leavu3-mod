@@ -2,12 +2,13 @@ package se.gigurra.leavu3
 
 import com.badlogic.gdx.ApplicationListener
 import se.gigurra.leavu3.externaldata.ExternalData
-import se.gigurra.leavu3.mfd.Mfd
 import se.gigurra.serviceutils.twitter.logging.Logging
 
 import scala.util.{Failure, Success, Try}
 
-case class GdxAppListener(initialConfiguration: Configuration, dlinkSettings: DlinkSettings) extends ApplicationListener with Logging{
+case class GdxAppListener(initialConfiguration: Configuration,
+                          dlinkSettings: DlinkSettings,
+                          onCreate: () => Unit) extends ApplicationListener with Logging{
 
   val instrumentClassName = initialConfiguration.instrument
   val instrumentClass: Class[Instrument] =
@@ -38,5 +39,6 @@ case class GdxAppListener(initialConfiguration: Configuration, dlinkSettings: Dl
   }
 
   override def create(): Unit = {
+    onCreate()
   }
 }
