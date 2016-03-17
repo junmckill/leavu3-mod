@@ -3,9 +3,7 @@ package se.gigurra.leavu3
 import javax.swing.JOptionPane
 
 import com.badlogic.gdx.backends.lwjgl.{LwjglApplication, LwjglApplicationConfiguration}
-import com.sun.jna.Platform
 import se.gigurra.leavu3.externaldata.{ScriptInjector, DlinkOutData, DlinkInData, GameData}
-import se.gigurra.leavu3.keyinput.KeyInput
 import se.gigurra.leavu3.util.RestClient
 import se.gigurra.leavu3.windowstweaks.WindowTweaks
 import se.gigurra.serviceutils.json.JSON
