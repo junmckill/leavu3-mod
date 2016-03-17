@@ -3,7 +3,9 @@ package se.gigurra.leavu3
 import javax.swing.JOptionPane
 
 import com.badlogic.gdx.backends.lwjgl.{LwjglApplication, LwjglApplicationConfiguration}
+import com.sun.jna.Platform
 import se.gigurra.leavu3.externaldata.{ScriptInjector, DlinkOutData, DlinkInData, GameData}
+import se.gigurra.leavu3.keyinput.KeyInput
 import se.gigurra.leavu3.util.RestClient
 import se.gigurra.leavu3.windowstweaks.WindowTweaks
 import se.gigurra.serviceutils.json.JSON
@@ -21,12 +23,13 @@ object DesktopMain extends Logging {
     val config = loadConfig(args.headOption.getOrElse("leavu3-cfg.json"))
     val dlinkConfig = downloadDlinkConfig(config)
     val lwjglConfig = loadLwjglConfig(config)
-    new LwjglApplication(new GdxAppListener(config, dlinkConfig, () => onInitDispaly(config)), lwjglConfig)
+    new LwjglApplication(new GdxAppListener(config, dlinkConfig, () => onInitDisplay(config)), lwjglConfig)
 
     ScriptInjector.startInjecting(config.dcsRemoteAddress, config.dcsRemotePort)
     GameData.startPoller(config.gameDataFps, config.dcsRemoteAddress, config.dcsRemotePort)
     DlinkOutData.startPoller(config, dlinkConfig)
     DlinkInData.startPoller(dlinkConfig)
+    listenForKeyInput(config)
 
   } match {
     case Success(_) =>
@@ -36,7 +39,11 @@ object DesktopMain extends Logging {
       System.exit(1)
   }
 
-  private def onInitDispaly(config: Configuration): Unit = {
+  private def listenForKeyInput(config: Configuration): Unit = {
+    // TODO: Some implementation..
+  }
+
+  private def onInitDisplay(config: Configuration): Unit = {
     WindowTweaks.apply(config)
   }
 
