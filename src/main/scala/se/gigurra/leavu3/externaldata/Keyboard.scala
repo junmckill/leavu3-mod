@@ -60,6 +60,16 @@ object Key {
   val END = 0x23
   val PAGE_UP = 0x21
   val PAGE_DOWN = 0x22
+  val _0 = 48
+  val _1 = 49
+  val _2 = 50
+  val _3 = 51
+  val _4 = 52
+  val _5 = 53
+  val _6 = 54
+  val _7 = 55
+  val _8 = 56
+  val _9 = 57
   val A = 65
   val B = 66
   val C = 67
@@ -86,6 +96,72 @@ object Key {
   val X = 88
   val Y = 89
   val Z = 90
+  val OSB_0 = new Combination(_0, p => p.isControlDown && p.isShiftDown)
+  val OSB_1 = new Combination(_1, p => p.isControlDown && p.isShiftDown)
+  val OSB_2 = new Combination(_2, p => p.isControlDown && p.isShiftDown)
+  val OSB_3 = new Combination(_3, p => p.isControlDown && p.isShiftDown)
+  val OSB_4 = new Combination(_4, p => p.isControlDown && p.isShiftDown)
+  val OSB_5 = new Combination(_5, p => p.isControlDown && p.isShiftDown)
+  val OSB_6 = new Combination(_6, p => p.isControlDown && p.isShiftDown)
+  val OSB_7 = new Combination(_7, p => p.isControlDown && p.isShiftDown)
+  val OSB_8 = new Combination(_8, p => p.isControlDown && p.isShiftDown)
+  val OSB_9 = new Combination(_9, p => p.isControlDown && p.isShiftDown)
+  val OSB_10 = new Combination(_0, p => p.isControlDown && p.isAltDown)
+  val OSB_11 = new Combination(_1, p => p.isControlDown && p.isAltDown)
+  val OSB_12 = new Combination(_2, p => p.isControlDown && p.isAltDown)
+  val OSB_13 = new Combination(_3, p => p.isControlDown && p.isAltDown)
+  val OSB_14 = new Combination(_4, p => p.isControlDown && p.isAltDown)
+  val OSB_15 = new Combination(_5, p => p.isControlDown && p.isAltDown)
+  val OSB_16 = new Combination(_6, p => p.isControlDown && p.isAltDown)
+  val OSB_17 = new Combination(_7, p => p.isControlDown && p.isAltDown)
+  val OSB_18 = new Combination(_8, p => p.isControlDown && p.isAltDown)
+  val OSB_19 = new Combination(_9, p => p.isControlDown && p.isAltDown)
+
+  object QP_OSB {
+    def unapply(keyPress: KeyPress): Option[Int] = {
+      keyPress match {
+        // case OSB_10 => Some(10)
+        case OSB_11() => Some(11)
+        case OSB_12() => Some(12)
+        case OSB_13() => Some(13)
+        // case OSB_14 => Some(14)
+        case _ => None
+      }
+    }
+  }
+
+  object OSB {
+    def unapply(keyPress: KeyPress): Option[Int] = {
+      keyPress match {
+        case OSB_0() => Some(0)
+        case OSB_1() => Some(1)
+        case OSB_2() => Some(2)
+        case OSB_3() => Some(3)
+        case OSB_4() => Some(4)
+
+        case OSB_5() => Some(5)
+        case OSB_6() => Some(6)
+        case OSB_7() => Some(7)
+        case OSB_8() => Some(8)
+        case OSB_9() => Some(9)
+
+        case OSB_10() => Some(10)
+        case OSB_11() => Some(11)
+        case OSB_12() => Some(12)
+        case OSB_13() => Some(13)
+        case OSB_14() => Some(14)
+
+        case OSB_15() => Some(15)
+        case OSB_16() => Some(16)
+        case OSB_17() => Some(17)
+        case OSB_18() => Some(18)
+        case OSB_19() => Some(19)
+        case _ => None
+      }
+    }
+  }
+
+  val modifiers = Set(LSHIFT, RSHIFT, SHIFT, LCONTROL, RCONTROL, CONTROL, ALT)
 }
 
 case class KeyPress(key: Int, keysDown: Set[Int]) {
@@ -93,9 +169,20 @@ case class KeyPress(key: Int, keysDown: Set[Int]) {
   def isShiftDown: Boolean = isKeyDown(Key.LSHIFT) || isKeyDown(Key.RSHIFT) || isKeyDown(Key.SHIFT)
   def isControlDown: Boolean = isKeyDown(Key.LCONTROL) || isKeyDown(Key.RCONTROL) || isKeyDown(Key.CONTROL)
   def isAltDown: Boolean = isKeyDown(Key.ALT)
+  override def toString: String = {
+    val char = key.toString.toInt.toChar
+    val base: String =
+      if (Key.modifiers.contains(key))
+        ""
+      else if (char.isLetterOrDigit)
+        char.toString
+      else
+        key.toString
+    s"${if (isControlDown) "Control " else ""}${if (isShiftDown) "Shift " else ""}${if (isAltDown) "Alt " else ""}$base"
+  }
 }
 
-case class Combination(key: Int, modifierTest: KeyPress => Boolean = _ => true) {
+class Combination(key: Int, modifierTest: KeyPress => Boolean = _ => true) {
   def unapply(keyPress: KeyPress): Boolean = {
     modifierTest(keyPress) && keyPress.key == key
   }

@@ -1,6 +1,6 @@
 package se.gigurra.leavu3.mfd
 
-import se.gigurra.leavu3.externaldata.{KeyPress, GameData}
+import se.gigurra.leavu3.externaldata.{Key, KeyPress, GameData}
 import se.gigurra.leavu3.gfx.RenderContext._
 import se.gigurra.leavu3.{DlinkSettings, Configuration, DlinkData, Instrument}
 
@@ -35,7 +35,14 @@ case class Mfd(implicit config: Configuration, dlinkSettings: DlinkSettings) ext
   }
 
   def keyPressed(press: KeyPress): Unit = {
-    currentPage.foreach(_.keyPressed(press))
+    press match {
+      case Key.QP_OSB(i) => pressQpOsb(i)
+      case Key.OSB(i) => currentPage.foreach(_.pressOsb(i))
+      case _ =>
+    }
   }
 
+  def pressQpOsb(i: Int): Unit = {
+    println(s"Pressed qp OSB $i")
+  }
 }

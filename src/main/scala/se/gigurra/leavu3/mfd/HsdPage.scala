@@ -19,10 +19,9 @@ case class HsdPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
   val deprFactor = CircleBuffer(0.0, 0.5).withDefaultValue(0.5)
   val stdTextSize = 0.75f
 
-  override def keyPressed(press: KeyPress): Unit = {
-    press.key match {
-      case Key.END if press.isShiftDown && press.isControlDown => deprFactor.stepDown()
-      case _ =>
+  override def pressOsb(i: Int): Unit = {
+    i match {
+      case 2 => deprFactor.stepDown()
     }
   }
 
@@ -181,7 +180,6 @@ case class HsdPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
   def drawDlinkMembers(dlinkIn: Map[String, DlinkData]): Unit = {
 
     val dlinksOfInterest = dlinkIn.filter(m => m._2.data.planeId != self.planeId || m._1 != self.dlinkCallsign)
-    val targetsToDraw = new mutable.HashMap[Int, (DlinkData, Target)]
 
     for ((name, member) <- dlinksOfInterest) {
 
