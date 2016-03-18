@@ -14,11 +14,6 @@ val leavu3 = Project(id = "leavu3", base = file("."))
       "com.badlogicgames.gdx" %   "gdx-backend-lwjgl"     % ext_libgdxVersion,
       "com.badlogicgames.gdx" %   "gdx-platform"          % ext_libgdxVersion classifier "natives-desktop",
       "com.badlogicgames.gdx" %   "gdx-freetype-platform" % ext_libgdxVersion classifier "natives-desktop"
-
-      /*
-      "net.java.dev.jna"      %   "jna-platform"          % "4.1.0",
-      "net.java.dev.jna"      %   "jna"                   % "4.1.0"
-*/
     )
     
   )
