@@ -327,10 +327,9 @@ case class HsdPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
     val selfBra = (self.position - bullsEye.position).asBra
     val scale = config.symbolScale * 0.02 / font.getSpaceWidth
 
-    batched {
+    batched { atScreen(-0.9, 0.9) {
 
       transform(_
-        .translate(-0.9f, 0.9f)
         .scalexy(scale)) {
 
         val beStr = s"bullseye : wp ${bullsEye.index - 1}"
@@ -358,8 +357,7 @@ case class HsdPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
         }
 
       }
-
-    }
+    }}
 
   }
 

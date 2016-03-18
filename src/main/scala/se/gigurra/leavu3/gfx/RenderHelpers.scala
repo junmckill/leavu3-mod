@@ -118,6 +118,28 @@ trait RenderHelpers extends UnitConversions { _: RenderContext.type =>
     projection.at(position, heading)(f)
   }
 
+  def atScreen(x: Double, y: Double)(f: => Unit): Unit = {
+    atScreen(Vec2(x,y))(f)
+  }
+
+  def atScreen(position: Vec2)(f: => Unit): Unit = {
+
+    val w = Gdx.graphics.getWidth.toFloat
+    val h = Gdx.graphics.getHeight.toFloat
+
+    val (sx, sy) = if (w > h) {
+      (w / h, 1.0f)
+    } else {
+      (1.0f, h / w)
+    }
+
+    val delta = Vec2(position.x * sx, position.y * sy)
+
+    transform(_.translate(delta)) {
+      f
+    }
+  }
+
   def rotatedTo[_: Projection](heading: Double)(f: => Unit): Unit = {
     projection.rotatedTo(heading)(f)
   }
