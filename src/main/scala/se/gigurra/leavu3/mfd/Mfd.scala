@@ -3,7 +3,6 @@ package se.gigurra.leavu3.mfd
 import com.badlogic.gdx.graphics.Color
 import se.gigurra.leavu3.externaldata.{Vec2, Key, KeyPress, GameData}
 import se.gigurra.leavu3.gfx.PpiProjection
-import se.gigurra.leavu3.gfx.RenderContext._
 import se.gigurra.leavu3.{DlinkSettings, Configuration, DlinkData, Instrument}
 
 import scala.language.postfixOps
@@ -19,7 +18,7 @@ case class Mfd(implicit config: Configuration, dlinkSettings: DlinkSettings)
   val sms = SmsPage()
   val fcr = FcrPage()
   val available = Seq(hsd, rwr, sms, fcr)
-  var qPages = Map[Int, Page](0 -> hsd, 1 -> rwr, 2-> sms)
+  var qPages = Map[Int, Page](0 -> hsd, 1 -> fcr, 2 -> rwr)
   var iQPage = 0
   var mainMenuOpen: Boolean = false
 
@@ -33,12 +32,34 @@ case class Mfd(implicit config: Configuration, dlinkSettings: DlinkSettings)
     currentPage.foreach(_.draw(game, dlinkIn))
   }
 
+  def drawQps(): Unit = {
+    val white = LIGHT_GRAY
+    val black = BLACK
+    for (iQp <- Seq(0, 1, 2)) {
+      val iOsb = qp2Osb(iQp)
+      val isCurrent = iQp == iQPage
+      qPages.get(iQp).foreach { page =>
+        val pos = Mfd.Osb.positions(iOsb)
+        atScreen(pos) {
+          if (isCurrent) {
+            rect(symbolScale * Mfd.Osb.boxWidth, symbolScale * Mfd.Osb.boxHeight, color = white, typ = FILL)
+          }
+          batched {
+            page.name.drawCentered(if (isCurrent) black else white)
+          }
+        }
+      }
+    }
+  }
+
   def drawMainMenu(): Unit = {
     // TODO: Draw something
     for (pos <- Mfd.Osb.positions) {
-      batched { atScreen(pos) {
-        "Hello".drawCentered(Color.WHITE)
-      }}
+      batched {
+        atScreen(pos) {
+          "Item".drawCentered(Color.WHITE)
+        }
+      }
     }
   }
 
@@ -47,6 +68,7 @@ case class Mfd(implicit config: Configuration, dlinkSettings: DlinkSettings)
       drawMainMenu()
     } else {
       drawPage(game, dlinkIn)
+      drawQps()
     }
   }
 
@@ -76,19 +98,20 @@ case class Mfd(implicit config: Configuration, dlinkSettings: DlinkSettings)
 }
 
 object Mfd {
+
   object Osb {
     val nPerSide = 5
     val boxWidth = 0.10f
     val boxHeight = 0.05f
     val offs = 0.4f
-    val inset = 0.125f
+    val inset = 0.1f
     val wholeWidth = 2.0f - offs * 2.0f
     val step = wholeWidth / (nPerSide - 1).toFloat
 
-    val upperLeftBox  = Vec2(-1.0f + offs,   1.0f - inset)
-    val upperRightBox = Vec2( 1.0f - inset,  1.0f - offs)
-    val lowerRightBox = Vec2( 1.0f - offs,  -1.0f + inset)
-    val lowerLeftBox  = Vec2(-1.0f + inset, -1.0f + offs)
+    val upperLeftBox = Vec2(-1.0f + offs, 1.0f - inset)
+    val upperRightBox = Vec2(1.0f - inset, 1.0f - offs)
+    val lowerRightBox = Vec2(1.0f - offs, -1.0f + inset)
+    val lowerLeftBox = Vec2(-1.0f + inset, -1.0f + offs)
 
     val upperBoxCenters = Seq(
       upperLeftBox + 0.0 * Vec2(step, 0.0),
@@ -125,4 +148,5 @@ object Mfd {
     val positions = Seq(upperBoxCenters, rightBoxCenters, lowerBoxCenters, leftBoxCenters).flatten
 
   }
+
 }

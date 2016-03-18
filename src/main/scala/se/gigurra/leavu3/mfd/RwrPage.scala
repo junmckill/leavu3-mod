@@ -6,7 +6,7 @@ import se.gigurra.leavu3.externaldata.GameData
 /**
   * Created by kjolh on 3/12/2016.
   */
-case class RwrPage() extends Page {
+case class RwrPage() extends Page("RWR") {
 
   def draw(game: GameData, dlinkIn: Map[String, DlinkData]): Unit = {
 

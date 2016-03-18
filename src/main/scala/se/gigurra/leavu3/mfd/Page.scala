@@ -4,7 +4,7 @@ import se.gigurra.leavu3.DlinkData
 import se.gigurra.leavu3.externaldata.GameData
 import se.gigurra.serviceutils.twitter.logging.Logging
 
-abstract class Page extends Logging {
+abstract class Page(val name: String) extends Logging {
 
   def pressOsb(i: Int): Unit = {}
 

@@ -76,6 +76,16 @@ trait RenderHelpers extends UnitConversions { _: RenderContext.type =>
     }
   }
 
+  def rect(width: Number = 1.0,
+           height: Number = 1.0,
+           at: Vector2 = Vector2.Zero,
+           typ: ShapeRenderer.ShapeType = LINE,
+           color: Color = null): Unit = {
+    shape(typ, color) {
+      shapeRenderer.rect(at.x - width.floatValue / 2.0f, at.y - height.floatValue / 2.0f, width.floatValue, height.floatValue)
+    }
+  }
+
   def arc(radius: Number,
           angle: Number,
           at: Vector2 = Vector2.Zero,
