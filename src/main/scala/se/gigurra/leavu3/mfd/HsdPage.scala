@@ -20,6 +20,10 @@ case class HsdPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
   val stdTextSize = 0.75f
 
   override def keyPressed(press: KeyPress): Unit = {
+    press.key match {
+      case Key.END if press.isShiftDown && press.isControlDown => deprFactor.stepDown()
+      case _ =>
+    }
   }
 
   override def update(game: GameData, dlinkIn: Map[String, DlinkData]): Unit = {
