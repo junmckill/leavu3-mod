@@ -1,12 +1,18 @@
 package se.gigurra.leavu3.mfd
 
+import com.badlogic.gdx.graphics.Color
 import se.gigurra.leavu3.externaldata.{Vec2, Key, KeyPress, GameData}
+import se.gigurra.leavu3.gfx.PpiProjection
 import se.gigurra.leavu3.gfx.RenderContext._
 import se.gigurra.leavu3.{DlinkSettings, Configuration, DlinkData, Instrument}
 
 import scala.language.postfixOps
+import se.gigurra.leavu3.gfx.RenderContext._
 
-case class Mfd(implicit config: Configuration, dlinkSettings: DlinkSettings) extends Instrument(config, dlinkSettings) {
+case class Mfd(implicit config: Configuration, dlinkSettings: DlinkSettings)
+  extends Instrument(config, dlinkSettings) {
+
+  implicit val _p = PpiProjection()
 
   val hsd = HsdPage()
   val rwr = RwrPage()
@@ -29,6 +35,11 @@ case class Mfd(implicit config: Configuration, dlinkSettings: DlinkSettings) ext
 
   def drawMainMenu(): Unit = {
     // TODO: Draw something
+    for (pos <- Mfd.Osb.positions) {
+      batched { atScreen(pos) {
+        "Hello".drawCentered(Color.WHITE)
+      }}
+    }
   }
 
   def update(game: GameData, dlinkIn: Map[String, DlinkData]): Unit = frame {
@@ -42,7 +53,6 @@ case class Mfd(implicit config: Configuration, dlinkSettings: DlinkSettings) ext
   def keyPressed(press: KeyPress): Unit = {
     if (mainMenuOpen) {
       press match {
-        case Key.QP_OSB(i) => pressOsbInMenu(i)
         case Key.OSB(i) => pressOsbInMenu(i)
         case _ =>
       }
@@ -70,8 +80,8 @@ object Mfd {
     val nPerSide = 5
     val boxWidth = 0.10f
     val boxHeight = 0.05f
-    val offs = 0.2f
-    val inset = 0.1f
+    val offs = 0.4f
+    val inset = 0.125f
     val wholeWidth = 2.0f - offs * 2.0f
     val step = wholeWidth / (nPerSide - 1).toFloat
 
