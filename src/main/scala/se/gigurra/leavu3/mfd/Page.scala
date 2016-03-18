@@ -8,7 +8,7 @@ abstract class Page extends Logging {
 
   def pressOsb(i: Int): Unit = {}
 
-  def update(game: GameData, dlinkIn: Map[String, DlinkData]): Unit
+  def draw(game: GameData, dlinkIn: Map[String, DlinkData]): Unit
 
   val shortName = this.getClass.getSimpleName.toLowerCase.subSequence(0, 3)
   logger.info(s"Created $shortName mfd page")

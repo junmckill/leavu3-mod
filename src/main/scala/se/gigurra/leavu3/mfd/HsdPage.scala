@@ -24,10 +24,11 @@ case class HsdPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
   override def pressOsb(i: Int): Unit = {
     i match {
       case 2 => deprFactor.stepDown()
+      case _ => // Nothing yet
     }
   }
 
-  override def update(game: GameData, dlinkIn: Map[String, DlinkData]): Unit = {
+  override def draw(game: GameData, dlinkIn: Map[String, DlinkData]): Unit = {
     matchIngameScale(game)
     viewport(viewportSize = distance * 2.0, offs = Vec2(0.0, -distance * deprFactor), heading = self.heading) {
       drawSelf(game)

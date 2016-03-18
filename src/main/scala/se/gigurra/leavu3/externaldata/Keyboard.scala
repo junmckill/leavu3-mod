@@ -50,6 +50,7 @@ object Key {
   val LCONTROL = 0xA2
   val RCONTROL = 0xA3
   val ALT = 0x12
+  val LALT = 164
   val LEFT = 0x25
   val RIGHT = 0x27
   val UP = 0x26
@@ -120,11 +121,9 @@ object Key {
   object QP_OSB {
     def unapply(keyPress: KeyPress): Option[Int] = {
       keyPress match {
-        // case OSB_10 => Some(10)
         case OSB_11() => Some(11)
         case OSB_12() => Some(12)
         case OSB_13() => Some(13)
-        // case OSB_14 => Some(14)
         case _ => None
       }
     }
@@ -168,7 +167,7 @@ case class KeyPress(key: Int, keysDown: Set[Int]) {
   def isKeyDown(key: Int): Boolean = keysDown.contains(key)
   def isShiftDown: Boolean = isKeyDown(Key.LSHIFT) || isKeyDown(Key.RSHIFT) || isKeyDown(Key.SHIFT)
   def isControlDown: Boolean = isKeyDown(Key.LCONTROL) || isKeyDown(Key.RCONTROL) || isKeyDown(Key.CONTROL)
-  def isAltDown: Boolean = isKeyDown(Key.ALT)
+  def isAltDown: Boolean = isKeyDown(Key.ALT) || isKeyDown(Key.LALT)
   override def toString: String = {
     val char = key.toString.toInt.toChar
     val base: String =

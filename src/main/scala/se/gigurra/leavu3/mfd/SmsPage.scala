@@ -8,7 +8,7 @@ import se.gigurra.leavu3.externaldata.GameData
   */
 case class SmsPage() extends Page {
 
-  def update(game: GameData, dlinkIn: Map[String, DlinkData]): Unit = {
+  def draw(game: GameData, dlinkIn: Map[String, DlinkData]): Unit = {
 
   }
 }
