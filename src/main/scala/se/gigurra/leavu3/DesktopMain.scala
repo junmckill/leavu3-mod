@@ -28,7 +28,6 @@ object DesktopMain extends Logging {
     DlinkOutData.startPoller(config, dlinkConfig)
     DlinkInData.startPoller(dlinkConfig)
     Keyboard.startPolling(config)
-    listenForKeyInput(config)
 
   } match {
     case Success(_) =>
@@ -36,10 +35,6 @@ object DesktopMain extends Logging {
       JOptionPane.showMessageDialog(null, e.getMessage, s"Leavu 3 failed", JOptionPane.ERROR_MESSAGE)
       logger.error(e, s"Leavu 3 failed")
       System.exit(1)
-  }
-
-  private def listenForKeyInput(config: Configuration): Unit = {
-    // TODO: Some implementation..
   }
 
   private def onInitDisplay(config: Configuration): Unit = {

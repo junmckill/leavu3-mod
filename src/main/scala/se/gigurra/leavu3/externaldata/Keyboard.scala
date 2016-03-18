@@ -25,7 +25,7 @@ object Keyboard extends Logging {
     SimpleTimer.fromFps(configuration.gameDataFps) {
       Try {
         val kbData = client.getBlocking("keyboard", cacheMaxAgeMillis = Some(Int.MaxValue))
-        val keysPressed = JSON.readMap(kbData).keys.map(_.toInt).toSet
+        val keysPressed = JSON.readMap(kbData).keys.map(_.toInt).toSet.map((x: Int) => x + configuration.keyBindingOffset)
         if (keysPressed != oldKeysPressed)
           for (press <- keysPressed -- oldKeysPressed) {
             val event = KeyPress(press, keysPressed)

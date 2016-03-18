@@ -29,6 +29,7 @@ case class Configuration(source: SourceData = Map.empty) extends Parsed[Configur
   val borderless        = parse(schema.borderless)
   val noFocusOnClick    = parse(schema.noFocusOnClick)
   val alwaysOnTop       = parse(schema.alwaysOnTop)
+  val keyBindingOffset  = parse(schema.keyBindingOffset)
 }
 
 object Configuration extends Schema[Configuration] with Logging {
@@ -51,6 +52,7 @@ object Configuration extends Schema[Configuration] with Logging {
   val borderless        = required[Boolean] ("borderless",        default = false)
   val noFocusOnClick    = required[Boolean] ("noFocusOnClick",    default = false)
   val alwaysOnTop       = required[Boolean] ("alwaysOnTop",       default = false)
+  val keyBindingOffset  = required[Int]     ("keyBindingOffset",  default = 0)
 
   def readFromFile(s: String = "leavu3-cfg.json"): Configuration = {
     logger.info(s"Loading configuration file: $s")

@@ -17,5 +17,6 @@
   "aaSamples"        : 4,
   "instrument"       : "se.gigurra.leavu3.mfd.Mfd",
   "symbolScale"      : 1.25,
-  "relayDlink"       : true
+  "relayDlink"       : true,
+  "keyBindingOffset" : 0
 }
