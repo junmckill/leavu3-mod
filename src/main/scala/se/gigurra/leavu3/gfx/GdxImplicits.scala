@@ -36,7 +36,7 @@ trait GdxImplicits { _: RenderContext.type =>
       )
     }
 
-    def drawPpiCentered(color: Color = null, scale: Float = 1.0f)(implicit configuration: Configuration): Unit = {
+    def drawCentered[_: Projection](color: Color = null, scale: Float = 1.0f)(implicit configuration: Configuration): Unit = {
       transform(_
         .scalexy(scale * 0.05f * symbolScaleF / font.size)
         .rotate(-self.heading)) {
@@ -44,7 +44,7 @@ trait GdxImplicits { _: RenderContext.type =>
       }
     }
 
-    def drawPpiRightOf(color: Color = null, scale: Float = 1.0f)(implicit configuration: Configuration): Unit = {
+    def drawRightOf[_: Projection](color: Color = null, scale: Float = 1.0f)(implicit configuration: Configuration): Unit = {
       transform(_
         .scalexy(scale * 0.05f * symbolScaleF / font.size)
         .rotate(-self.heading)) {
@@ -52,7 +52,7 @@ trait GdxImplicits { _: RenderContext.type =>
       }
     }
 
-    def drawPpiLeftOf(color: Color = null, scale: Float = 1.0f)(implicit configuration: Configuration): Unit = {
+    def drawLeftOf[_: Projection](color: Color = null, scale: Float = 1.0f)(implicit configuration: Configuration): Unit = {
       transform(_
         .scalexy(scale * 0.05f * symbolScaleF / font.size)
         .rotate(-self.heading)) {
@@ -60,7 +60,7 @@ trait GdxImplicits { _: RenderContext.type =>
       }
     }
 
-    def drawPpiBelow(color: Color = null, scale: Float = 1.0f)(implicit configuration: Configuration): Unit = {
+    def drawBelow[_: Projection](color: Color = null, scale: Float = 1.0f)(implicit configuration: Configuration): Unit = {
       transform(_
         .scalexy(scale * 0.05f * symbolScaleF / font.size)
         .rotate(-self.heading)) {

@@ -25,8 +25,9 @@ object RenderContext
   })
   font.setColor(RED)
 
-  def symbolScale(implicit config: Configuration) = config.symbolScale * screen2World
-  def symbolScaleF(implicit config: Configuration) = symbolScale.toFloat
+  def symbolScale(implicit config: Configuration, _p: Projection[_]) = config.symbolScale * screen2World
+  def symbolScaleF(implicit config: Configuration, _p: Projection[_]) = symbolScale.toFloat
 
+  val self = se.gigurra.leavu3.gfx.self
 
 }

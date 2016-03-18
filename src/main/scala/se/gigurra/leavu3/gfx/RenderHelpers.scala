@@ -54,15 +54,6 @@ trait RenderHelpers extends UnitConversions { _: RenderContext.type =>
     shapeRenderer.setProjectionMatrix(camera.combined)
   }
 
-  def ppi_viewport(viewportSize: Double, heading: Float = 0.0f, offs: Vector2 = Vector2.Zero)(f: => Unit) {
-    transform(_
-      .scalexy(2.0f / viewportSize.toFloat)
-      .translate(offs.x, offs.y, 0.0f)
-      .rotate(heading)) {
-      f
-    }
-  }
-
   def shape(typ: ShapeRenderer.ShapeType = LINE,
             color: Color = null)(drawCode: => Unit): Unit = {
     try {
@@ -115,11 +106,68 @@ trait RenderHelpers extends UnitConversions { _: RenderContext.type =>
     }
   }
 
+  def viewport[_: Projection](viewportSize: Double,
+                              heading: Float = 0.0f,
+                              offs: Vector2 = Vector2.Zero)
+                             (f: => Unit) = {
+    projection.viewport(viewportSize, heading, offs)(f)
+  }
+
+  def at[_: Projection](position: Vec2,
+                        heading: Double = 0.0)(f: => Unit): Unit = {
+    projection.at(position, heading)(f)
+  }
+
+  def rotatedTo[_: Projection](heading: Double)(f: => Unit): Unit = {
+    projection.rotatedTo(heading)(f)
+  }
+
+  def screen2World[_: Projection]: Float = {
+    projection.screen2World
+  }
+
+  def projection[_: Projection]: Projection[_] = implicitly[Projection[_]]
+
+}
+
+object self {
+  def dlinkCallsign(implicit c: DlinkSettings): String = c.callsign
+  def planeId: Int = ExternalData.gameData.metaData.planeId
+  def modelTime: Double = ExternalData.gameData.metaData.modelTime
+  def coalition: Int = ExternalData.gameData.selfData.coalitionId
+  def pitch: Float = ExternalData.gameData.selfData.pitch
+  def roll: Float = ExternalData.gameData.selfData.roll
+  def heading: Float = ExternalData.gameData.selfData.heading
+  def position: Vec3 = ExternalData.gameData.selfData.position
+  def velocity: Vec3 = ExternalData.gameData.flightModel.velocity
+  def acceleration: Vec3 = ExternalData.gameData.flightModel.acceleration
+}
+
+trait Projection[+T] {
+  def viewport(viewportSize: Double, heading: Float = 0.0f, offs: Vector2 = Vector2.Zero)(f: => Unit)
+  def at(position: Vec2, heading: Double = 0.0)(f: => Unit): Unit
+  def rotatedTo(heading: Double)(f: => Unit): Unit
+  def screen2World: Float
+}
+
+case class PpiProjection() extends Projection[Any] {
+
+  val transform = RenderContext.transform
+
+  def viewport(viewportSize: Double, heading: Float = 0.0f, offs: Vector2 = Vector2.Zero)(f: => Unit) {
+    transform(_
+      .scalexy(2.0f / viewportSize.toFloat)
+      .translate(offs.x, offs.y, 0.0f)
+      .rotate(heading)) {
+      f
+    }
+  }
+
   def at(position: Vec2, heading: Double = 0.0)(f: => Unit): Unit = {
     transform(_
       .translate(position - self.position)
       .rotate(-heading)) {
-        f
+      f
     }
   }
 
@@ -132,18 +180,5 @@ trait RenderHelpers extends UnitConversions { _: RenderContext.type =>
 
   def screen2World: Float = {
     1.0f / transform.current.getScaleX
-  }
-
-  object self {
-    def dlinkCallsign(implicit c: DlinkSettings): String = c.callsign
-    def planeId: Int = ExternalData.gameData.metaData.planeId
-    def modelTime: Double = ExternalData.gameData.metaData.modelTime
-    def coalition: Int = ExternalData.gameData.selfData.coalitionId
-    def pitch: Float = ExternalData.gameData.selfData.pitch
-    def roll: Float = ExternalData.gameData.selfData.roll
-    def heading: Float = ExternalData.gameData.selfData.heading
-    def position: Vec3 = ExternalData.gameData.selfData.position
-    def velocity: Vec3 = ExternalData.gameData.flightModel.velocity
-    def acceleration: Vec3 = ExternalData.gameData.flightModel.acceleration
   }
 }
