@@ -33,18 +33,21 @@ case class Mfd(implicit config: Configuration, dlinkSettings: DlinkSettings)
   }
 
   def drawQps(): Unit = {
+
     val white = LIGHT_GRAY
     val black = BLACK
-    for (iQp <- Seq(0, 1, 2)) {
-      val iOsb = qp2Osb(iQp)
-      val isCurrent = iQp == iQPage
-      qPages.get(iQp).foreach { page =>
-        val pos = Mfd.Osb.positions(iOsb)
-        atScreen(pos) {
-          if (isCurrent) {
-            rect(symbolScale * Mfd.Osb.boxWidth, symbolScale * Mfd.Osb.boxHeight, color = white, typ = FILL)
-          }
-          batched {
+
+    atScreen(Mfd.Osb.positions(qp2Osb(iQPage))) {
+      rect(symbolScale * Mfd.Osb.boxWidth, symbolScale * Mfd.Osb.boxHeight, color = white, typ = FILL)
+    }
+
+    batched {
+      for (iQp <- Seq(0, 1, 2)) {
+        val iOsb = qp2Osb(iQp)
+        val isCurrent = iQp == iQPage
+        qPages.get(iQp).foreach { page =>
+          val pos = Mfd.Osb.positions(iOsb)
+          atScreen(pos) {
             page.name.drawCentered(if (isCurrent) black else white)
           }
         }
