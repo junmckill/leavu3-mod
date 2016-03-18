@@ -19,7 +19,10 @@ case class HsdPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
   val deprFactor = CircleBuffer(0.0, 0.5).withDefaultValue(0.5)
   val stdTextSize = 0.75f
 
-  def update(game: GameData, dlinkIn: Map[String, DlinkData]): Unit = {
+  override def keyPressed(press: KeyPress): Unit = {
+  }
+
+  override def update(game: GameData, dlinkIn: Map[String, DlinkData]): Unit = {
     matchIngameScale(game)
     ppi_viewport(viewportSize = distance * 2.0, offs = Vec2(0.0, -distance * deprFactor), heading = self.heading) {
       drawSelf(game)

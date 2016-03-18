@@ -39,6 +39,16 @@ object Keyboard extends Logging {
       }
     }
   }
+
+  val SHIFT = 0x10
+  val CONTROL = 0x11
+  val ALT = 0x12
 }
 
-case class KeyPress(key: Int, keysHeld: Set[Int])
+case class KeyPress(key: Int, keysHeld: Set[Int]) {
+  import Keyboard._
+  def isKeyDown(key: Int): Boolean = keysHeld.contains(key)
+  def isShiftDown: Boolean = isKeyDown(SHIFT)
+  def isControlDown: Boolean = isKeyDown(CONTROL)
+  def isAltDown: Boolean = isKeyDown(ALT)
+}

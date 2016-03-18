@@ -35,5 +35,7 @@ case class Mfd(implicit config: Configuration, dlinkSettings: DlinkSettings) ext
   }
 
   def keyPressed(press: KeyPress): Unit = {
+    currentPage.foreach(_.keyPressed(press))
   }
+
 }
