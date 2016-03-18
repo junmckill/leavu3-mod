@@ -1,5 +1,6 @@
 package se.gigurra.leavu3.externaldata
 
+import com.twitter.finagle.FailedFastException
 import se.gigurra.heisenberg.MapDataParser
 import se.gigurra.leavu3.util.{RestClient, SimpleTimer}
 import se.gigurra.leavu3.{DlinkSettings, Configuration, DlinkData}
@@ -25,6 +26,7 @@ object DlinkInData extends Logging {
         case Success(_) =>
         case Failure(e: ServiceException) =>
           logger.error(s"Data link host replied with an error: $e")
+        case Failure(e: FailedFastException) => // Ignore ..
         case Failure(e) =>
           logger.error(e, s"Unexpected error when attempting to receive from dlink")
       }

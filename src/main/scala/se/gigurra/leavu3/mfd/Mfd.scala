@@ -1,6 +1,6 @@
 package se.gigurra.leavu3.mfd
 
-import se.gigurra.leavu3.externaldata.GameData
+import se.gigurra.leavu3.externaldata.{KeyPress, GameData}
 import se.gigurra.leavu3.gfx.RenderContext._
 import se.gigurra.leavu3.{DlinkSettings, Configuration, DlinkData, Instrument}
 
@@ -34,4 +34,6 @@ case class Mfd(implicit config: Configuration, dlinkSettings: DlinkSettings) ext
     drawMainMenuIfOpen()
   }
 
+  def keyPressed(press: KeyPress): Unit = {
+  }
 }

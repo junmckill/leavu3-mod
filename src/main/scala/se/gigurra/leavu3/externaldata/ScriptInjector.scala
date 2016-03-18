@@ -1,5 +1,6 @@
 package se.gigurra.leavu3.externaldata
 
+import com.twitter.finagle.FailedFastException
 import com.twitter.util.Duration
 import se.gigurra.leavu3.util.{Resource2String, SimpleTimer, RestClient}
 import se.gigurra.serviceutils.json.JSON
@@ -21,6 +22,7 @@ object ScriptInjector extends Logging {
 
     SimpleTimer.apply(Duration.fromSeconds(10)) {
       Try(JSON.read[GameData](client.getBlocking(GameData.path))) match {
+        case Failure(e: FailedFastException) => // Ignore ..
         case Failure(e: ServiceException) =>
           logger.warning(s"Dcs Remote replied: Unable to inject game export script: $e")
         case Failure(_) | Success(BadGameData()) =>

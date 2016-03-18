@@ -3,7 +3,7 @@ package se.gigurra.leavu3
 import javax.swing.JOptionPane
 
 import com.badlogic.gdx.backends.lwjgl.{LwjglApplication, LwjglApplicationConfiguration}
-import se.gigurra.leavu3.externaldata.{ScriptInjector, DlinkOutData, DlinkInData, GameData}
+import se.gigurra.leavu3.externaldata._
 import se.gigurra.leavu3.util.RestClient
 import se.gigurra.leavu3.windowstweaks.WindowTweaks
 import se.gigurra.serviceutils.json.JSON
@@ -27,6 +27,7 @@ object DesktopMain extends Logging {
     GameData.startPoller(config.gameDataFps, config.dcsRemoteAddress, config.dcsRemotePort)
     DlinkOutData.startPoller(config, dlinkConfig)
     DlinkInData.startPoller(dlinkConfig)
+    Keyboard.startPolling(config)
     listenForKeyInput(config)
 
   } match {

@@ -1,9 +1,8 @@
 package se.gigurra.leavu3.externaldata
 
-import java.time.Instant
-
+import com.twitter.finagle.FailedFastException
 import se.gigurra.heisenberg.MapData._
-import se.gigurra.heisenberg.{Parsed, Schema}
+import se.gigurra.heisenberg.Schema
 import se.gigurra.leavu3.util.{CurTime, RestClient, SimpleTimer}
 import se.gigurra.serviceutils.json.JSON
 import se.gigurra.serviceutils.twitter.logging.Logging
@@ -83,6 +82,7 @@ object GameData extends Schema[GameData] with Logging {
           val newData = JSON.read(stringData)
           ExternalData.gameData = process(newData)
         case Failure(e: ServiceException) => logger.warning(s"Dcs Remote replied: Could not fetch game data from Dcs Remote: $e")
+        case Failure(e: FailedFastException) => // Ignore ..
         case Failure(e) => logger.error(s"Could not fetch game data from Dcs Remote: $e")
       }
     }
