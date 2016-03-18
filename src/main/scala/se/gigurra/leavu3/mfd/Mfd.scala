@@ -95,8 +95,11 @@ case class Mfd(implicit config: Configuration, dlinkSettings: DlinkSettings)
   }
 
   def pressQpOsb(i: Int): Unit = {
-    if (i == iQPage)
-      mainMenuOpen = !mainMenuOpen
+    if (i == iQPage) {
+      mainMenuOpen = true
+    } else {
+      iQPage = i
+    }
   }
 }
 
