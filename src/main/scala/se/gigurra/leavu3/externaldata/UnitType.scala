@@ -105,7 +105,7 @@ object UnitType extends Schema[UnitType] with Logging {
       }
     }
 
-    mappedTypes.getOrElseUpdate(t.typ, UnitTypeData.UKN)
+    mappedTypes.getOrElse(t.typ, UnitTypeData.UKN)
   }
 
   implicit def UnitType2Data(t: UnitType)(implicit c: Configuration): UnitTypeData = getData(t)
