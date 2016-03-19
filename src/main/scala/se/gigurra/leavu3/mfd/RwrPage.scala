@@ -1,12 +1,10 @@
 package se.gigurra.leavu3.mfd
 
-import se.gigurra.leavu3.externaldata.GameData
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
-import se.gigurra.leavu3.externaldata._
-import se.gigurra.leavu3.gfx.{Blink, PpiProjection}
+import se.gigurra.leavu3.externaldata.{GameData, _}
 import se.gigurra.leavu3.gfx.RenderContext._
-import se.gigurra.leavu3.util.CurTime
+import se.gigurra.leavu3.gfx.{Blink, PpiProjection}
 import se.gigurra.leavu3.{Configuration, DlinkData, DlinkSettings}
 
 import scala.language.postfixOps
@@ -116,34 +114,6 @@ case class RwrPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
       lines(shapes.self.coords * symbolScale, CYAN)
       circle(0.005 * symbolScale, color = CYAN, typ = FILL)
       circle(minRangeOffset, color = DARK_GRAY, typ = LINE)
-    }
-  }
-
-  def drawWaypoints(game: GameData): Unit = {
-
-    def wpByIndex(i: Int): Option[Waypoint] = {
-      game.route.waypoints.find(_.index == i)
-    }
-
-    for (wp <- game.route.waypoints) {
-      circle(at = wp.position - self.position, radius = 0.015 * symbolScale, color = WHITE)
-      wpByIndex(wp.next) match {
-        case None =>
-        case Some(nextWp) =>
-          val thisOne = wp.position - self.position
-          val nextOne = nextWp.position - self.position
-          lines(Seq(thisOne -> nextOne))
-      }
-    }
-    circle(at = game.route.currentWaypoint.position - self.position, radius = 0.015 * symbolScale, typ = FILL, color = WHITE)
-
-    batched {
-      for (wp <- game.route.waypoints) {
-        val text = if (wp.index > 0) (wp.index - 1).toString else "x"
-        at(wp.position) {
-          text.drawRightOf(scale = stdTextSize, color = WHITE)
-        }
-      }
     }
   }
 
