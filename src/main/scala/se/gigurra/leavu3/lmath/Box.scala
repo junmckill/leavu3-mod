@@ -1,4 +1,4 @@
-package se.gigurra.leavu3.math
+package se.gigurra.leavu3.lmath
 
 import se.gigurra.leavu3.externaldata.Vec2
 

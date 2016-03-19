@@ -9,7 +9,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType
 import com.badlogic.gdx.math.{Vector2, Vector3}
 import se.gigurra.leavu3.{DlinkSettings, Configuration}
 import se.gigurra.leavu3.externaldata.{Vec2, Vec3, ExternalData}
-import se.gigurra.leavu3.math.{Matrix4Stack, UnitConversions}
+import se.gigurra.leavu3.lmath.{Matrix4Stack, UnitConversions}
 
 trait RenderHelpers extends UnitConversions { _: RenderContext.type =>
 

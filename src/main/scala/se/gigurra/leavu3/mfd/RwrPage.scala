@@ -119,7 +119,7 @@ case class RwrPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
 
     for (threat <- allEmitters.filter(threatFilter).sortBy(_.priority)) {
       val bearing = threat.azimuth + self.heading
-      val bra = Bra(bearing = bearing, range = threat.range, deltaAltitude = 0.0)
+      val bra = Bra(bearingRaw = bearing, range = threat.range, deltaAltitude = 0.0)
 
       val offset = bra.toOffset
 
@@ -169,7 +169,7 @@ case class RwrPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
 
     for (azimuth <- Seq(-90.0f, 90.0f)) {
       val bearing = azimuth + self.heading
-      val bra = Bra(bearing = bearing, range = distance, deltaAltitude = 0.0)
+      val bra = Bra(bearingRaw = bearing, range = distance, deltaAltitude = 0.0)
       val offset = bra.toOffset
 
       val w = 0.02

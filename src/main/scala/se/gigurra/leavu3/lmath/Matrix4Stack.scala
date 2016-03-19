@@ -1,4 +1,4 @@
-package se.gigurra.leavu3.math
+package se.gigurra.leavu3.lmath
 
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.GlyphLayout

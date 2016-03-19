@@ -181,7 +181,7 @@ case class MouseClick(screenX: Int, screenY: Int, button: Int) {
     }
 
   val x11 = sx * x11Raw
-  val y11 = sy * y11Raw/ hh
+  val y11 = sy * y11Raw
   val ortho11 = Vec2(x11, y11)
 
   override def toString: String = {

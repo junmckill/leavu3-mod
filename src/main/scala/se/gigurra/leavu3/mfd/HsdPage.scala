@@ -4,8 +4,8 @@ import com.badlogic.gdx.graphics.Color
 import se.gigurra.leavu3.externaldata._
 import se.gigurra.leavu3.gfx.PpiProjection
 import se.gigurra.leavu3.gfx.RenderContext._
-import se.gigurra.leavu3.util.{CurTime, CircleBuffer}
-import se.gigurra.leavu3.{DlinkSettings, Configuration, DlinkData}
+import se.gigurra.leavu3.util.{CircleBuffer, CurTime}
+import se.gigurra.leavu3._
 
 import scala.collection.mutable
 import scala.language.postfixOps
@@ -24,13 +24,24 @@ case class HsdPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
   val OSB_DEPR = 1
   val OSB_SCALE = 17
   val OSB_HSI = 3
+  val OSB_DEL = 7
 
   override def pressOsb(i: Int): Unit = {
     i match {
       case OSB_DEPR => deprFactor.stepDown()
       case OSB_HSI => shouldDrawDetailedHsi = !shouldDrawDetailedHsi
+      case OSB_DEL => DlinkOutData.deleteMark(dlinkSettings.callsign)
       case _ => // Nothing yet
     }
+  }
+
+  override def mouseClicked(click: MouseClick): Unit =  {
+    val screenCenter = Vec2(0.0, -deprFactor)
+    val offs = (click.ortho11 - screenCenter) * distance
+    val relativeBra = offs.asBra
+    val bra = relativeBra.copy(bearingRaw = self.heading + relativeBra.bearing)
+    val clickPos = self.position + bra.toOffset
+    DlinkOutData.addMark(Mark(dlinkSettings.callsign, clickPos))
   }
 
   override def draw(game: GameData, dlinkIn: Map[String, DlinkData]): Unit = {
@@ -42,7 +53,8 @@ case class HsdPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
       drawScanZone(game)
       drawAiWingmen(game)
       drawAiWingmenTargets(game)
-      drawDlinkMembers(dlinkIn)
+      drawDlinkMembersAndTargets(dlinkIn)
+      drawDlinkMarks(dlinkIn)
       drawLockedTargets(game)
       drawTdc(game)
     }
@@ -189,7 +201,36 @@ case class HsdPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
     }
   }
 
-  def drawDlinkMembers(dlinkIn: Map[String, DlinkData]): Unit = {
+
+  def drawDlinkMarks(dlinkIn: Map[String, DlinkData]): Unit = {
+
+    val radius = 0.015 * symbolScale
+
+    def draw(f: (String, Member, String, Mark) => Unit): Unit = {
+      for {
+        (name, member) <- dlinkIn
+        (id, mark) <- member.marks
+      } {
+        at(mark.position) {
+          f(name, member, id, mark)
+        }
+      }
+    }
+
+    draw { (name, member, id, mark) =>
+      circle(radius = radius, typ = LINE, color = YELLOW)
+      circle(radius = radius * 0.5f, typ = LINE, color = YELLOW)
+    }
+
+    draw { (name, member, id, mark) =>
+      batched {
+        mark.id.take(2).drawRightOf(YELLOW)
+      }
+    }
+
+  }
+
+  def drawDlinkMembersAndTargets(dlinkIn: Map[String, DlinkData]): Unit = {
 
     val dlinksOfInterest = dlinkIn.filter(m => m._2.data.planeId != self.planeId || m._1 != self.dlinkCallsign)
 
@@ -326,13 +367,6 @@ case class HsdPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
     }
   }
 
-  def drawOsbs(game: GameData): Unit = {
-    import Mfd.Osb._
-    drawBoxed(OSB_DEPR, "DEP", boxed = deprFactor.index != 0)
-    drawBoxed(OSB_HSI, "HSI", boxed = shouldDrawDetailedHsi)
-    drawBoxed(OSB_SCALE, (distance.get * m_to_nmi).round.toString, boxed = false)
-  }
-
   def drawBullsEyeNumbers(game: GameData) = {
 
     def mkBraString(prefix: String, bra: Bra): String = s"$prefix : ${bra.brString}"
@@ -398,7 +432,7 @@ case class HsdPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
 
         val wp = game.route.currentWaypoint
         val wpBra = (wp.position - self.position).asBra
-        val wpStr = mkBraString(s"wp ${(wp.index-1)}".pad(8), wpBra)
+        val wpStr = mkBraString(s"wp ${wp.index-1}".pad(8), wpBra)
         drawTextLine(wpStr, DARK_GRAY)
 
         game.tdcPosition foreach { tdc =>
@@ -416,6 +450,15 @@ case class HsdPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
       }
     }}
 
+  }
+
+  def drawOsbs(game: GameData): Unit = {
+    import Mfd.Osb._
+    drawBoxed(OSB_DEPR, "DEP", boxed = deprFactor.index != 0)
+    drawBoxed(OSB_HSI, "HSI", boxed = shouldDrawDetailedHsi)
+    if (DlinkOutData.hasMark(dlinkSettings.callsign))
+      drawBoxed(OSB_DEL, "DEL", boxed = false)
+    drawBoxed(OSB_SCALE, (distance.get * m_to_nmi).round.toString, boxed = false)
   }
 
 }

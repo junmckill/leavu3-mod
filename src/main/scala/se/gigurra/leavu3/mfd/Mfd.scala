@@ -9,7 +9,7 @@ import se.gigurra.leavu3.{Configuration, DlinkData, DlinkSettings, Instrument}
 
 import scala.language.postfixOps
 import se.gigurra.leavu3.gfx.RenderContext._
-import se.gigurra.leavu3.math.Box
+import se.gigurra.leavu3.lmath.Box
 
 case class Mfd(implicit config: Configuration, dlinkSettings: DlinkSettings)
   extends Instrument(config, dlinkSettings) {
@@ -88,14 +88,19 @@ case class Mfd(implicit config: Configuration, dlinkSettings: DlinkSettings)
   }
 
   def mouseClicked(click: MouseClick): Unit = {
-    val clickIndex = (0 until 20).find { i =>
+    (0 until 20).find { i =>
       val center = Mfd.Osb.positions(i)
       val height = Mfd.Osb.boxHeight * config.symbolScale
       val width = Mfd.Osb.boxWidth * config.symbolScale
       val hitBox = Box(width, height, center)
       hitBox.contains(click.ortho11Raw)
+    } match {
+      case Some(i) => pressOsb(i)
+      case None =>
+        if (!mainMenuOpen) {
+          currentPage.foreach(_.mouseClicked(click))
+        }
     }
-    clickIndex foreach pressOsb
   }
 
   def pressOsbInMenu(i: Int): Unit = {
