@@ -38,9 +38,9 @@ case class RwrPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
   }
 
   object groundThreat {
-    val w = 0.04
+    val w = airThreat.h // Must be same as airThreat.h to ensure line connects properly!
     def draw(threat: Emitter): Unit = {
-      rect(w * symbolScale, w * symbolScale, typ = threat.fillType, color = threat.color)
+      rect(w * symbolScale, w * symbolScale, at = Vec2(0.0, w/2 *symbolScale), typ = threat.fillType, color = threat.color)
     }
   }
 
