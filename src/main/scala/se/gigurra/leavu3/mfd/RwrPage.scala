@@ -20,6 +20,7 @@ case class RwrPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
   implicit val projection = new PpiProjection
   val stdTextSize = 0.75f
   val distance = 100 nmi
+  val minRangeOffset = distance * 0.05 * config.symbolScale
 
   override def pressOsb(i: Int): Unit = {
     i match {
@@ -39,9 +40,8 @@ case class RwrPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
 
   implicit class RichEmitter(e: Emitter) {
     def range: Double = {
-      val offset = distance * 0.05 * config.symbolScale
-      val scalable = distance - offset
-      offset + scalable * (1.0 - math.pow(e.power, 2.0))
+      val scalable = distance - minRangeOffset
+      minRangeOffset + scalable * (1.0 - math.pow(e.power, 2.0))
     }
 
     def color: Color = {
@@ -53,10 +53,9 @@ case class RwrPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
   }
 
   def drawPdtBearing(pdt: Option[Target]): Unit = pdt foreach { pdt =>
-    val offset = distance * (pdt.position - self.position : Vec2).normalized
-    lines(Seq(
-      Vec2(0.0,0.0) -> offset
-    ), DARK_GRAY)
+    val a = minRangeOffset * (pdt.position - self.position : Vec2).normalized
+    val b = distance * (pdt.position - self.position : Vec2).normalized
+    lines(Seq(a -> b), DARK_GRAY)
   }
 
   def drawThreats(game: GameData): Unit = {
@@ -65,10 +64,15 @@ case class RwrPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
       val bearing = threat.azimuth + self.heading
       val bra = Bra(bearing = bearing, range = threat.range, deltaAltitude = 0.0)
 
-      val position = self.position + bra.toOffset
-      at(position, heading = bearing) {
+      val offset = bra.toOffset
+      val edgeOffset = offset.normalized * distance
+
+      at(self.position + offset, heading = bearing) {
         drawAirThreat(threat)
       }
+
+      lines(Seq(offset -> edgeOffset), threat.color)
+
     }
   }
 
@@ -96,6 +100,7 @@ case class RwrPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
     transform(_.rotate(-self.heading)) {
       lines(shapes.self.coords * symbolScale, CYAN)
       circle(0.005 * symbolScale, color = CYAN, typ = FILL)
+      circle(minRangeOffset, color = DARK_GRAY, typ = LINE)
     }
   }
 
@@ -125,6 +130,10 @@ case class RwrPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
         }
       }
     }
+  }
+
+  def drawNotchBlocks(game: GameData): Unit = {
+
   }
 
   def drawMenuItems(game: GameData): Unit = {
