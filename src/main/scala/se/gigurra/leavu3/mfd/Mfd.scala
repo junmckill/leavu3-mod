@@ -18,7 +18,7 @@ case class Mfd(implicit config: Configuration, dlinkSettings: DlinkSettings)
   val sms = SmsPage()
   val fcr = FcrPage()
   val available = Seq(hsd, rwr, sms, fcr)
-  var qPages = Map[Int, Page](0 -> hsd, 1 -> fcr, 2 -> rwr)
+  var qPages = Map[Int, Page](0 -> hsd, 1 -> rwr/*, 2 -> fcr*/)
   var iQPage = 0
   var mainMenuOpen: Boolean = false
 
@@ -67,6 +67,7 @@ case class Mfd(implicit config: Configuration, dlinkSettings: DlinkSettings)
   }
 
   def update(game: GameData, dlinkIn: Map[String, DlinkData]): Unit = frame {
+    mainMenuOpen = false // Add support for menu later
     if (mainMenuOpen) {
       drawMainMenu()
     } else {
@@ -98,9 +99,11 @@ case class Mfd(implicit config: Configuration, dlinkSettings: DlinkSettings)
     if (i == iQPage) {
       mainMenuOpen = true
     } else {
-      iQPage = i
+      if (qPages.contains(i))
+        iQPage = i
     }
   }
+
 }
 
 object Mfd {
