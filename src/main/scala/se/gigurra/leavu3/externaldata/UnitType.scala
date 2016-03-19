@@ -60,6 +60,12 @@ object UnitTypeData {
     case x if x.startsWith("csa")       => Data("8",            DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
     case x if x.startsWith("tunguska")  => Data("19",           DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
     case x if x.startsWith("tor")       => Data("15",           DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
+    case x if x.startsWith("buk")       => Data("11",           DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
+
+    // EWs
+    case x if x.startsWith("dog")       => Data("DE",           DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
+    case x if x.startsWith("1l13")      => Data("EW",           DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
+    case x if x.startsWith("55g6")      => Data("EW",           DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
 
     // Active missiles
     case x if x.startsWith("aim-120")   => Data("M120",         DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_ARH_MAX_RANGE_INDICATION)
