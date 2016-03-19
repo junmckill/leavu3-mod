@@ -224,7 +224,7 @@ case class HsdPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
 
     draw { (name, member, id, mark) =>
       batched {
-        mark.id.take(2).drawRightOf(YELLOW)
+        mark.id.drawRightOf(scale = stdTextSize * 0.8f, color = YELLOW)
       }
     }
 
