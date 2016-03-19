@@ -74,6 +74,7 @@ case class RwrPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
     def color: Color = {
       e.signalType match {
         case Emitter.RADAR_SEARCH   => BROWN
+        case Emitter.RADAR_TWS      => BROWN
         case Emitter.RADAR_LOCK     => YELLOW
         case Emitter.MISSILE_LAUNCH => Blink(Seq(YELLOW, RED), blinkSpeed)
         case Emitter.MISSILE_ACTIVE => Blink(Seq(YELLOW, RED), blinkSpeed)
