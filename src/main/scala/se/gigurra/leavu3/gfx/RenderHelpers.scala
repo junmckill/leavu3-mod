@@ -86,6 +86,24 @@ trait RenderHelpers extends UnitConversions { _: RenderContext.type =>
     }
   }
 
+  def triangle(a: Vec2,
+               b: Vec2,
+               c: Vec2,
+               at: Vector2 = Vector2.Zero,
+               typ: ShapeRenderer.ShapeType = LINE,
+               color: Color = null): Unit = {
+    shape(typ, color) {
+      shapeRenderer.triangle(
+        at.x + a.x.toFloat,
+        at.y + a.y.toFloat,
+        at.x + b.x.toFloat,
+        at.y + b.y.toFloat,
+        at.x + c.x.toFloat,
+        at.y + c.y.toFloat
+      )
+    }
+  }
+
   def arc(radius: Number,
           angle: Number,
           at: Vector2 = Vector2.Zero,

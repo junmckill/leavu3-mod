@@ -1,12 +1,13 @@
 package se.gigurra.leavu3.mfd
 
 import se.gigurra.leavu3.externaldata.GameData
-
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import se.gigurra.leavu3.externaldata._
-import se.gigurra.leavu3.gfx.PpiProjection
+import se.gigurra.leavu3.gfx.{Blink, PpiProjection}
 import se.gigurra.leavu3.gfx.RenderContext._
-import se.gigurra.leavu3.{DlinkSettings, Configuration, DlinkData}
+import se.gigurra.leavu3.util.CurTime
+import se.gigurra.leavu3.{Configuration, DlinkData, DlinkSettings}
 
 import scala.language.postfixOps
 
@@ -18,6 +19,18 @@ case class RwrPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
   val stdTextSize = 0.75f
   val distance = 100 nmi
   val minRangeOffset = distance * 0.05 * config.symbolScale
+  val blinkSpeed = 1.0 / 3.0
+
+  object airThreat {
+    val w = 0.015
+    val h = 0.035
+    def draw(threat: Emitter): Unit = {
+      val a = Vec2(0,0) * symbolScale
+      val b = Vec2(w,h) * symbolScale
+      val c = Vec2(-w,h) * symbolScale
+      triangle(a, b, c, typ = threat.fillType, color = threat.color)
+    }
+  }
 
   override def pressOsb(i: Int): Unit = {
     i match {
@@ -37,6 +50,7 @@ case class RwrPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
   }
 
   implicit class RichEmitter(e: Emitter) {
+
     def range: Double = {
       val scalable = distance - minRangeOffset
       minRangeOffset + scalable * (1.0 - math.pow(e.power, 2.0))
@@ -44,8 +58,20 @@ case class RwrPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
 
     def color: Color = {
       e.signalType match {
-        case "scan" => BROWN
-        case _ => YELLOW
+        case Emitter.RADAR_SEARCH   => BROWN
+        case Emitter.RADAR_LOCK     => YELLOW
+        case Emitter.MISSILE_LAUNCH => Blink(Seq(YELLOW, RED), blinkSpeed)
+        case Emitter.MISSILE_ACTIVE => Blink(Seq(YELLOW, RED), blinkSpeed)
+        case s =>
+          logger.warning(s"RWR: Unknown signal type: $s")
+          Color.YELLOW
+      }
+    }
+
+    def fillType: ShapeRenderer.ShapeType = {
+      e.signalType match {
+        case Emitter.MISSILE_ACTIVE => FILL
+        case _ => LINE
       }
     }
   }
@@ -63,25 +89,16 @@ case class RwrPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
       val bra = Bra(bearing = bearing, range = threat.range, deltaAltitude = 0.0)
 
       val offset = bra.toOffset
-      val edgeOffset = offset.normalized * distance
 
       at(self.position + offset, heading = bearing) {
-        drawAirThreat(threat)
+        airThreat.draw(threat)
       }
 
-      lines(Seq(offset -> edgeOffset), threat.color)
+      val lineStart = offset.normalized * (bra.range + airThreat.h * symbolScale)
+      val edgeOffset = offset.normalized * distance
+      lines(Seq(lineStart -> edgeOffset), threat.color)
 
     }
-  }
-
-  def drawAirThreat(threat: Emitter): Unit = {
-    val w = 0.015
-    val h = 0.035
-    lines(Seq(
-      Vec2(0.0, 0.0) -> Vec2(w, h),
-      Vec2(0.0, 0.0) -> Vec2(-w, h),
-      Vec2(w, h) -> Vec2(-w, h)
-    ) * symbolScale, threat.color)
   }
 
   def drawHsi(game: GameData): Unit = {

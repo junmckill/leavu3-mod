@@ -19,4 +19,9 @@ object Emitter extends Schema[Emitter] {
   val priority    = required[Float]("Priority")
   val power       = required[Float]("Power")
   val unitType    = required[UnitType]("Type")
+
+  val RADAR_SEARCH = "scan"
+  val RADAR_LOCK = "lock"
+  val MISSILE_LAUNCH = "missile_radio_guided"
+  val MISSILE_ACTIVE = "missile_active_homing"
 }
