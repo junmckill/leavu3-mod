@@ -386,7 +386,7 @@ case class HsdPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
       transform(_
         .scalexy(scale)) {
 
-        val beStr = s"BRA from : self"
+        val beStr = s" BR from : self"
 
         var n = 0
         def drawTextLine(str: String, color: Color): Unit = {
