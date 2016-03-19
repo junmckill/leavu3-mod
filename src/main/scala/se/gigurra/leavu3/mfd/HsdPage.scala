@@ -59,7 +59,7 @@ case class HsdPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
       drawTdc(game)
     }
     drawBullsEyeNumbers(game)
-    drawBraEyeNumbers(game)
+    drawBraNumbers(game)
     drawOsbs(game)
   }
 
@@ -409,7 +409,7 @@ case class HsdPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
 
   }
 
-  def drawBraEyeNumbers(game: GameData) = {
+  def drawBraNumbers(game: GameData) = {
 
     def mkBraString(prefix: String, bra: Bra): String = s"$prefix : ${bra.brString}"
 
