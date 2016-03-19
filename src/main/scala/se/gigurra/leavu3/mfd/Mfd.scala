@@ -64,16 +64,24 @@ case class Mfd(implicit config: Configuration, dlinkSettings: DlinkSettings)
   }
 
   def keyPressed(press: KeyPress): Unit = {
+    press match {
+      case Key.OSB(i) => pressOsb(i)
+      case _ =>
+    }
+  }
+
+  def isQpOsb(i: Int): Boolean = {
+    11 <= i && i <= 13
+  }
+
+  def pressOsb(i: Int): Unit = {
     if (mainMenuOpen) {
-      press match {
-        case Key.OSB(i) => pressOsbInMenu(i)
-        case _ =>
-      }
+      pressOsbInMenu(i)
     } else {
-      press match {
-        case Key.QP_OSB(i) => pressQpOsb(osb2Qp(i))
-        case Key.OSB(i) => currentPage.foreach(_.pressOsb(i))
-        case _ =>
+      if (isQpOsb(i)) {
+        pressQpOsb(osb2Qp(i))
+      } else {
+        currentPage.foreach(_.pressOsb(i))
       }
     }
   }
