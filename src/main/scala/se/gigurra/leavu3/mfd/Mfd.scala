@@ -67,7 +67,7 @@ case class Mfd(implicit config: Configuration, dlinkSettings: DlinkSettings)
   }
 
   def update(game: GameData, dlinkIn: Map[String, DlinkData]): Unit = frame {
-    mainMenuOpen = false // Add support for menu later
+    mainMenuOpen = false // Add support for menu later when we have more than 3 pages implemented
     if (mainMenuOpen) {
       drawMainMenu()
     } else {
