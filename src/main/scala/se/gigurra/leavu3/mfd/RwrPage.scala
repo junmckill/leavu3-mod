@@ -18,12 +18,12 @@ case class RwrPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
   val distance = 100 nmi
   val minRangeOffset = distance * 0.05 * config.symbolScale
   val blinkSpeed = 1.0 / 3.0
-  var shouldHorizonStabilize = true
+  //TODO: Impl Roll stab var shouldHorizonStabilize = true
   var shouldDrawAll = true
   var shouldDrawDetailedHsi = true
   val screenEdgeOffset = 0.75f
-  val OSB_HOR = 1
-  val OSB_ALL = 2
+  val OSB_ALL = 1
+  //TODO: Impl Roll stab val OSB_HOR = 2
   val OSB_HSI = 3
 
   object airThreat {
@@ -39,7 +39,7 @@ case class RwrPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
 
   override def pressOsb(i: Int): Unit = {
     i match {
-      case OSB_HOR => shouldHorizonStabilize = !shouldHorizonStabilize
+      //TODO: Impl Roll stab case OSB_HOR => shouldHorizonStabilize = !shouldHorizonStabilize
       case OSB_ALL => shouldDrawAll = !shouldDrawAll
       case OSB_HSI => shouldDrawDetailedHsi = !shouldDrawDetailedHsi
       case _ => // Nothing yet
@@ -172,7 +172,7 @@ case class RwrPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
 
   def drawOsbs(game: GameData): Unit = {
     import Mfd.Osb._
-    drawBoxed(OSB_HOR, "HOR", shouldHorizonStabilize)
+    //TODO: Impl Roll stab drawBoxed(OSB_HOR, "HOR", shouldHorizonStabilize)
     drawBoxed(OSB_ALL, "ALL", shouldDrawAll)
     drawBoxed(OSB_HSI, "HSI", shouldDrawDetailedHsi)
   }
