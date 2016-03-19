@@ -28,23 +28,59 @@ case class RwrPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
   }
 
   override def draw(game: GameData, dlinkIn: Map[String, DlinkData]): Unit = {
-    viewport(viewportSize = distance * 2.0, offs = Vec2(0.0, 0.0), heading = self.heading) {
+    viewport(viewportSize = distance * 2.0 * 1.33333, offs = Vec2(0.0, 0.0), heading = self.heading) {
       drawSelf(game)
       drawHsi(game)
+      drawThreatLines(game)
     }
     drawMenuItems(game)
   }
 
-  def drawHsi(game: GameData): Unit = {
-    transform(_.scalexy(0.75f)) {
-      circle(radius = distance * 1.00, color = DARK_GRAY)
-      lines(
-        shapes.hsi.flag * symbolScale + Vec2(0.0, distance * 1.00),
-        shapes.hsi.eastPin * symbolScale + Vec2(distance * 1.00, 0.0),
-        shapes.hsi.westPin * symbolScale + Vec2(-distance * 1.00, 0.0),
-        shapes.hsi.southPin * symbolScale + Vec2(0.0, -distance * 1.00)
-      )
+  implicit class RichEmitter(e: Emitter) {
+    def range: Double = {
+      val offset = distance * 0.05 * config.symbolScale
+      val scalable = distance - offset
+      offset + scalable * (1.0 - math.pow(e.power, 2.0))
     }
+    def color: Color = {
+      e.signalType match {
+        case "scan" => BROWN
+        case _ => YELLOW
+      }
+    }
+  }
+
+  def drawThreatLines(game: GameData): Unit = {
+
+    for (threat <- game.electronicWarf.rwr.emitters) {
+      val bearing = threat.azimuth + self.heading
+      val bra = Bra(bearing = bearing, range = threat.range, deltaAltitude = 0.0)
+
+      val position = self.position + bra.toOffset
+      at(position, heading = bearing) {
+        drawAirThreat(threat)
+      }
+    }
+  }
+
+  def drawAirThreat(threat: Emitter): Unit = {
+    val w = 0.015
+    val h = 0.035
+    lines(Seq(
+      Vec2(0.0, 0.0) ->Vec2(w, h),
+      Vec2(0.0, 0.0) ->Vec2(-w, h),
+      Vec2(w, h) ->Vec2(-w, h)
+    ) * symbolScale, threat.color)
+  }
+
+  def drawHsi(game: GameData): Unit = {
+    circle(radius = distance * 1.00, color = DARK_GRAY)
+    lines(
+      shapes.hsi.flag * symbolScale + Vec2(0.0, distance * 1.00),
+      shapes.hsi.eastPin * symbolScale + Vec2(distance * 1.00, 0.0),
+      shapes.hsi.westPin * symbolScale + Vec2(-distance * 1.00, 0.0),
+      shapes.hsi.southPin * symbolScale + Vec2(0.0, -distance * 1.00)
+    )
   }
 
   def drawSelf(game: GameData): Unit = {

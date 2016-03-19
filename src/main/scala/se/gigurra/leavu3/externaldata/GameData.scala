@@ -20,8 +20,7 @@ case class GameData(source: SourceData) extends SafeParsed[GameData.type] {
   val requestId = parse(schema.requestId)
 
   // Actual game data
-  val rwr             = parse(schema.rwr)
-  val counterMeasures = parse(schema.counterMeasures)
+  val electronicWarf  = parse(schema.electronicWarf)
   val payload         = parse(schema.payload)
   val flightModel     = parse(schema.flightModel)
   val sensors         = parse(schema.sensors)
@@ -53,8 +52,7 @@ object GameData extends Schema[GameData] with Logging {
   val requestId = optional[String]("requestId")
 
   // Actual game data
-  val rwr             = required[Rwr]("rwr", default = Rwr())
-  val counterMeasures = required[CounterMeasures]("counterMeasures", default = CounterMeasures())
+  val electronicWarf  = required[ElectronicWarfare]("electronicWarfare", default = ElectronicWarfare())
   val payload         = required[Payload]("payload", default = Payload())
   val flightModel     = required[FlightModel]("flightModel", default = FlightModel())
   val sensors         = required[Sensors]("sensor", default = Sensors())
