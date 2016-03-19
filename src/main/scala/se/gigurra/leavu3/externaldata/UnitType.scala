@@ -20,6 +20,7 @@ case class UnitTypeData(fullName: String,
 
 object UnitTypeData {
   val DEFAULT_POWER_MAPPING_EXPONENT = 2.0
+  val AWACS_POWER_MAPPING_EXPONENT = 7.0
   val DEFAULT_MAX_RANGE_INDICATION = 1.0
   val DEFAULT_ARH_MAX_RANGE_INDICATION = 0.4
   val UKN = UnitTypeData("unknown", "UKN", isKnown = false, (0,0,0,0), DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
@@ -27,13 +28,31 @@ object UnitTypeData {
 
   case class Data(shortName: String, power2RangeExponent: Double, maxRangeIndication: Double)
 
+  def firstNumber(text: String): String = {
+    val iFirst = text.indexWhere(_.isDigit)
+    if (iFirst >= 0) {
+      val iLast = text.drop(iFirst).indexWhere(!_.isDigit)
+      if (iLast > 0) {
+        text.substring(iFirst, iLast + iFirst)
+      } else {
+        text.substring(iFirst, iFirst + 1)
+      }
+    } else {
+      "ukn"
+    }
+  }
+
   val unitMappings: PartialFunction[String, Data] = {
-    case x if x.startsWith("mig-29")  => Data("29",   DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
-    case x if x.startsWith("su-27")   => Data("29",   DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
-    case x if x.startsWith("su-3")    => Data("30",   DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
-    case x if x.startsWith("aim-120") => Data("M120", DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_ARH_MAX_RANGE_INDICATION)
-    case x if x.startsWith("aim-154") => Data("M54",  DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_ARH_MAX_RANGE_INDICATION)
-    case x if x.startsWith("r-77")    => Data("M77",  DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_ARH_MAX_RANGE_INDICATION)
+    case x if x.startsWith("mig-29")  => Data("29",           DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
+    case x if x.startsWith("su-27")   => Data("29",           DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
+    case x if x.startsWith("su-3")    => Data("30",           DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
+    case x if x.startsWith("su-")     => Data(firstNumber(x), DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
+    case x if x.startsWith("mig-")    => Data(firstNumber(x), DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
+    case x if x.startsWith("f-")      => Data(firstNumber(x), DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
+    case x if x.startsWith("e-3")     => Data("E3",           AWACS_POWER_MAPPING_EXPONENT,   DEFAULT_MAX_RANGE_INDICATION)
+    case x if x.startsWith("aim-120") => Data("M120",         DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_ARH_MAX_RANGE_INDICATION)
+    case x if x.startsWith("aim-154") => Data("M54",          DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_ARH_MAX_RANGE_INDICATION)
+    case x if x.startsWith("r-77")    => Data("M77",          DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_ARH_MAX_RANGE_INDICATION)
   }
 
   def apply(fullName: String, isKnown: Boolean, typ: UnitType.TYPE): UnitTypeData = {
