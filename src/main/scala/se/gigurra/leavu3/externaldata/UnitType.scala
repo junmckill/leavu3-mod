@@ -24,7 +24,8 @@ object UnitTypeData {
   val DEFAULT_MAX_RANGE_INDICATION = 1.0
   val DEFAULT_ARH_MAX_RANGE_INDICATION = 0.4
   val UKN = UnitTypeData("unknown", "UKN", isKnown = false, (0,0,0,0), DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
-  def default(fullName: String) =Data(fullName.split(' ').head, DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
+
+  def defaultShortName(fullName: String) =Data(fullName.split(' ').head.toUpperCase, DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
 
   case class Data(shortName: String, power2RangeExponent: Double, maxRangeIndication: Double)
 
@@ -56,7 +57,7 @@ object UnitTypeData {
   }
 
   def apply(fullName: String, isKnown: Boolean, typ: UnitType.TYPE): UnitTypeData = {
-    val data = unitMappings.applyOrElse(fullName.toLowerCase, (_: Any) => default(fullName))
+    val data = unitMappings.applyOrElse(fullName.toLowerCase, defaultShortName)
     UnitTypeData(fullName, data.shortName, isKnown, typ, data.power2RangeExponent, data.maxRangeIndication)
   }
 }
