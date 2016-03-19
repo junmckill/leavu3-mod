@@ -70,6 +70,8 @@ case class UnitType(source: SourceData = Map.empty) extends SafeParsed[UnitType.
   def typ: UnitType.TYPE = {
     (level1, level2, level3, level4)
   }
+
+  def isFlyer: Boolean = level1 == UnitType.AIR ||level1 == UnitType.WEAPON
 }
 
 object UnitType extends Schema[UnitType] with Logging {
@@ -77,6 +79,13 @@ object UnitType extends Schema[UnitType] with Logging {
   val level2 = required[Int]("level2", default = 0)
   val level3 = required[Int]("level3", default = 0)
   val level4 = required[Int]("level4", default = 0)
+
+  val AIR = 1
+  val GROUND = 2
+  val NAVY = 3
+  val WEAPON = 4
+  val STATIC = 5
+  val DESTROYED = 6
 
   type TYPE = (Int, Int, Int, Int)
   val pendingTypes = new concurrent.TrieMap[TYPE, Boolean]()

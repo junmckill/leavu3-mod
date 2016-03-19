@@ -37,6 +37,13 @@ case class RwrPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
     }
   }
 
+  object groundThreat {
+    val w = 0.04
+    def draw(threat: Emitter): Unit = {
+      rect(w * symbolScale, w * symbolScale, typ = threat.fillType, color = threat.color)
+    }
+  }
+
   override def pressOsb(i: Int): Unit = {
     i match {
       //TODO: Impl Roll stab case OSB_HOR => shouldHorizonStabilize = !shouldHorizonStabilize
@@ -110,14 +117,18 @@ case class RwrPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
 
     val allEmitters = game.electronicWarf.rwr.emitters
 
-    for (threat <- allEmitters.filter(threatFilter)) {
+    for (threat <- allEmitters.filter(threatFilter).sortBy(_.priority)) {
       val bearing = threat.azimuth + self.heading
       val bra = Bra(bearing = bearing, range = threat.range, deltaAltitude = 0.0)
 
       val offset = bra.toOffset
 
       at(self.position + offset, heading = bearing) {
-        airThreat.draw(threat)
+        if (threat.typ.isFlyer) {
+          airThreat.draw(threat)
+        } else {
+          groundThreat.draw(threat)
+        }
       }
 
       val lineStart = offset.normalized * (bra.range + airThreat.h * symbolScale)
