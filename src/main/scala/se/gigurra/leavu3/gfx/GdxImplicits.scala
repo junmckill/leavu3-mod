@@ -39,7 +39,7 @@ trait GdxImplicits { _: RenderContext.type =>
     def drawCentered[_: Projection](color: Color = null, scale: Float = 1.0f)(implicit configuration: Configuration): Unit = {
       transform(_
         .scalexy(scale * 0.05f * symbolScaleF / font.size)
-        .rotate(-self.heading)) {
+        .rotate(projection.headingCorrection)) {
         drawRaw(color = color, yAlign = extraDownOffset)
       }
     }
@@ -47,7 +47,7 @@ trait GdxImplicits { _: RenderContext.type =>
     def drawRightOf[_: Projection](color: Color = null, scale: Float = 1.0f)(implicit configuration: Configuration): Unit = {
       transform(_
         .scalexy(scale * 0.05f * symbolScaleF / font.size)
-        .rotate(-self.heading)) {
+        .rotate(projection.headingCorrection)) {
         drawRaw(xAlign = 0.5f, yAlign = extraDownOffset, xRawOffs = 0.025f * symbolScaleF, color = color)
       }
     }
@@ -55,7 +55,7 @@ trait GdxImplicits { _: RenderContext.type =>
     def drawLeftOf[_: Projection](color: Color = null, scale: Float = 1.0f)(implicit configuration: Configuration): Unit = {
       transform(_
         .scalexy(scale * 0.05f * symbolScaleF / font.size)
-        .rotate(-self.heading)) {
+        .rotate(projection.headingCorrection)) {
         drawRaw(xAlign = -0.5f, yAlign = extraDownOffset, xRawOffs = -0.025f * symbolScaleF, color = color)
       }
     }
@@ -63,7 +63,7 @@ trait GdxImplicits { _: RenderContext.type =>
     def drawBelow[_: Projection](color: Color = null, scale: Float = 1.0f)(implicit configuration: Configuration): Unit = {
       transform(_
         .scalexy(scale * 0.05f * symbolScaleF / font.size)
-        .rotate(-self.heading)) {
+        .rotate(projection.headingCorrection)) {
         drawRaw(yAlign = -0.5f, yRawOffs = -0.025f * symbolScaleF, color = color)
       }
     }

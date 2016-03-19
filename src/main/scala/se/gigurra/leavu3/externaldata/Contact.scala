@@ -62,7 +62,7 @@ case class Contact(source: SourceData) extends SafeParsed[Contact.type] {
 
   import SensorFlags._
   def isDesignated           = flags.hasAnyOf(RADAR_BUG | EOS_BUG | RADAR_HOJ)
-  def isPositionKnown        = flags.hasNoneOf(RADAR_HOJ)
+  def isPositionKnown        = flags.hasNoneOf(RADAR_HOJ) && (!jamming || burnthrough)
 }
 
 object Contact extends Schema[Contact] {

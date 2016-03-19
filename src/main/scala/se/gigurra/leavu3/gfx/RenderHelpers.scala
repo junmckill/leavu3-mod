@@ -9,7 +9,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType
 import com.badlogic.gdx.math.{Vector2, Vector3}
 import se.gigurra.leavu3.{DlinkSettings, Configuration}
 import se.gigurra.leavu3.externaldata.{Vec2, Vec3, ExternalData}
-import se.gigurra.leavu3.math.UnitConversions
+import se.gigurra.leavu3.math.{Matrix4Stack, UnitConversions}
 
 trait RenderHelpers extends UnitConversions { _: RenderContext.type =>
 
@@ -180,6 +180,36 @@ trait Projection[+T] {
   def at(position: Vec2, heading: Double = 0.0)(f: => Unit): Unit
   def rotatedTo(heading: Double)(f: => Unit): Unit
   def screen2World: Float
+  def headingCorrection: Float
+}
+
+case class ScreenProjection() extends Projection[Any] {
+
+  val transform = RenderContext.transform
+
+  override def viewport(viewportSize: Double, heading: Float, offs: Vector2)(f: => Unit): Unit = {
+    f
+  }
+
+  override def screen2World: Float = {
+    1.0f / transform.current.getScaleX
+  }
+
+  override def rotatedTo(heading: Double)(f: => Unit): Unit = {
+    transform(_
+      .rotate(-heading)) {
+      f
+    }
+  }
+
+  def headingCorrection: Float = {
+    0.0f
+  }
+
+  override def at(position: Vec2, heading: Double)(f: => Unit): Unit = {
+    RenderContext.atScreen(position)(f)
+  }
+
 }
 
 case class PpiProjection() extends Projection[Any] {
@@ -213,4 +243,9 @@ case class PpiProjection() extends Projection[Any] {
   def screen2World: Float = {
     1.0f / transform.current.getScaleX
   }
+
+  def headingCorrection: Float = {
+    -self.heading
+  }
+
 }
