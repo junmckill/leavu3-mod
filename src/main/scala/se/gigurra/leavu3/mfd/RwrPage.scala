@@ -18,6 +18,8 @@ case class RwrPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
   val distance = 100 nmi
   val minRangeOffset = distance * 0.05 * config.symbolScale
   val blinkSpeed = 1.0 / 3.0
+  var shouldDrawDetailedHsi = true
+  val screenEdgeOffset = 0.75f
 
   object airThreat {
     val w = 0.015
@@ -37,12 +39,12 @@ case class RwrPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
   }
 
   override def draw(game: GameData, dlinkIn: Map[String, DlinkData]): Unit = {
-    viewport(viewportSize = distance * 2.0 * 1.33333, offs = Vec2(0.0, 0.0), heading = self.heading) {
+    viewport(viewportSize = distance * 2.0 / screenEdgeOffset, offs = Vec2(0.0, 0.0), heading = self.heading) {
       drawSelf(game)
       drawHsi(game)
       // TODO: DetailHSI
       drawNotchBlocks(game)
-      drawPdtBearing(game.pdt)
+      drawTargetBearings(game)
       drawThreats(game)
       // TODO: Threat types
     }
@@ -76,9 +78,9 @@ case class RwrPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
     }
   }
 
-  def drawPdtBearing(pdt: Option[Target]): Unit = pdt foreach { pdt =>
-    val a = minRangeOffset * (pdt.position - self.position : Vec2).normalized
-    val b = distance * (pdt.position - self.position : Vec2).normalized
+  def drawTargetBearings(game: GameData): Unit = for (target <- game.sensors.targets.locked) {
+    val a = minRangeOffset * (target.position - self.position : Vec2).normalized
+    val b = distance * (target.position - self.position : Vec2).normalized
     lines(Seq(a -> b), DARK_GRAY)
   }
 
@@ -109,6 +111,9 @@ case class RwrPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
       shapes.hsi.westPin * symbolScale + Vec2(-distance * 1.00, 0.0),
       shapes.hsi.southPin * symbolScale + Vec2(0.0, -distance * 1.00)
     )
+    if (shouldDrawDetailedHsi) {
+      lines(shapes.hsi.detail(screen2World * screenEdgeOffset, config.symbolScale))
+    }
   }
 
   def drawSelf(game: GameData): Unit = {

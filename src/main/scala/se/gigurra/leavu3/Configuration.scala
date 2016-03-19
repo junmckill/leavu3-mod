@@ -47,7 +47,7 @@ object Configuration extends Schema[Configuration] with Logging {
   val dcsRemotePort     = required[Int]     ("dcsRemotePort",     default = 12340)
   val aaSamples         = required[Int]     ("aaSamples",         default = 4)
   val instrument        = required[String]  ("instrument",        default = "se.gigurra.leavu3.mfd.Mfd")
-  val symbolScale       = required[Double]  ("symbolScale",       default = 1.0)
+  val symbolScale       = required[Float]   ("symbolScale",       default = 1.0f)
   val relayDlink        = required[Boolean] ("relayDlink",        default = true)
   val borderless        = required[Boolean] ("borderless",        default = false)
   val noFocusOnClick    = required[Boolean] ("noFocusOnClick",    default = false)

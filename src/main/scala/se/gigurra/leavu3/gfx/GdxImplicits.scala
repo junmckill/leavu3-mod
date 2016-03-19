@@ -16,6 +16,13 @@ trait GdxImplicits { _: RenderContext.type =>
     def scaleAlpha(s: Float): Color = new Color(color.r, color.g, color.b, color.a * s)
   }
 
+  implicit class DrawableSomething(x: Any) {
+    def pad(len: Int, c: Char = ' '): String = {
+      val res = String.valueOf(x)
+      (0 until math.max(0, len - res.length)).map(_ => c).mkString + res
+    }
+  }
+
   implicit class DrawableString(text: String) {
 
     val lines = getLines(text)

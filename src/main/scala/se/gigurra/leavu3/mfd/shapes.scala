@@ -1,6 +1,7 @@
 package se.gigurra.leavu3.mfd
 
 import se.gigurra.leavu3.externaldata.Vec2
+import se.gigurra.leavu3.gfx.RenderContext._
 
 object shapes {
 
@@ -10,15 +11,28 @@ object shapes {
     val h = 0.075
 
     val flag = Seq(
-      Vec2(0.00,  0.00) -> Vec2(0.00,     h),
-      Vec2(0.00,     h) -> Vec2(  -w, h-w/2),
-      Vec2(-w,   h-w/2) -> Vec2(0.00,   h-w)
+      Vec2(0.00,   0.00) -> Vec2(0.00,     -h),
+      Vec2(0.00,     -h) -> Vec2(  -w, -h+w/2),
+      Vec2(-w,   -h+w/2) -> Vec2(0.00,   -h+w)
     )
 
-    val eastPin  = Seq(Vec2(0.00,  0.00) -> Vec2( h/2, 0.00))
-    val westPin  = Seq(Vec2(0.00,  0.00) -> Vec2(-h/2, 0.00))
-    val southPin = Seq(Vec2(0.00,  0.00) -> Vec2(0.00, -h/2))
+    val eastPin  = Seq(Vec2(0.00,  0.00) -> Vec2(-h/2, 0.00))
+    val westPin  = Seq(Vec2(0.00,  0.00) -> Vec2(+h/2, 0.00))
+    val southPin = Seq(Vec2(0.00,  0.00) -> Vec2(0.00, +h/2))
+
+    def detail(screen2World: Float, symScale: Float) : Seq[(Vec2, Vec2)] = {
+      val r0 = screen2World.toDouble
+      val r1 = r0 -  screen2World * symScale * h/4
+      val n = 36
+      for (i <- 0 until n) yield {
+        val angle = (360.0 * i.toDouble / n.toDouble).toRadians
+        val a = r0 * Vec2(math.cos(angle), math.sin(angle))
+        val b = r1 * Vec2(math.cos(angle), math.sin(angle))
+        a -> b
+      }
+    }
   }
+
 
 
   object self {

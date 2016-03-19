@@ -17,15 +17,18 @@ case class HsdPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
 
   implicit val projection = new PpiProjection
   var shouldMatchIngameScale = true
+  var shouldDrawDetailedHsi = true
   val distance = CircleBuffer(10 nmi, 20 nmi, 40 nmi, 80 nmi, 160 nmi).withDefaultValue(40 nmi)
   val deprFactor = CircleBuffer(0.0, 0.5).withDefaultValue(0.5)
   val stdTextSize = 0.75f
   val OSB_DEPR = 2
   val OSB_SCALE = 17
+  val OSB_HSI = 3
 
   override def pressOsb(i: Int): Unit = {
     i match {
       case OSB_DEPR => deprFactor.stepDown()
+      case OSB_HSI => shouldDrawDetailedHsi = !shouldDrawDetailedHsi
       case _ => // Nothing yet
     }
   }
@@ -44,6 +47,7 @@ case class HsdPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
       drawTdc(game)
     }
     drawBullsEyeNumbers(game)
+    drawBraEyeNumbers(game)
     drawOsbs(game)
   }
 
@@ -71,6 +75,9 @@ case class HsdPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
       shapes.hsi.southPin * symbolScale + Vec2(0.0, -distance * 1.00),
       shapes.hsi.southPin * symbolScale + Vec2(0.0, -distance * 1.50)
     )
+    if (shouldDrawDetailedHsi) {
+      lines(shapes.hsi.detail(screen2World, config.symbolScale))
+    }
   }
 
   def drawSelf(game: GameData): Unit = {
@@ -322,6 +329,7 @@ case class HsdPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
   def drawOsbs(game: GameData): Unit = {
     import Mfd.Osb._
     drawBoxed(OSB_DEPR, "DEP", boxed = deprFactor.index != 0)
+    drawBoxed(OSB_HSI, "HSI", boxed = shouldDrawDetailedHsi)
     drawBoxed(OSB_SCALE, (distance.get * m_to_nmi).round.toString, boxed = false)
   }
 
@@ -339,7 +347,7 @@ case class HsdPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
         .scalexy(scale)) {
 
         val beStr = s"bullseye : wp ${bullsEye.index - 1}"
-        val selfStr = mkBraString("    self", selfBra)
+        val selfStr = mkBraString("self".pad(8), selfBra)
 
         var n = 0
         def drawTextLine(str: String, color: Color): Unit = {
@@ -352,13 +360,56 @@ case class HsdPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
 
         game.tdcPosition foreach { tdc =>
           val tdcBra = (tdc - bullsEye.position).asBra
-          val tdcStr = mkBraString("     tdc", tdcBra)
+          val tdcStr = mkBraString("tdc".pad(8), tdcBra)
           drawTextLine(tdcStr, WHITE)
         }
 
         game.pdt.filter(_.isPositionKnown) foreach { pdt =>
           val pdtBra = (pdt.position - bullsEye.position).asBra
-          val pdtStr = mkBraString("     pdt", pdtBra)
+          val pdtStr = mkBraString("pdt".pad(8), pdtBra)
+          drawTextLine(pdtStr, contactColor(pdt, fromDatalink = false))
+        }
+
+      }
+    }}
+
+  }
+
+  def drawBraEyeNumbers(game: GameData) = {
+
+    def mkBraString(prefix: String, bra: Bra): String = s"$prefix : ${bra.brString}"
+
+    val scale = config.symbolScale * 0.02 / font.getSpaceWidth
+
+    batched { atScreen(0.45, 0.9) {
+
+      transform(_
+        .scalexy(scale)) {
+
+        val beStr = s"BRA from : self"
+
+        var n = 0
+        def drawTextLine(str: String, color: Color): Unit = {
+          transform(_.translate(y = -n.toFloat * font.getLineHeight))(str.drawRaw(xAlign = 0.5f, color = color))
+          n += 1
+        }
+
+        drawTextLine(beStr, LIGHT_GRAY)
+
+        val wp = game.route.currentWaypoint
+        val wpBra = (wp.position - self.position).asBra
+        val wpStr = mkBraString(s"wp ${(wp.index-1)}".pad(8), wpBra)
+        drawTextLine(wpStr, DARK_GRAY)
+
+        game.tdcPosition foreach { tdc =>
+          val tdcBra = (tdc - self.position).asBra
+          val tdcStr = mkBraString("tdc".pad(8), tdcBra)
+          drawTextLine(tdcStr, WHITE)
+        }
+
+        game.pdt.filter(_.isPositionKnown) foreach { pdt =>
+          val pdtBra = (pdt.position - self.position).asBra
+          val pdtStr = mkBraString("pdt".pad(8), pdtBra)
           drawTextLine(pdtStr, contactColor(pdt, fromDatalink = false))
         }
 
