@@ -1,16 +1,13 @@
 package se.gigurra.leavu3.mfd
 
-import se.gigurra.leavu3.DlinkData
 import se.gigurra.leavu3.externaldata.GameData
 
 import com.badlogic.gdx.graphics.Color
 import se.gigurra.leavu3.externaldata._
 import se.gigurra.leavu3.gfx.PpiProjection
 import se.gigurra.leavu3.gfx.RenderContext._
-import se.gigurra.leavu3.util.{CurTime, CircleBuffer}
 import se.gigurra.leavu3.{DlinkSettings, Configuration, DlinkData}
 
-import scala.collection.mutable
 import scala.language.postfixOps
 
 /**
@@ -32,6 +29,7 @@ case class RwrPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
     viewport(viewportSize = distance * 2.0 * 1.33333, offs = Vec2(0.0, 0.0), heading = self.heading) {
       drawSelf(game)
       drawHsi(game)
+      drawNotchBlocks(game)
       drawPdtBearing(game.pdt)
       drawThreats(game)
     }
@@ -134,6 +132,18 @@ case class RwrPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
 
   def drawNotchBlocks(game: GameData): Unit = {
 
+    for (azimuth <- Seq(-90.0f, 90.0f)) {
+      val bearing = azimuth + self.heading
+      val bra = Bra(bearing = bearing, range = distance, deltaAltitude = 0.0)
+      val offset = bra.toOffset
+
+      val w = 0.02
+      val h = 0.05
+
+      at(self.position + offset, heading = bearing) {
+        rect(w * symbolScale, h * symbolScale, color = DARK_GRAY, typ = FILL)
+      }
+    }
   }
 
   def drawMenuItems(game: GameData): Unit = {
