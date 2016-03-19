@@ -1,8 +1,9 @@
 package se.gigurra.leavu3.mfd
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType
-import se.gigurra.leavu3.externaldata.{GameData, Key, KeyPress, Vec2}
+import se.gigurra.leavu3.externaldata.{GameData, Key, KeyPress, MouseClick, Vec2}
 import se.gigurra.leavu3.gfx.{PpiProjection, ScreenProjection}
 import se.gigurra.leavu3.{Configuration, DlinkData, DlinkSettings, Instrument}
 
@@ -75,6 +76,10 @@ case class Mfd(implicit config: Configuration, dlinkSettings: DlinkSettings)
         case _ =>
       }
     }
+  }
+
+  def mouseClicked(click: MouseClick): Unit = {
+    println(s"MouseClick: $click")
   }
 
   def pressOsbInMenu(i: Int): Unit = {

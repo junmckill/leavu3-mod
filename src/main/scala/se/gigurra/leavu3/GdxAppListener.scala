@@ -1,14 +1,17 @@
 package se.gigurra.leavu3
 
-import com.badlogic.gdx.ApplicationListener
-import se.gigurra.leavu3.externaldata.{Keyboard, ExternalData}
+import com.badlogic.gdx.{ApplicationListener, InputProcessor}
+import se.gigurra.leavu3.externaldata.{ExternalData, Keyboard, MouseClick}
 import se.gigurra.serviceutils.twitter.logging.Logging
 
 import scala.util.{Failure, Success, Try}
 
 case class GdxAppListener(initialConfiguration: Configuration,
                           dlinkSettings: DlinkSettings,
-                          onCreate: () => Unit) extends ApplicationListener with Logging{
+                          onCreate: () => Unit)
+  extends ApplicationListener
+    with InputProcessor
+    with Logging {
 
   val instrumentClassName = initialConfiguration.instrument
   val instrumentClass: Class[Instrument] =
@@ -43,4 +46,16 @@ case class GdxAppListener(initialConfiguration: Configuration,
   override def create(): Unit = {
     onCreate()
   }
+
+  override def mouseMoved(screenX: Int, screenY: Int): Boolean = { false }
+  override def keyTyped(character: Char): Boolean = { false }
+  override def keyDown(keycode: Int): Boolean = { false }
+  override def touchDown(x: Int, y: Int, pointer: Int, button: Int): Boolean = {
+    instrument.mouseClicked(MouseClick(x,y,button))
+    true
+  }
+  override def keyUp(keycode: Int): Boolean = { false }
+  override def scrolled(amount: Int): Boolean = { false }
+  override def touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean = { false }
+  override def touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean = { false }
 }

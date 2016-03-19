@@ -2,6 +2,7 @@ package se.gigurra.leavu3.externaldata
 
 import java.util.concurrent.ConcurrentLinkedQueue
 
+import com.badlogic.gdx.Gdx
 import com.twitter.finagle.FailedFastException
 import se.gigurra.leavu3.Configuration
 import se.gigurra.leavu3.util.{RestClient, SimpleTimer}
@@ -161,6 +162,30 @@ object Key {
   }
 
   val modifiers = Set(LSHIFT, RSHIFT, SHIFT, LCONTROL, RCONTROL, CONTROL, ALT)
+}
+
+case class MouseClick(screenX: Int, screenY: Int, button: Int) {
+
+  val hw = Gdx.graphics.getWidth.toFloat / 2.0f
+  val hh = Gdx.graphics.getHeight.toFloat / 2.0f
+
+  val x11Raw = (screenX.toFloat - hw) / hw
+  val y11Raw = -(screenY.toFloat - hh) / hh
+
+  val (sx, sy) =
+    if (hw > hh) {
+      (hw / hh, 1.0f)
+    } else {
+      (1.0f, hh / hw)
+    }
+
+  val x11 = sx * x11Raw
+  val y11 = sy * y11Raw
+
+  override def toString: String = {
+    s"MouseClick[$x11, $y11][$x11Raw, $y11Raw]"
+  }
+
 }
 
 case class KeyPress(key: Int, keysDown: Set[Int]) {

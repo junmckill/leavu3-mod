@@ -2,6 +2,7 @@ package se.gigurra.leavu3
 
 import javax.swing.JOptionPane
 
+import com.badlogic.gdx.{Gdx, Input}
 import com.badlogic.gdx.backends.lwjgl.{LwjglApplication, LwjglApplicationConfiguration}
 import se.gigurra.leavu3.externaldata._
 import se.gigurra.leavu3.util.RestClient
@@ -21,7 +22,9 @@ object DesktopMain extends Logging {
     val config = loadConfig(args.headOption.getOrElse("leavu3-cfg.json"))
     val dlinkConfig = downloadDlinkConfig(config)
     val lwjglConfig = loadLwjglConfig(config)
-    new LwjglApplication(new GdxAppListener(config, dlinkConfig, () => onInitDisplay(config)), lwjglConfig)
+    val appListener = new GdxAppListener(config, dlinkConfig, () => onInitDisplay(config))
+    new LwjglApplication(appListener, lwjglConfig)
+    Gdx.input.setInputProcessor(appListener)
 
     ScriptInjector.startInjecting(config.dcsRemoteAddress, config.dcsRemotePort)
     GameData.startPoller(config.gameDataFps, config.dcsRemoteAddress, config.dcsRemotePort)
