@@ -171,6 +171,7 @@ case class MouseClick(screenX: Int, screenY: Int, button: Int) {
 
   val x11Raw = (screenX.toFloat - hw) / hw
   val y11Raw = -(screenY.toFloat - hh) / hh
+  val ortho11Raw = Vec2(x11Raw, y11Raw)
 
   val (sx, sy) =
     if (hw > hh) {
@@ -180,7 +181,8 @@ case class MouseClick(screenX: Int, screenY: Int, button: Int) {
     }
 
   val x11 = sx * x11Raw
-  val y11 = sy * y11Raw
+  val y11 = sy * y11Raw/ hh
+  val ortho11 = Vec2(x11, y11)
 
   override def toString: String = {
     s"MouseClick[$x11, $y11][$x11Raw, $y11Raw]"
