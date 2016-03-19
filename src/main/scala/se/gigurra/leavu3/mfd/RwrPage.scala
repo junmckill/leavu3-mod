@@ -31,7 +31,8 @@ case class RwrPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
     viewport(viewportSize = distance * 2.0 * 1.33333, offs = Vec2(0.0, 0.0), heading = self.heading) {
       drawSelf(game)
       drawHsi(game)
-      drawThreatLines(game)
+      drawPdtBearing(game.pdt)
+      drawThreats(game)
     }
     drawMenuItems(game)
   }
@@ -42,6 +43,7 @@ case class RwrPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
       val scalable = distance - offset
       offset + scalable * (1.0 - math.pow(e.power, 2.0))
     }
+
     def color: Color = {
       e.signalType match {
         case "scan" => BROWN
@@ -50,7 +52,14 @@ case class RwrPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
     }
   }
 
-  def drawThreatLines(game: GameData): Unit = {
+  def drawPdtBearing(pdt: Option[Target]): Unit = pdt foreach { pdt =>
+    val offset = distance * (pdt.position - self.position : Vec2).normalized
+    lines(Seq(
+      Vec2(0.0,0.0) -> offset
+    ), DARK_GRAY)
+  }
+
+  def drawThreats(game: GameData): Unit = {
 
     for (threat <- game.electronicWarf.rwr.emitters) {
       val bearing = threat.azimuth + self.heading
@@ -67,9 +76,9 @@ case class RwrPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
     val w = 0.015
     val h = 0.035
     lines(Seq(
-      Vec2(0.0, 0.0) ->Vec2(w, h),
-      Vec2(0.0, 0.0) ->Vec2(-w, h),
-      Vec2(w, h) ->Vec2(-w, h)
+      Vec2(0.0, 0.0) -> Vec2(w, h),
+      Vec2(0.0, 0.0) -> Vec2(-w, h),
+      Vec2(w, h) -> Vec2(-w, h)
     ) * symbolScale, threat.color)
   }
 
