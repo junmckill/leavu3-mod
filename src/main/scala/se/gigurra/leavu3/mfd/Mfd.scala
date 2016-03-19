@@ -1,9 +1,10 @@
 package se.gigurra.leavu3.mfd
 
 import com.badlogic.gdx.graphics.Color
-import se.gigurra.leavu3.externaldata.{Vec2, Key, KeyPress, GameData}
-import se.gigurra.leavu3.gfx.{ScreenProjection, PpiProjection}
-import se.gigurra.leavu3.{DlinkSettings, Configuration, DlinkData, Instrument}
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType
+import se.gigurra.leavu3.externaldata.{GameData, Key, KeyPress, Vec2}
+import se.gigurra.leavu3.gfx.{PpiProjection, ScreenProjection}
+import se.gigurra.leavu3.{Configuration, DlinkData, DlinkSettings, Instrument}
 
 import scala.language.postfixOps
 import se.gigurra.leavu3.gfx.RenderContext._
@@ -33,24 +34,9 @@ case class Mfd(implicit config: Configuration, dlinkSettings: DlinkSettings)
   }
 
   def drawQps(): Unit = {
-
-    val white = LIGHT_GRAY
-    val black = BLACK
-
-    atScreen(Mfd.Osb.positions(qp2Osb(iQPage))) {
-      rect(symbolScale * Mfd.Osb.boxWidth, symbolScale * Mfd.Osb.boxHeight, color = white, typ = FILL)
-    }
-
-    batched {
-      for (iQp <- Seq(0, 1, 2)) {
-        val iOsb = qp2Osb(iQp)
-        val isCurrent = iQp == iQPage
-        qPages.get(iQp).foreach { page =>
-          val pos = Mfd.Osb.positions(iOsb)
-          atScreen(pos) {
-            page.name.drawCentered(if (isCurrent) black else white)
-          }
-        }
+    for (iQp <- Seq(0, 1, 2)) {
+      qPages.get(iQp).foreach { page =>
+        Mfd.Osb.drawHighlighted(qp2Osb(iQp), page.name, iQp == iQPage)
       }
     }
   }
@@ -155,6 +141,44 @@ object Mfd {
     )
 
     val positions = Seq(upperBoxCenters, rightBoxCenters, lowerBoxCenters, leftBoxCenters).flatten
+
+
+    def drawBoxed(iOsb: Int,
+                  text: String,
+                  boxed: Boolean = true)(implicit config: Configuration): Unit = {
+      draw(iOsb, text, if (boxed) LINE else null)
+    }
+
+    def drawHighlighted(iOsb: Int,
+                        text: String,
+                        highlighted: Boolean = true)(implicit config: Configuration): Unit = {
+      draw(iOsb, text, if (highlighted) FILL else null)
+    }
+
+    def draw(iOsb: Int,
+             text: String,
+             boxType: ShapeType = null)(implicit config: Configuration): Unit = {
+
+      implicit val _p = ScreenProjection()
+
+      val white = LIGHT_GRAY
+      val black = BLACK
+
+      if (boxType != null) {
+        atScreen(Mfd.Osb.positions(iOsb)) {
+          rect(symbolScale * Mfd.Osb.boxWidth, symbolScale * Mfd.Osb.boxHeight, color = white, typ = boxType)
+        }
+      }
+
+      batched {
+        val pos = Mfd.Osb.positions(iOsb)
+        atScreen(pos) {
+          text.drawCentered(if (boxType == FILL) black else white)
+        }
+      }
+
+    }
+
 
   }
 

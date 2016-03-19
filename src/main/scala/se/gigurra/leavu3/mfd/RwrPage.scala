@@ -40,11 +40,13 @@ case class RwrPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
     viewport(viewportSize = distance * 2.0 * 1.33333, offs = Vec2(0.0, 0.0), heading = self.heading) {
       drawSelf(game)
       drawHsi(game)
+      // TODO: DetailHSI
       drawNotchBlocks(game)
       drawPdtBearing(game.pdt)
       drawThreats(game)
+      // TODO: Threat types
     }
-    drawMenuItems(game)
+    drawOsbs(game)
   }
 
   implicit class RichEmitter(e: Emitter) {
@@ -133,6 +135,6 @@ case class RwrPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
     }
   }
 
-  def drawMenuItems(game: GameData): Unit = {
+  def drawOsbs(game: GameData): Unit = {
   }
 }

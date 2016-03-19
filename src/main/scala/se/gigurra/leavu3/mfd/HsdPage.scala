@@ -20,10 +20,12 @@ case class HsdPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
   val distance = CircleBuffer(10 nmi, 20 nmi, 40 nmi, 80 nmi, 160 nmi).withDefaultValue(40 nmi)
   val deprFactor = CircleBuffer(0.0, 0.5).withDefaultValue(0.5)
   val stdTextSize = 0.75f
+  val OSB_DEPR = 2
+  val OSB_SCALE = 17
 
   override def pressOsb(i: Int): Unit = {
     i match {
-      case 2 => deprFactor.stepDown()
+      case OSB_DEPR => deprFactor.stepDown()
       case _ => // Nothing yet
     }
   }
@@ -42,7 +44,7 @@ case class HsdPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
       drawTdc(game)
     }
     drawBullsEyeNumbers(game)
-    drawMenuItems(game)
+    drawOsbs(game)
   }
 
   def matchIngameScale(game: GameData) = {
@@ -317,7 +319,10 @@ case class HsdPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
     }
   }
 
-  def drawMenuItems(game: GameData): Unit = {
+  def drawOsbs(game: GameData): Unit = {
+    import Mfd.Osb._
+    drawBoxed(OSB_DEPR, "DEP", boxed = deprFactor.index != 0)
+    drawBoxed(OSB_SCALE, (distance.get * m_to_nmi).round.toString, boxed = false)
   }
 
   def drawBullsEyeNumbers(game: GameData) = {
