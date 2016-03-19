@@ -18,8 +18,13 @@ case class RwrPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
   val distance = 100 nmi
   val minRangeOffset = distance * 0.05 * config.symbolScale
   val blinkSpeed = 1.0 / 3.0
+  var shouldHorizonStabilize = true
+  var shouldDrawAll = true
   var shouldDrawDetailedHsi = true
   val screenEdgeOffset = 0.75f
+  val OSB_HOR = 1
+  val OSB_ALL = 2
+  val OSB_HSI = 3
 
   object airThreat {
     val w = 0.015
@@ -34,6 +39,9 @@ case class RwrPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
 
   override def pressOsb(i: Int): Unit = {
     i match {
+      case OSB_HOR => shouldHorizonStabilize = !shouldHorizonStabilize
+      case OSB_ALL => shouldDrawAll = !shouldDrawAll
+      case OSB_HSI => shouldDrawDetailedHsi = !shouldDrawDetailedHsi
       case _ => // Nothing yet
     }
   }
@@ -42,7 +50,6 @@ case class RwrPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
     viewport(viewportSize = distance * 2.0 / screenEdgeOffset, offs = Vec2(0.0, 0.0), heading = self.heading) {
       drawSelf(game)
       drawHsi(game)
-      // TODO: DetailHSI
       drawNotchBlocks(game)
       drawTargetBearings(game)
       drawThreats(game)
@@ -84,9 +91,15 @@ case class RwrPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
     lines(Seq(a -> b), DARK_GRAY)
   }
 
+  def threatFilter(e: Emitter): Boolean = {
+    if(shouldDrawAll) true else !e.isSearch
+  }
+
   def drawThreats(game: GameData): Unit = {
 
-    for (threat <- game.electronicWarf.rwr.emitters) {
+    val allEmitters = game.electronicWarf.rwr.emitters
+
+    for (threat <- allEmitters.filter(threatFilter)) {
       val bearing = threat.azimuth + self.heading
       val bra = Bra(bearing = bearing, range = threat.range, deltaAltitude = 0.0)
 
@@ -141,5 +154,9 @@ case class RwrPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
   }
 
   def drawOsbs(game: GameData): Unit = {
+    import Mfd.Osb._
+    drawBoxed(OSB_HOR, "HOR", shouldHorizonStabilize)
+    drawBoxed(OSB_ALL, "ALL", shouldDrawAll)
+    drawBoxed(OSB_HSI, "HSI", shouldDrawDetailedHsi)
   }
 }
