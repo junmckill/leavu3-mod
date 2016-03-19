@@ -53,7 +53,6 @@ case class RwrPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
       drawNotchBlocks(game)
       drawTargetBearings(game)
       drawThreats(game)
-      // TODO: Threat types
     }
     drawOsbs(game)
   }
@@ -62,7 +61,7 @@ case class RwrPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
 
     def range: Double = {
       val scalable = distance - minRangeOffset
-      minRangeOffset + scalable * (1.0 - math.pow(e.power, 2.0))
+      minRangeOffset + scalable * (1.0 - math.pow(e.power, e.typ.power2RangeExponent)) * e.typ.maxRangeIndication
     }
 
     def color: Color = {
@@ -77,10 +76,22 @@ case class RwrPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
       }
     }
 
+    def isActiveMissile: Boolean = {
+      e.signalType == Emitter.MISSILE_ACTIVE
+    }
+
     def fillType: ShapeRenderer.ShapeType = {
       e.signalType match {
         case Emitter.MISSILE_ACTIVE => FILL
         case _ => LINE
+      }
+    }
+
+    def rwrName: String = {
+      if (e.signalType == Emitter.MISSILE_ACTIVE) {
+        "M"
+      } else {
+        e.typ.shortName
       }
     }
   }
@@ -112,6 +123,12 @@ case class RwrPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
       val lineStart = offset.normalized * (bra.range + airThreat.h * symbolScale)
       val edgeOffset = offset.normalized * distance
       lines(Seq(lineStart -> edgeOffset), threat.color)
+
+      batched {
+        at(self.position + edgeOffset * 1.05f, heading = bearing - self.heading) {
+          threat.rwrName.drawCentered(threat.color, scale = 0.7f)
+        }
+      }
 
     }
   }

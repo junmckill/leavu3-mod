@@ -9,7 +9,7 @@ case class Emitter(source: SourceData) extends SafeParsed[Emitter.type] {
   val azimuth     = parse(schema.azimuth).toDegrees
   val priority    = parse(schema.priority)
   val power       = parse(schema.power)
-  val unitType    = parse(schema.unitType)
+  val typ         = parse(schema.unitType)
 
   def isSearch = signalType == Emitter.RADAR_SEARCH
 }

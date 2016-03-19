@@ -2,7 +2,7 @@ package se.gigurra.leavu3.util
 
 import com.twitter.finagle.Http
 import com.twitter.finagle.http._
-import com.twitter.util.{Future, Duration, Await}
+import com.twitter.util._
 import se.gigurra.serviceutils.twitter.service.ServiceException
 
 /**
@@ -11,18 +11,19 @@ import se.gigurra.serviceutils.twitter.service.ServiceException
 case class RestClient(addr: String, port: Int) {
 
   private val client = Http.client.newService(s"$addr:$port")
+  implicit private val timer = new JavaTimer(isDaemon = true)
 
-  def get(path: String, cacheMaxAgeMillis: Option[Long] = None): Future[String] = {
+  def get(path: String, cacheMaxAgeMillis: Option[Long] = None, timeout: Duration = Duration.fromSeconds(3)): Future[String] = {
     val params = cacheMaxAgeMillis.toSeq.map(x =>"max_cached_age" -> x.toString)
     val request = Request(path, params:_*)
-    client.apply(request) flatMap {
+    client.apply(request).raiseWithin(timeout).flatMap {
       case OkResponse(response)  => Future.value(response.contentString)
       case BadResponse(response) => Future.exception(ServiceException(response))
     }
   }
 
   def getBlocking(path: String, cacheMaxAgeMillis: Option[Long] = None, timeout: Duration = Duration.fromSeconds(3)): String = {
-    Await.result(get(path, cacheMaxAgeMillis), timeout)
+    Await.result(get(path, cacheMaxAgeMillis, timeout))
   }
 
   def post(path: String, data: String): Future[Unit] = {
