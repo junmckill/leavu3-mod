@@ -4,7 +4,7 @@ import javax.swing.JOptionPane
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.backends.lwjgl.{LwjglApplication, LwjglApplicationConfiguration}
-import se.gigurra.leavu3.app.App
+import se.gigurra.leavu3.app.{App, Version}
 import se.gigurra.leavu3.datamodel.Configuration
 import se.gigurra.leavu3.interfaces._
 import se.gigurra.leavu3.windowstweaks.WindowTweaks
@@ -19,6 +19,8 @@ object DesktopMain extends Logging {
 
     Capture.stdOutToFile(s"leavu3-debug-log.txt", append = true)
     Capture.stdErrToFile(s"leavu3-log.txt", append = true)
+
+    logger.info(s"Starting leavu version: $Version")
 
     val config = loadConfig(args.headOption.getOrElse("leavu3-cfg.json"))
 

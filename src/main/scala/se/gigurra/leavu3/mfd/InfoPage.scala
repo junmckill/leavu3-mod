@@ -1,19 +1,15 @@
 package se.gigurra.leavu3.mfd
 
-import java.awt.Desktop
-import java.net.URI
 
 import com.badlogic.gdx.graphics.Color
-import com.twitter.util.{Duration, JavaTimer, Time}
+import se.gigurra.leavu3.app.Version
 import se.gigurra.leavu3.datamodel._
 import se.gigurra.leavu3.gfx.RenderContext._
 import se.gigurra.leavu3.gfx.{Blink, ScreenProjection}
 import se.gigurra.leavu3.interfaces.{DcsRemote, Dlink, GameIn, MouseClick}
 import se.gigurra.leavu3.lmath.Box
-import se.gigurra.leavu3.util.Resource2String
 
 import scala.language.postfixOps
-import scala.util.Try
 
 /**
   * Created by kjolh on 3/12/2016.
@@ -26,29 +22,12 @@ case class InfoPage(implicit dcsRemote: DcsRemote, config: Configuration) extend
   val OSB_UPDATE_COVER2 = 4
   val blink = Blink(Seq(true, false), 1.0)
   val clickToUpdateText = "CLICK TO UPDATE"
-  val versionUrl = "http://build.culvertsoft.se/dcs/leavu3-version.txt"
-  val downloadUrl = "http://build.culvertsoft.se/dcs/"
-  val version = Try(Resource2String("version.txt")).getOrElse("unknown")
-  @volatile var latestVersion = "checking..."
-
-  def updateVersion(): Unit = {
-    if(Desktop.isDesktopSupported) {
-      Desktop.getDesktop.browse(new URI(downloadUrl))
-    } else {
-      logger.error(s"Can't auto update - browser not supported!")
-    }
-  }
-
-  val versionGetterTimer = new JavaTimer(isDaemon = true)
-  versionGetterTimer.schedule(Time.now, Duration.fromSeconds(2)) {
-    latestVersion = Try(scala.io.Source.fromURL(versionUrl, "UTF-8").mkString).getOrElse("unknown")
-  }
 
   override def pressOsb(i: Int): Unit = {
     i match {
-      case OSB_UPDATE_COVER => updateVersion()
-      case OSB_UPDATE_COVER2 => updateVersion()
-      case OSB_UPDATE => updateVersion()
+      case OSB_UPDATE_COVER => Version.downloadLatest()
+      case OSB_UPDATE_COVER2 => Version.downloadLatest()
+      case OSB_UPDATE => Version.downloadLatest()
       case _ =>
     }
   }
@@ -59,13 +38,13 @@ case class InfoPage(implicit dcsRemote: DcsRemote, config: Configuration) extend
     val width = Mfd.Osb.boxWidth * config.symbolScale * (clickToUpdateText.length.toFloat / 3.0f)
     val hitBox = Box(width, height, center)
     if (hitBox.contains(click.ortho11Raw)) {
-      updateVersion()
+      Version.downloadLatest()
     }
   }
 
   override def draw(game: GameData, dlinkIn: Map[String, DlinkData]): Unit = {
 
-    val updateAvailable = version != latestVersion
+    val updateAvailable = Version.current != Version.latest
     val scale = config.symbolScale * 0.02 / font.getSpaceWidth
 
     batched { atScreen(-0.8, 0.8) {
@@ -87,8 +66,8 @@ case class InfoPage(implicit dcsRemote: DcsRemote, config: Configuration) extend
         drawTextLine("----------------", "--------------------------------", LIGHT_GRAY)
         drawTextLine("-----VERSION----", "--------------------------------", LIGHT_GRAY)
         drawTextLine("----------------", "--------------------------------", LIGHT_GRAY)
-        drawTextLine(" Latest version", latestVersion, LIGHT_GRAY)
-        drawTextLine("   Your version", version, if (updateAvailable) YELLOW else LIGHT_GRAY)
+        drawTextLine(" Latest version", Version.latest, LIGHT_GRAY)
+        drawTextLine("   Your version", Version.current, if (updateAvailable) YELLOW else LIGHT_GRAY)
         drawTextLine("Update available", if (updateAvailable) "Yes" else "No", if (updateAvailable) YELLOW else LIGHT_GRAY)
         drawTextLine("----------------", "--------------------------------", LIGHT_GRAY)
         drawTextLine("----------------", "--------------------------------", LIGHT_GRAY)

@@ -15,6 +15,6 @@ object MetaData extends Schema[MetaData] {
   val camera    = required[Spatial]("camPos", default = Spatial())
   val planeId   = required[Int]("playerPlaneId", default = 0)
   val modelTime = required[Double]("modelTime", default = 0)
-  val version   = required[Version]("version", default = Version())
+  val version   = required[GameVersion]("version", default = GameVersion())
   val selfData  = required[SelfData]("selfData", default = SelfData())
 }
