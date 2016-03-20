@@ -37,9 +37,7 @@ You can also configure parameters for window position, size, AA, update rates, e
 
 ### WHERE IS THE DATA COMING FROM?
 
-Leavu3 uses [dcs-remote2](https://github.com/GiGurra/dcs-remote2) to inject a [data export script](https://github.com/GiGurra/leavu3/blob/master/src/main/resources/lua_scripts/LoDataExport.lua) into DCS, which then grabs ownship + AI wingman information from the game.
-
-In order to display information regarding your human wingmen and their targets, you both need to be connected to the Leavu3 datalink (see above).
+Leavu3 uses [dcs-remote2](https://github.com/GiGurra/dcs-remote2) to inject a [data export script](https://github.com/GiGurra/leavu3/blob/master/src/main/resources/lua_scripts/LoDataExport.lua) into DCS, which then grabs ownship + AI wingman information from the game. In order to display information regarding your human wingmen and their targets, you both need to be connected to the Leavu3 datalink (see above).
 
 
 ### COMPATIBILITY
