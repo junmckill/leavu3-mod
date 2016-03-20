@@ -58,8 +58,8 @@ object DesktopMain extends Logging {
       height = config.height
       forceExit = config.forceExit
       vSyncEnabled = config.vSyncEnabled
-      foregroundFPS = 10 // We will override this and trigger drawing ourselves
-      backgroundFPS = 10 // We will override this and trigger drawing ourselves
+      foregroundFPS = 1 // We will override this and trigger drawing ourselves
+      backgroundFPS = 1 // We will override this and trigger drawing ourselves
       samples = config.aaSamples
       resizable = !config.borderless
     }
