@@ -38,38 +38,44 @@ object UnitTypeData {
         text.substring(iFirst, iFirst + 1)
       }
     } else {
-      "ukn"
+      "U"
     }
   }
 
   val unitMappings: PartialFunction[String, Data] = {
-
-    // Fighters
-    case x if x.startsWith("mig-29")    => Data("29",           DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
-    case x if x.startsWith("su-27")     => Data("29",           DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
-    case x if x.startsWith("su-3")      => Data("30",           DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
-    case x if x.startsWith("su-")       => Data(firstNumber(x), DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
-    case x if x.startsWith("mig-")      => Data(firstNumber(x), DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
-    case x if x.startsWith("f-")        => Data(firstNumber(x), DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
-
-    case x if x.startsWith("e-3")       => Data("E3",           AWACS_POWER_MAPPING_EXPONENT,   DEFAULT_MAX_RANGE_INDICATION)
-
+    // Aircraft
+    case x if x.startsWith("mig-29")  => Data("29",           DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
+    case x if x.startsWith("su-27")   => Data("29",           DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
+    case x if x.startsWith("su-3")    => Data("30",           DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
+    case x if x.startsWith("su-")     => Data(firstNumber(x), DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
+    case x if x.startsWith("mig-")    => Data(firstNumber(x), DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
+    case x if x.startsWith("f-")      => Data(firstNumber(x), DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
+    case x if x.startsWith("e-3")     => Data("E3",           AWACS_POWER_MAPPING_EXPONENT,   DEFAULT_MAX_RANGE_INDICATION)
     // SAMs
-    case x if x.startsWith("s-300")     => Data("10",           DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
-    case x if x.startsWith("csa")       => Data("8",            DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
-    case x if x.startsWith("tunguska")  => Data("19",           DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
-    case x if x.startsWith("tor")       => Data("15",           DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
-    case x if x.startsWith("buk")       => Data("11",           DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
-
-    // EWs
-    case x if x.startsWith("dog")       => Data("DE",           DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
-    case x if x.startsWith("1l13")      => Data("EW",           DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
-    case x if x.startsWith("55g6")      => Data("EW",           DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
-
-    // Active missiles
-    case x if x.startsWith("aim-120")   => Data("M120",         DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_ARH_MAX_RANGE_INDICATION)
-    case x if x.startsWith("aim-154")   => Data("M54",          DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_ARH_MAX_RANGE_INDICATION)
-    case x if x.startsWith("r-77")      => Data("M77",          DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_ARH_MAX_RANGE_INDICATION)
+    case x if x.startsWith("Hawk cwar") => Data("55", DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
+    case x if x.startsWith("Hawk sr") => Data("50", DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
+    case x if x.startsWith("Hawk tr") => Data("46", DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
+    case x if x.startsWith("Patriot") => Data("P", DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
+    case x if x.startsWith("p-19")    => Data("FFB", DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
+    case x if x.startsWith("snr s-125 tr") => Data("3", DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
+    case x if x.startsWith("Kub 1S91 str") => Data("6", DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
+    case x if x.startsWith("SA-11 Buk SR") => Data("SD", DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
+    case x if x.startsWith("Dog")     => Data("DE", DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
+    case x if x.startsWith("S-300PS 40B6MD sr") => Data("CS", DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
+    case x if x.startsWith("S-300PS 64H6E sr")  => Data("BB", DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
+    case x if x.startsWith("S-300PS 40B6M tr")  => Data("10", DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
+    case x if x.startsWith("Roland")  => Data("RO", DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
+    case x if x.startsWith("2S6")     => Data("19", DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
+    case x if x.startsWith("Osa")     => Data("8", DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
+    case x if x.startsWith("Tor")     => Data("15", DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
+    case x if x.startsWith("SA-")     => Data(firstNumber(x), DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
+    // EWRs - 1L13, 55G6
+    case x if x.startsWith("EWR")     => Data("EW", DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
+    // Ships
+    // Missiles
+    case x if x.startsWith("aim-120") => Data("M120",         DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_ARH_MAX_RANGE_INDICATION)
+    case x if x.startsWith("aim-154") => Data("M54",          DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_ARH_MAX_RANGE_INDICATION)
+    case x if x.startsWith("r-77")    => Data("M77",          DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_ARH_MAX_RANGE_INDICATION)
   }
 
   def apply(fullName: String, isKnown: Boolean, typ: UnitType.TYPE): UnitTypeData = {
