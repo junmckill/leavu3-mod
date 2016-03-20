@@ -10,13 +10,13 @@ import scala.util.{Failure, Success, Try}
 /**
   * Created by kjolh on 3/20/2016.
   */
-case class App(dcsRemote: DcsRemote,
-               appCfg: Configuration,
+case class App(appCfg: Configuration,
                onCreate: () => Unit)
   extends ApplicationListener
     with InputProcessor
     with Logging {
 
+  val dcsRemote = DcsRemote(appCfg)
   val instrumentClassName = appCfg.instrument
   val instrumentClass: Class[Instrument] =
     Try(Class.forName(instrumentClassName)) match {

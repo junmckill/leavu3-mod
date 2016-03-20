@@ -21,16 +21,15 @@ object DesktopMain extends Logging {
     Capture.stdErrToFile(s"leavu3-log.txt", append = true)
 
     val config = loadConfig(args.headOption.getOrElse("leavu3-cfg.json"))
-    val dcsRemote = DcsRemote(config)
 
     val lwjglConfig = loadLwjglConfig(config)
-    val appListener = new App(dcsRemote, config, () => onInitDisplay(config))
+    val appListener = new App(config, () => onInitDisplay(config))
     new LwjglApplication(appListener, lwjglConfig)
     Gdx.input.setInputProcessor(appListener)
 
-    GameIn.start(dcsRemote, config.gameDataFps)
-    Dlink.start(dcsRemote, config.relayDlink)
-    Keyboard.start(dcsRemote, config)
+    GameIn.start(config)
+    Dlink.start(config)
+    Keyboard.start(config)
 
   } match {
     case Success(_) =>

@@ -20,7 +20,10 @@ object GameIn extends Logging {
   val path = "export/dcs_remote_export_data()"
   @volatile var snapshot: GameData = new GameData(Map.empty)
 
-  def start(dcsRemote: DcsRemote, fps: Int): Unit = {
+  def start(appCfg: Configuration): Unit = {
+
+    val fps = appCfg.gameDataFps
+    val dcsRemote = DcsRemote(appCfg)
 
     ScriptInject.start(dcsRemote)
 

@@ -19,13 +19,15 @@ object Dlink extends Logging {
   @volatile var config: DlinkConfiguration = DlinkConfiguration()
   @volatile var dlinkClient = RestClient(config.host, config.port)
 
-  def start(dcsRemote: DcsRemote, relayDlink: Boolean): Unit = {
+  def start(appCfg: Configuration): Unit = {
+    val dcsRemote = DcsRemote(appCfg)
+
     logger.info(s"Downloading datalink settings from dcs-remote ..")
     config = downloadDlinkConfig(dcsRemote)
     CfgUpdate.handleDlinkConfig(config)
     logger.info(s"Dlink settings downloaded:\n ${JSON.write(config)}")
     In.start()
-    if (relayDlink)
+    if (appCfg.relayDlink)
       Out.start()
     CfgUpdate.start(dcsRemote)
   }

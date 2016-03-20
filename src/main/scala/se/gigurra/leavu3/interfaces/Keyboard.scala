@@ -18,7 +18,9 @@ object Keyboard extends Logging {
 
   val inputQue = new ConcurrentLinkedQueue[KeyPress]
 
-  def start(dcsRemote: DcsRemote, configuration: Configuration): Unit = {
+  def start(configuration: Configuration): Unit = {
+
+    val dcsRemote = DcsRemote(configuration)
 
     var oldKeysPressed = Set.empty[Int]
 
