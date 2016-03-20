@@ -10,6 +10,7 @@ import se.gigurra.leavu3.gfx.RenderContext._
 import se.gigurra.leavu3.gfx.{Blink, ScreenProjection}
 import se.gigurra.leavu3.interfaces.{DcsRemote, Dlink, GameIn, MouseClick}
 import se.gigurra.leavu3.lmath.Box
+import se.gigurra.leavu3.util.Resource2String
 
 import scala.language.postfixOps
 import scala.util.Try
@@ -27,7 +28,7 @@ case class InfoPage(implicit dcsRemote: DcsRemote, config: Configuration) extend
   val clickToUpdateText = "CLICK TO UPDATE"
   val versionUrl = "http://build.culvertsoft.se/dcs/leavu3-version.txt"
   val downloadUrl = "http://build.culvertsoft.se/dcs/"
-  val version = Try(scala.io.Source.fromFile("version.txt", "UTF-8").mkString).getOrElse("unknown (version.txt missing)")
+  val version = Try(Resource2String("version.txt")).getOrElse("unknown")
   @volatile var latestVersion = "checking..."
 
   def updateVersion(): Unit = {
