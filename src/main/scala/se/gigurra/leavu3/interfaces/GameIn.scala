@@ -17,24 +17,41 @@ import scala.util.{Failure, Success, Try}
   */
 object GameIn extends Logging {
 
+  private val defaultGameData = GameData()
   val path = "export/dcs_remote_export_data()"
+
   @volatile var snapshot: GameData = new GameData(Map.empty)
+  @volatile var dcsRemoteConnected: Boolean = true // App doesnt even start otherwise!
+  @volatile var dcsGameConnected: Boolean = false
 
   def start(appCfg: Configuration): Unit = {
+    ScriptInject.start(appCfg)
+    Updater.start(appCfg)
+  }
 
-    val fps = appCfg.gameDataFps
-    val dcsRemote = DcsRemote(appCfg)
+  object Updater {
+    def start(appCfg: Configuration): Unit = {
+      val fps = appCfg.gameDataFps
+      val dcsRemote = DcsRemote(appCfg)
 
-    ScriptInject.start(dcsRemote)
-
-    SimpleTimer.fromFps(fps) {
-      Try(dcsRemote.getBlocking(path, cacheMaxAgeMillis = Some((1000.0 / fps.toDouble / 2.0).toLong))) match {
-        case Success(stringData) =>
-          val newData = JSON.read[GameData](stringData)
-          snapshot = process(newData)
-        case Failure(e: ServiceException) => logger.warning(s"Dcs Remote replied: Could not fetch game data from Dcs Remote: $e")
-        case Failure(e: FailedFastException) => // Ignore ..
-        case Failure(e) => logger.error(s"Could not fetch game data from Dcs Remote: $e")
+      SimpleTimer.fromFps(fps) {
+        Try(dcsRemote.getBlocking(path, cacheMaxAgeMillis = Some((1000.0 / fps.toDouble / 2.0).toLong))) match {
+          case Success(stringData) =>
+            val newData = JSON.read[GameData](stringData)
+            snapshot = process(newData)
+            dcsRemoteConnected = true
+            dcsGameConnected = true
+          case Failure(e: ServiceException) =>
+            logger.warning(s"Dcs Remote replied: Could not fetch game data from Dcs Remote: $e")
+            dcsRemoteConnected = true
+            dcsGameConnected = false
+          case Failure(e: FailedFastException) =>
+          // Ignore ..
+          case Failure(e) =>
+            logger.error(s"Could not fetch game data from Dcs Remote: $e")
+            dcsRemoteConnected = false
+            dcsGameConnected = false
+        }
       }
     }
   }
@@ -84,7 +101,8 @@ object GameIn extends Logging {
 
     val luaDataExportScript = Resource2String("lua_scripts/LoDataExport.lua")
 
-    def start(dcsRemote: DcsRemote): Unit = {
+    def start(appCfg: Configuration): Unit = {
+      val dcsRemote = DcsRemote(appCfg)
 
       SimpleTimer.apply(Duration.fromSeconds(10)) {
         Try(JSON.read[GameData](dcsRemote.getBlocking(GameIn.path))) match {

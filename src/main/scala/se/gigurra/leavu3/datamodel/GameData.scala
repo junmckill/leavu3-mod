@@ -6,7 +6,7 @@ import se.gigurra.leavu3.util.CurTime
 import se.gigurra.serviceutils.twitter.logging.Logging
 import scala.language.implicitConversions
 
-case class GameData(source: SourceData) extends SafeParsed[GameData.type] {
+case class GameData(source: SourceData = Map.empty) extends SafeParsed[GameData.type] {
 
   // DCS Remote Metadata
   val err       = parse(schema.err)
@@ -36,6 +36,12 @@ case class GameData(source: SourceData) extends SafeParsed[GameData.type] {
 
   val timeStamp: Double = CurTime.seconds
   def age: Double = CurTime.seconds - timeStamp
+
+  def hasRequestId: Boolean = requestId.isDefined
+  def timedOut: Boolean = age > 3.0
+  def hasError: Boolean = err.isDefined
+
+  def isValid: Boolean = hasRequestId && !hasError && !timedOut
 }
 
 object GameData extends Schema[GameData] with Logging {
