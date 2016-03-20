@@ -1,6 +1,7 @@
 package se.gigurra.leavu3
 
-import se.gigurra.leavu3.externaldata.{DlinkData, GameData, KeyPress, MouseClick}
+import se.gigurra.leavu3.externaldata.{DlinkData, GameData}
+import se.gigurra.leavu3.interfaces.{KeyPress, MouseClick}
 
 /**
   * Created by kjolh on 3/12/2016.

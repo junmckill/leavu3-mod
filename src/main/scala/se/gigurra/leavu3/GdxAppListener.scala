@@ -1,7 +1,7 @@
 package se.gigurra.leavu3
 
 import com.badlogic.gdx.{ApplicationListener, InputProcessor}
-import se.gigurra.leavu3.externaldata.{ExternalData, Keyboard, MouseClick}
+import se.gigurra.leavu3.interfaces.{Keyboard, MouseClick, Snapshots}
 import se.gigurra.serviceutils.twitter.logging.Logging
 
 import scala.util.{Failure, Success, Try}
@@ -37,7 +37,7 @@ case class GdxAppListener(initialConfiguration: Configuration,
   override def render(): Unit = {
     while(!Keyboard.inputQue.isEmpty)
       instrument.keyPressed(Keyboard.inputQue.poll)
-    instrument.update(ExternalData.gameData, ExternalData.dlinkIn)
+    instrument.update(Snapshots.gameData, Snapshots.dlinkIn)
   }
 
   override def resume(): Unit = {

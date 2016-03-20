@@ -4,7 +4,7 @@ import javax.swing.JOptionPane
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.backends.lwjgl.{LwjglApplication, LwjglApplicationConfiguration}
-import se.gigurra.leavu3.externaldata._
+import se.gigurra.leavu3.interfaces._
 import se.gigurra.leavu3.util.RestClient
 import se.gigurra.leavu3.windowstweaks.WindowTweaks
 import se.gigurra.serviceutils.json.JSON
@@ -26,10 +26,9 @@ object DesktopMain extends Logging {
     new LwjglApplication(appListener, lwjglConfig)
     Gdx.input.setInputProcessor(appListener)
 
-    ScriptInjector.startInjecting(config.dcsRemoteAddress, config.dcsRemotePort)
-    GameData.startPoller(config.gameDataFps, config.dcsRemoteAddress, config.dcsRemotePort)
-    DlinkOutData.startPoller(config, dlinkConfig)
-    DlinkInData.startPoller(dlinkConfig)
+    GameIn.startPoller(config)
+    DlinkOut.startPoller(config, dlinkConfig)
+    DlinkIn.startPoller(dlinkConfig)
     Keyboard.startPolling(config)
 
   } match {
