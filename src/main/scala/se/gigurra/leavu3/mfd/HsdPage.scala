@@ -497,7 +497,7 @@ case class HsdPage(implicit dcsRemote: DcsRemote, config: Configuration) extends
   }
 
   def drawModes(game: GameData): Unit = {
-    implicit val p = ppiProjection
+    implicit val p = screenProjection
     val sensors = game.sensors.status
     val scale = config.symbolScale * 0.02 / font.getSpaceWidth
 
