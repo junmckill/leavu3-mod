@@ -45,7 +45,7 @@ Leavu3 uses [dcs-remote2](https://github.com/GiGurra/dcs-remote2) to inject a [d
 
 ### STATUS & BUGS!
 
-ONLY use the Issue tracker at the top of this page (https://github.com/GiGurra/leavu3/issues) to report bugs!
+ONLY use [the Issue tracker at the top of this page](https://github.com/GiGurra/leavu3/issues) to report bugs!
 
 Leavu3 is beta-beta-beta!
 Right now the top priority is to get all unit names correctly displayed on the RWR page. -> At the moment a lot of threats show up with their full names instead of proper threat indications (e.g. F-15 instead of 15, 'S300....' instead of '10'). 
