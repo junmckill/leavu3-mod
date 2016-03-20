@@ -2,7 +2,7 @@ package se.gigurra.leavu3.mfd
 
 import com.badlogic.gdx.graphics.Color
 import se.gigurra.leavu3.externaldata._
-import se.gigurra.leavu3.gfx.PpiProjection
+import se.gigurra.leavu3.gfx.{PpiProjection, ScreenProjection}
 import se.gigurra.leavu3.gfx.RenderContext._
 import se.gigurra.leavu3.util.{CircleBuffer, CurTime}
 import se.gigurra.leavu3._
@@ -455,6 +455,8 @@ case class HsdPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
 
   }
 
+  val screenprojection = ScreenProjection()
+
   def drawOsbs(game: GameData): Unit = {
     import Mfd.Osb._
     drawBoxed(OSB_DEPR, "DEP", boxed = deprFactor.index != 0)
@@ -466,7 +468,7 @@ case class HsdPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
     if (shouldDrawOwnHeading) {
       batched {
         atScreen(Mfd.Osb.positions(2) - Vec2(0.0, 0.1)) {
-          self.heading.round.toString.pad(3, '0').drawCentered(WHITE)
+          self.heading.round.toString.pad(3, '0').drawCentered(WHITE)(screenprojection, config)
         }
       }
     }
