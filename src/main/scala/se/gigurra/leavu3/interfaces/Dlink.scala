@@ -17,37 +17,54 @@ import scala.util.{Failure, Success, Try}
 object Dlink extends Logging {
 
   @volatile var config: DlinkConfiguration = DlinkConfiguration()
-  @volatile var snapshot: Map[String, DlinkData] = Map.empty
+  @volatile var dlinkClient = RestClient(config.host, config.port)
 
   def start(dcsRemote: DcsRemote, relayDlink: Boolean): Unit = {
     logger.info(s"Downloading datalink settings from dcs-remote ..")
     config = downloadDlinkConfig(dcsRemote)
+    CfgUpdate.handleDlinkConfig(config)
     logger.info(s"Dlink settings downloaded:\n ${JSON.write(config)}")
-    In.start(config)
+    In.start()
     if (relayDlink)
-      Out.start(config)
-    CfgUpdate.start(config)
+      Out.start()
+    CfgUpdate.start(dcsRemote)
   }
 
   object CfgUpdate {
-    def start(config: DlinkConfiguration): Unit = {
+
+    def handleDlinkConfig(newConfig: DlinkConfiguration): Unit = {
+      if (newConfig != config) {
+        logger.info(s"Updating dlink settings to: \n ${JSON.write(newConfig)}")
+        dlinkClient = RestClient(config.host, config.port)(dlinkClient.timer)
+        config = newConfig
+        In.onNewConfig()
+        Out.onNewConfig()
+      }
+    }
+
+    def start(dcsRemote: DcsRemote): Unit = {
       SimpleTimer(Duration.fromSeconds(3)) {
-        //TODO: REMOVE logging AFTER IMPLEMENTING
-        // TODO: On Change, delete all marks!
-        logger.info(s"Updating dlink settings")
+        Try(downloadDlinkConfig(dcsRemote)) match {
+          case Success(newConfig) => handleDlinkConfig(newConfig)
+          case Failure(e) => logger.warning(s"Unable to update data link configuration: $e")
+        }
       }
     }
   }
 
   object In {
 
-    def start(config: DlinkConfiguration): Unit = {
+    @volatile var snapshot: Map[String, DlinkData] = Map.empty
 
-      val client = RestClient(config.host, config.port)
+    def onNewConfig(): Unit = {
+      snapshot = Map.empty
+    }
+
+    def start(): Unit = {
 
       SimpleTimer.fromFps(config.inFps) {
         Try {
-          val rawData = JSON.readMap(client.getBlocking(config.team, cacheMaxAgeMillis = Some(10000L)))
+          val rawData = JSON.readMap(dlinkClient.getBlocking(config.team, cacheMaxAgeMillis = Some(10000L)))
           snapshot = rawData.collect {
             case ValidDlinkData(id, dlinkData) => id -> dlinkData
           }
@@ -82,17 +99,14 @@ object Dlink extends Logging {
     @volatile private var marks: Map[String, Mark] = Map.empty
 
     def hasMark(id: String): Boolean = marks.contains(id)
+    def addMark(mark: Mark): Unit = marks += mark.id -> mark
+    def deleteMark(id: String): Unit = marks -= id
 
-    def addMark(mark: Mark): Unit = {
-      marks += mark.id -> mark
+    def onNewConfig(): Unit = {
+      marks = Map.empty
     }
 
-    def deleteMark(id: String): Unit = {
-      marks -= id
-    }
-
-    def start(config: DlinkConfiguration): Unit = {
-      val client = RestClient(config.host, config.port)
+    def start(): Unit = {
 
       SimpleTimer.fromFps(config.outFps) {
         val source = GameIn.snapshot
@@ -107,7 +121,7 @@ object Dlink extends Logging {
             Member.markPos -> marks
           )
           val json = JSON.write(self)
-          Try(client.putBlocking(s"${config.team}/${config.callsign}", json)) match {
+          Try(dlinkClient.putBlocking(s"${config.team}/${config.callsign}", json)) match {
             case Success(_) =>
             case Failure(e: ServiceException) =>
               logger.error(s"Data link host replied with an error: $e")

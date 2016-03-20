@@ -8,10 +8,13 @@ import se.gigurra.serviceutils.twitter.service.ServiceException
 /**
   * Created by kjolh on 3/10/2016.
   */
-case class RestClient(addr: String, port: Int) {
+case class RestClient(addr: String, port: Int)(implicit val timer: JavaTimer = new JavaTimer(isDaemon = true)) {
 
   private val client = Http.client.newService(s"$addr:$port")
-  implicit private val timer = new JavaTimer(isDaemon = true)
+
+  def close(): Unit = {
+    timer.stop()
+  }
 
   def get(path: String, cacheMaxAgeMillis: Option[Long] = None, timeout: Duration = Duration.fromSeconds(3)): Future[String] = {
     val params = cacheMaxAgeMillis.toSeq.map(x =>"max_cached_age" -> x.toString)

@@ -41,7 +41,7 @@ case class App(dcsRemote: DcsRemote,
   override def render(): Unit = {
     while(!Keyboard.inputQue.isEmpty)
       instrument.keyPressed(Keyboard.inputQue.poll)
-    instrument.update(GameIn.snapshot, Dlink.snapshot)
+    instrument.update(GameIn.snapshot, Dlink.In.snapshot)
   }
 
   override def resume(): Unit = {
