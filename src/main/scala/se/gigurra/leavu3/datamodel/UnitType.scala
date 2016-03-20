@@ -108,8 +108,6 @@ object UnitType extends Schema[UnitType] with Logging {
   val pendingTypes = new concurrent.TrieMap[TYPE, Boolean]()
   val mappedTypes = new concurrent.TrieMap[TYPE, UnitTypeData]()
 
-  val timer = new JavaTimer(isDaemon = true)
-
   def getData(t: UnitType)(implicit dcsRemote: DcsRemote): UnitTypeData = {
 
     if (!mappedTypes.contains(t.typ) && !pendingTypes.contains(t.typ)) {
