@@ -1,6 +1,6 @@
 # Leavu3
 
-Leavu is a software for building glass cockpits for DCS Flaming Cliffs. It uses [Dcs Remote 2](https://github.com/GiGurra/dcs-remote2) to communicate with DCS. There is currently one included instrument - a generic MFD - with 3 pages:
+Leavu is a software for building glass cockpits for DCS Flaming Cliffs. It uses [Dcs Remote 2](https://github.com/GiGurra/dcs-remote2) to communicate with DCS. Leavu currently includes instrument - a generic MFD with 3 pages:
  * HSD
  * RWR
  * INFO
