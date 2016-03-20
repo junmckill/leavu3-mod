@@ -32,10 +32,9 @@ object GameIn extends Logging {
   object Updater {
     def start(appCfg: Configuration, drawable: Drawable): Unit = {
       val fps = appCfg.gameDataFps
-      val dcsRemote = DcsRemote(appCfg)
 
       SimpleTimer.fromFps(fps) {
-        Try(dcsRemote.getBlocking(path, cacheMaxAgeMillis = Some((1000.0 / fps.toDouble / 2.0).toLong))) match {
+        Try(DcsRemote.getBlocking(path, cacheMaxAgeMillis = Some((1000.0 / fps.toDouble / 2.0).toLong))) match {
           case Success(stringData) =>
             val newData = JSON.read[GameData](stringData)
             snapshot = process(newData)
@@ -103,16 +102,17 @@ object GameIn extends Logging {
     val luaDataExportScript = Resource2String("lua_scripts/LoDataExport.lua")
 
     def start(appCfg: Configuration): Unit = {
-      val dcsRemote = DcsRemote(appCfg)
+
+      DcsRemote.getBlocking("123")
 
       SimpleTimer.apply(Duration.fromSeconds(10)) {
-        Try(JSON.read[GameData](dcsRemote.getBlocking(GameIn.path))) match {
+        Try(JSON.read[GameData](DcsRemote.getBlocking(GameIn.path))) match {
           case Failure(e: FailedFastException) => // Ignore ..
           case Failure(e: ServiceException) =>
             logger.warning(s"Dcs Remote replied: Unable to inject game export script: $e")
           case Failure(_) | Success(BadGameData()) =>
             logger.info(s"Injecting data export script .. -> ${GameIn.path}")
-            dcsRemote.postBlocking("export", luaDataExportScript)
+            DcsRemote.postBlocking("export", luaDataExportScript)
           case _ =>
           // It's already loaded
         }

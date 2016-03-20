@@ -21,16 +21,15 @@ object Dlink extends Logging {
   @volatile var connected = false
 
   def start(appCfg: Configuration): Unit = {
-    val dcsRemote = DcsRemote(appCfg)
 
     logger.info(s"Downloading datalink settings from dcs-remote ..")
-    config = downloadDlinkConfig(dcsRemote)
+    config = downloadDlinkConfig()
     CfgUpdate.handleDlinkConfig(config)
     logger.info(s"Dlink settings downloaded:\n ${JSON.write(config)}")
     In.start()
     if (appCfg.relayDlink)
       Out.start()
-    CfgUpdate.start(dcsRemote)
+    CfgUpdate.start()
   }
 
   object CfgUpdate {
@@ -45,9 +44,9 @@ object Dlink extends Logging {
       }
     }
 
-    def start(dcsRemote: DcsRemote): Unit = {
+    def start(): Unit = {
       SimpleTimer(Duration.fromSeconds(3)) {
-        Try(downloadDlinkConfig(dcsRemote)) match {
+        Try(downloadDlinkConfig()) match {
           case Success(newConfig) => handleDlinkConfig(newConfig)
           case Failure(e) => logger.warning(s"Unable to update data link configuration: $e")
         }
@@ -142,8 +141,8 @@ object Dlink extends Logging {
     }
   }
 
-  private def downloadDlinkConfig(dcsRemote: DcsRemote): DlinkConfiguration = {
-    Try(dcsRemote.getBlocking(s"static-data/dlink-settings")) match {
+  private def downloadDlinkConfig(): DlinkConfiguration = {
+    Try(DcsRemote.getBlocking(s"static-data/dlink-settings")) match {
       case Success(data) => JSON.read[DlinkConfiguration](data)
       case Failure(e) => throw new RuntimeException(s"Could not download data link configuration from dcs-remote", e)
     }

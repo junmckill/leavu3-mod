@@ -8,10 +8,10 @@ import se.gigurra.leavu3.gfx.ScreenProjection
 
 import scala.language.postfixOps
 import se.gigurra.leavu3.gfx.RenderContext._
-import se.gigurra.leavu3.interfaces.{DcsRemote, Key, KeyPress, MouseClick}
+import se.gigurra.leavu3.interfaces.{Key, KeyPress, MouseClick}
 import se.gigurra.leavu3.lmath.Box
 
-case class Mfd(implicit dcsRemote: DcsRemote, config: Configuration) extends Instrument(dcsRemote, config) {
+case class Mfd(implicit config: Configuration) extends Instrument(config) {
 
   implicit val _p = ScreenProjection()
 

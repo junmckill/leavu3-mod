@@ -108,7 +108,7 @@ object UnitType extends Schema[UnitType] with Logging {
   val pendingTypes = new concurrent.TrieMap[TYPE, Boolean]()
   val mappedTypes = new concurrent.TrieMap[TYPE, UnitTypeData]()
 
-  def getData(t: UnitType)(implicit dcsRemote: DcsRemote): UnitTypeData = {
+  def getData(t: UnitType): UnitTypeData = {
 
     if (!mappedTypes.contains(t.typ) && !pendingTypes.contains(t.typ)) {
 
@@ -117,7 +117,7 @@ object UnitType extends Schema[UnitType] with Logging {
       val script =s"{name=LoGetNameByType${t.typ}}"
       val url = s"export/$script"
 
-      dcsRemote.get(url, Some(3600000L), Duration.fromSeconds(1)).map { json =>
+      DcsRemote.get(url, Some(3600000L), Duration.fromSeconds(1)).map { json =>
         val name = JSON.readMap(json)("name").asInstanceOf[String]
         mappedTypes.put(t.typ, UnitTypeData.apply(name, isKnown = true, t.typ))
         pendingTypes.remove(t.typ)
@@ -132,5 +132,5 @@ object UnitType extends Schema[UnitType] with Logging {
     mappedTypes.getOrElse(t.typ, UnitTypeData.UKN)
   }
 
-  implicit def UnitType2Data(t: UnitType)(implicit c: DcsRemote): UnitTypeData = getData(t)
+  implicit def UnitType2Data(t: UnitType): UnitTypeData = getData(t)
 }

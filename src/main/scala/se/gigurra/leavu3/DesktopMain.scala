@@ -24,6 +24,8 @@ object DesktopMain extends Logging {
 
     val config = loadConfig(args.headOption.getOrElse("leavu3-cfg.json"))
 
+    DcsRemote.init(config)
+
     val lwjglConfig = loadLwjglConfig(config)
     val appListener = new App(config, () => onInitDisplay(config))
     val drawable = new DynamicFpsLwjglApplication(appListener, lwjglConfig)

@@ -15,7 +15,7 @@ import scala.language.postfixOps
 /**
   * Created by kjolh on 3/12/2016.
   */
-case class InfoPage(implicit dcsRemote: DcsRemote, config: Configuration) extends Page("INF") {
+case class InfoPage(implicit config: Configuration) extends Page("INF") {
 
   implicit val projection = new ScreenProjection()
   val OSB_UPDATE_COVER = 2

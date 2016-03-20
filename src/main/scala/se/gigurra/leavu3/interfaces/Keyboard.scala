@@ -21,13 +21,11 @@ object Keyboard extends Logging {
 
   def start(configuration: Configuration, drawable: Drawable): Unit = {
 
-    val dcsRemote = DcsRemote(configuration)
-
     var oldKeysPressed = Set.empty[Int]
 
     SimpleTimer.fromFps(configuration.gameDataFps) {
       Try {
-        val kbData = dcsRemote.getBlocking("keyboard", cacheMaxAgeMillis = Some(Int.MaxValue))
+        val kbData = DcsRemote.getBlocking("keyboard", cacheMaxAgeMillis = Some(Int.MaxValue))
         val keysPressed = JSON.readMap(kbData).keys.map(_.toInt).toSet.map((x: Int) => x - configuration.keyBindingOffset)
         if (keysPressed != oldKeysPressed) {
           for (press <- keysPressed -- oldKeysPressed) {

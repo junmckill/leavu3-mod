@@ -13,7 +13,7 @@ import scala.language.postfixOps
 /**
   * Created by kjolh on 3/12/2016.
   */
-case class RwrPage(implicit dcsRemote: DcsRemote, config: Configuration) extends Page("RWR") {
+case class RwrPage(implicit config: Configuration) extends Page("RWR") {
   implicit val projection = new PpiProjection
   val stdTextSize = 0.75f
   val distance = 100 nmi
