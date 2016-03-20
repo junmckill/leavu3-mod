@@ -21,15 +21,16 @@ Leavu is a software for building glass cockpits for DCS Flaming Cliffs. It uses 
 
 ### CONFIGURATION
 
-**To use it solo on the same PC as DCS, no configuration is needed** - however - Leavu can be configured to connect to a datalink. The datalink server is just a separate instance of dcs-remote2. To configure datalink parameters check your dcs-remote2 folder for the file *static-data.json* and fill in your parameters for:
+**To use it solo on the same PC as DCS, no configuration is needed** - however - You can also run it on a separate computer. 
+To run Leavu3 on a different computer than your game PC, edit the leavu3-cfg.json file and input the ip address of your game PC. NOTE: DCS Remote **must** be running on your game PC.
+
+Leavu can be configured to connect to a datalink. The datalink server is just a separate instance of dcs-remote2. To configure datalink parameters check your dcs-remote2 folder for the file *static-data.json* and fill in your parameters for:
  * data link host
  * data link port
  * data link callsign
  * data link team
 
 **By default your datalink host is set to build.culvertsoft.se, team: BLUE_RABBITS, callsign: JarJar**
-
-To run Leavu3 on a different PC than DCS Remote, edit the leavu3-cfg.json file and input the ip address of your game PC.
 
 You can also configure parameters for window position, size, AA, update rates, etc. Check the leavu3-cfg.json for a full list of configurable parameters.
 
