@@ -35,6 +35,13 @@ Leavu can be configured to connect to a datalink. The datalink server is just a 
 You can also configure parameters for window position, size, AA, update rates, etc. Check the leavu3-cfg.json for a full list of configurable parameters.
 
 
+### WHERE IS THE DATA COMING FROM?
+
+Leavu3 uses [dcs-remote2](https://github.com/GiGurra/dcs-remote2) to inject a [data export script](https://github.com/GiGurra/leavu3/blob/master/src/main/resources/lua_scripts/LoDataExport.lua) into DCS, which then grabs ownship + AI wingman information from the game.
+
+In order to display information regarding your human wingmen and their targets, you both need to be connected to the Leavu3 datalink (see above).
+
+
 ### COMPATIBILITY
 
 Built with LibGDX for cross platform compatibility. Works out of the box on:
