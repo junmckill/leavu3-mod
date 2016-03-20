@@ -67,7 +67,7 @@ case class InfoPage(implicit config: Configuration) extends Page("INF") {
           names.map(_.take(6)).mkString(", ")
         }
 
-        val nMaxPerLine = 6
+        val nMaxPerLine = 5
 
         def buildPlayerLists(data: Map[String, DlinkData]): Seq[String] = {
           val out = data
