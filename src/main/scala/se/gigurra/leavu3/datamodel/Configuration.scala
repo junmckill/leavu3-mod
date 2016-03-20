@@ -17,8 +17,6 @@ case class Configuration(source: SourceData = Map.empty) extends Parsed[Configur
   val height            = parse(schema.height)
   val forceExit         = parse(schema.forceExit)
   val vSyncEnabled      = parse(schema.vSyncEnabled)
-  val foregroundFPS     = parse(schema.foregroundFPS)
-  val backgroundFPS     = parse(schema.backgroundFPS)
   val gameDataFps       = parse(schema.gameDataFps)
   val dcsRemoteAddress  = parse(schema.dcsRemoteAddress)
   val dcsRemotePort     = parse(schema.dcsRemotePort)
@@ -40,8 +38,6 @@ object Configuration extends Schema[Configuration] with Logging {
   val height            = required[Int]     ("height",            default = 1024)
   val forceExit         = required[Boolean] ("forceExit",         default = false)
   val vSyncEnabled      = required[Boolean] ("vSyncEnabled",      default = true)
-  val foregroundFPS     = required[Int]     ("foregroundFPS",     default = 30)
-  val backgroundFPS     = required[Int]     ("backgroundFPS",     default = 5)
   val gameDataFps       = required[Int]     ("gameDataFps",       default = 40)
   val dcsRemoteAddress  = required[String]  ("dcsRemoteAddress",  default = "127.0.0.1")
   val dcsRemotePort     = required[Int]     ("dcsRemotePort",     default = 12340)
@@ -73,8 +69,6 @@ case class DlinkConfiguration(source: SourceData = Map.empty) extends Parsed[Dli
   val port         = parse(schema.port)
   val team         = parse(schema.team)
   val callsign     = parse(schema.callsign)
-  val inFps        = parse(schema.inFps)
-  val outFps       = parse(schema.outFps)
 }
 
 object DlinkConfiguration extends Schema[DlinkConfiguration] {
@@ -82,6 +76,4 @@ object DlinkConfiguration extends Schema[DlinkConfiguration] {
   val port         = required[Int]     ("port",         default = 12340)
   val team         = required[String]  ("team",         default = "BLUE_RABBITS")
   val callsign     = required[String]  ("callsign",     default = "JarJar")
-  val inFps        = required[Int]     ("inFps",        default = 1)
-  val outFps       = required[Int]     ("outFps",       default = 2)
 }

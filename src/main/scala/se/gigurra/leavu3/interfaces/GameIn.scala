@@ -4,7 +4,8 @@ import com.twitter.finagle.FailedFastException
 import com.twitter.util.Duration
 import se.gigurra.leavu3.datamodel.Waypoint
 import se.gigurra.leavu3.datamodel.{Configuration, GameData}
-import se.gigurra.leavu3.util.{Resource2String, RestClient, SimpleTimer}
+import se.gigurra.leavu3.gfx.Drawable
+import se.gigurra.leavu3.util.{Resource2String, SimpleTimer}
 import se.gigurra.serviceutils.json.JSON
 import se.gigurra.serviceutils.twitter.logging.Logging
 import se.gigurra.serviceutils.twitter.service.ServiceException
@@ -17,20 +18,19 @@ import scala.util.{Failure, Success, Try}
   */
 object GameIn extends Logging {
 
-  private val defaultGameData = GameData()
   val path = "export/dcs_remote_export_data()"
 
-  @volatile var snapshot: GameData = new GameData(Map.empty)
-  @volatile var dcsRemoteConnected: Boolean = true // App doesnt even start otherwise!
-  @volatile var dcsGameConnected: Boolean = false
+  @volatile var snapshot = GameData()
+  @volatile var dcsRemoteConnected = true // App doesnt even start otherwise!
+  @volatile var dcsGameConnected = false
 
-  def start(appCfg: Configuration): Unit = {
+  def start(appCfg: Configuration, drawable: Drawable): Unit = {
     ScriptInject.start(appCfg)
-    Updater.start(appCfg)
+    Updater.start(appCfg, drawable)
   }
 
   object Updater {
-    def start(appCfg: Configuration): Unit = {
+    def start(appCfg: Configuration, drawable: Drawable): Unit = {
       val fps = appCfg.gameDataFps
       val dcsRemote = DcsRemote(appCfg)
 
@@ -41,6 +41,7 @@ object GameIn extends Logging {
             snapshot = process(newData)
             dcsRemoteConnected = true
             dcsGameConnected = true
+            drawable.draw()
           case Failure(e: ServiceException) =>
             logger.warning(s"Dcs Remote replied: Could not fetch game data from Dcs Remote: $e")
             dcsRemoteConnected = true

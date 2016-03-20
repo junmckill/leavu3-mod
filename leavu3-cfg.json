@@ -9,8 +9,6 @@
   "alwaysOnTop"      : false,
   "forceExit"        : true,
   "vSyncEnabled"     : true,
-  "foregroundFPS"    : 30,
-  "backgroundFPS"    : 30,
   "gameDataFps"      : 40,
   "dcsRemoteAddress" : "127.0.0.1",
   "dcsRemotePort"    : 12340,

@@ -65,7 +65,7 @@ object Dlink extends Logging {
 
     def start(): Unit = {
 
-      SimpleTimer.fromFps(config.inFps) {
+      SimpleTimer.fromFps(1) {
         Try {
           val rawData = JSON.readMap(dlinkClient.getBlocking(config.team, cacheMaxAgeMillis = Some(10000L)))
           snapshot = rawData.collect {
@@ -117,7 +117,7 @@ object Dlink extends Logging {
 
     def start(): Unit = {
 
-      SimpleTimer.fromFps(config.outFps) {
+      SimpleTimer.fromFps(2) {
         val source = GameIn.snapshot
         if (source.err.isEmpty && source.age < 3.0) {
           val self = Member.marshal(

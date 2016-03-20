@@ -1,6 +1,7 @@
 package se.gigurra.leavu3.mfd
 
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import se.gigurra.leavu3.app.Version
 import se.gigurra.leavu3.datamodel._
@@ -73,9 +74,10 @@ case class InfoPage(implicit dcsRemote: DcsRemote, config: Configuration) extend
         drawTextLine("----------------", "--------------------------------", LIGHT_GRAY)
         drawTextLine("-----STATUS-----", "--------------------------------", LIGHT_GRAY)
         drawTextLine("----------------", "--------------------------------", LIGHT_GRAY)
-        drawTextLine("     DCS Remote", if (GameIn.dcsRemoteConnected) "connected" else "disconnected", if (GameIn.dcsRemoteConnected) GREEN else RED)
-        drawTextLine("       DCS Game", if (GameIn.dcsGameConnected) "connected" else "disconnected", if (GameIn.dcsGameConnected) GREEN else RED)
-        drawTextLine("          DLink", if (Dlink.connected) "connected" else "disconnected", if (Dlink.connected) GREEN else RED)
+        drawTextLine("      DCS Remote", if (GameIn.dcsRemoteConnected) "connected" else "disconnected", if (GameIn.dcsRemoteConnected) GREEN else RED)
+        drawTextLine("        DCS Game", if (GameIn.dcsGameConnected) "connected" else "disconnected", if (GameIn.dcsGameConnected) GREEN else RED)
+        drawTextLine("           DLink", if (Dlink.connected) "connected" else "disconnected", if (Dlink.connected) GREEN else RED)
+        drawTextLine("        Draw fps", Gdx.graphics.getFramesPerSecond, LIGHT_GRAY)
         drawTextLine("----------------", "--------------------------------", LIGHT_GRAY)
         drawTextLine("----------------", "--------------------------------", LIGHT_GRAY)
         drawTextLine("----SETTINGS----", "--------------------------------", LIGHT_GRAY)
@@ -85,8 +87,6 @@ case class InfoPage(implicit dcsRemote: DcsRemote, config: Configuration) extend
         drawTextLine("      DLink team", Dlink.config.team, LIGHT_GRAY)
         drawTextLine("  DLink callsign", Dlink.config.callsign, LIGHT_GRAY)
         drawTextLine("      DLink mode", if (config.relayDlink) "receive + transmit" else "receive", LIGHT_GRAY)
-        drawTextLine("   foregroundFPS", config.foregroundFPS, LIGHT_GRAY)
-        drawTextLine("   backgroundFPS", config.backgroundFPS, LIGHT_GRAY)
         drawTextLine("     gameDataFps", config.gameDataFps, LIGHT_GRAY)
         drawTextLine("     symbolScale", config.symbolScale, LIGHT_GRAY)
 
@@ -96,6 +96,8 @@ case class InfoPage(implicit dcsRemote: DcsRemote, config: Configuration) extend
     if (updateAvailable) {
       Mfd.Osb.drawHighlighted(OSB_UPDATE, clickToUpdateText, highlighted = blink)
     }
+
+    tLast = t
   }
 
 }
