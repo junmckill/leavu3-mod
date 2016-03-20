@@ -259,7 +259,7 @@ case class PpiProjection() extends Projection[Any] {
   }
 
   def screen2World: Float = {
-    1.0f / transform.current.getScaleX
+    1.0f / math.sqrt(transform.current.getScaleXSquared).toFloat
   }
 
   def headingCorrection: Float = {
