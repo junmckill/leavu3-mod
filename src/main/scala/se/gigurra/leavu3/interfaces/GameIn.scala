@@ -45,12 +45,17 @@ object GameIn extends Logging {
             logger.warning(s"Dcs Remote replied: Could not fetch game data from Dcs Remote: $e")
             dcsRemoteConnected = true
             dcsGameConnected = false
+            snapshot = GameData()
           case Failure(e: FailedFastException) =>
+            dcsRemoteConnected = false
+            dcsGameConnected = false
+            snapshot = GameData()
           // Ignore ..
           case Failure(e) =>
             logger.error(s"Could not fetch game data from Dcs Remote: $e")
             dcsRemoteConnected = false
             dcsGameConnected = false
+            snapshot = GameData()
         }
       }
     }

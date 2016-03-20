@@ -56,35 +56,43 @@ object Dlink extends Logging {
 
   object In {
 
-    @volatile var snapshot: Map[String, DlinkData] = Map.empty
+    @volatile var ownTeam: Map[String, DlinkData] = Map.empty
+    @volatile var allTeams: Map[Int, Map[String, DlinkData]] = Map.empty
+
+    def notPlaying: Map[String, DlinkData] = allTeams.getOrElse(0, Map.empty)
+    def blue: Map[String, DlinkData] = allTeams.getOrElse(2, Map.empty)
+    def red: Map[String, DlinkData] = allTeams.getOrElse(1, Map.empty)
 
     def onNewConfig(): Unit = {
-      snapshot = Map.empty
+      ownTeam = Map.empty
+      allTeams = Map.empty
     }
 
     def start(): Unit = {
 
       SimpleTimer.fromFps(1) {
         Try {
-          val gameData = GameIn.snapshot
-          if (gameData.isValid) {
-            val rawData = JSON.readMap(dlinkClient.getBlocking(config.team, cacheMaxAgeMillis = Some(10000L)))
-            snapshot = rawData.collect {
-              case ValidDlinkData(id, dlinkData) if dlinkData.data.selfData.coalitionId == gameData.selfData.coalitionId =>
-                connected = true
-                id -> dlinkData
-            }
-          }
+          val rawData = JSON.readMap(dlinkClient.getBlocking(config.team, cacheMaxAgeMillis = Some(10000L)))
+          val everyoneOnNetwork = rawData.collect { case ValidDlinkData(id, dlinkData) => id -> dlinkData }
+          allTeams = everyoneOnNetwork.groupBy(_._2.selfData.coalitionId)
+          ownTeam = allTeams.getOrElse(GameIn.snapshot.selfData.coalitionId, Map.empty)
+          connected = true
         } match {
           case Success(_) =>
           case Failure(e: ServiceException) =>
             connected = false
+            allTeams = Map.empty
+            ownTeam = Map.empty
             logger.error(s"Data link host replied with an error: $e")
           case Failure(e: FailedFastException) =>
             connected = false
-            // Ignore ..
+            allTeams = Map.empty
+            ownTeam = Map.empty
+          // Ignore ..
           case Failure(e) =>
             connected = false
+            allTeams = Map.empty
+            ownTeam = Map.empty
             logger.error(e, s"Unexpected error when attempting to receive from dlink")
         }
       }
@@ -103,6 +111,9 @@ object Dlink extends Logging {
       }
     }
 
+    def sameTeam(data: DlinkData): Boolean = {
+      data.selfData.coalitionId == GameIn.snapshot.selfData.coalitionId
+    }
   }
 
   object Out extends Logging {
@@ -110,7 +121,9 @@ object Dlink extends Logging {
     @volatile private var marks: Map[String, Mark] = Map.empty
 
     def hasMark(id: String): Boolean = marks.contains(id)
+
     def addMark(mark: Mark): Unit = marks += mark.id -> mark
+
     def deleteMark(id: String): Unit = marks -= id
 
     def onNewConfig(): Unit = {
