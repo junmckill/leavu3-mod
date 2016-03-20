@@ -9,7 +9,6 @@ import se.gigurra.leavu3.gfx.RenderContext._
 import se.gigurra.leavu3.gfx.{Blink, ScreenProjection}
 import se.gigurra.leavu3.interfaces.{DcsRemote, Dlink, GameIn, MouseClick}
 import se.gigurra.leavu3.lmath.Box
-import se.gigurra.leavu3.util.CurTime
 
 import scala.language.postfixOps
 
