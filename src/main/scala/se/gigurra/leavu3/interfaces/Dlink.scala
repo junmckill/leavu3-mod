@@ -66,11 +66,14 @@ object Dlink extends Logging {
 
       SimpleTimer.fromFps(1) {
         Try {
-          val rawData = JSON.readMap(dlinkClient.getBlocking(config.team, cacheMaxAgeMillis = Some(10000L)))
-          snapshot = rawData.collect {
-            case ValidDlinkData(id, dlinkData) =>
-              connected = true
-              id -> dlinkData
+          val gameData = GameIn.snapshot
+          if (gameData.isValid) {
+            val rawData = JSON.readMap(dlinkClient.getBlocking(config.team, cacheMaxAgeMillis = Some(10000L)))
+            snapshot = rawData.collect {
+              case ValidDlinkData(id, dlinkData) if dlinkData.data.selfData.coalitionId == gameData.selfData.coalitionId =>
+                connected = true
+                id -> dlinkData
+            }
           }
         } match {
           case Success(_) =>
