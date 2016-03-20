@@ -19,8 +19,9 @@ case class Mfd(implicit dcsRemote: DcsRemote, config: Configuration) extends Ins
   val rwr = RwrPage()
   val sms = SmsPage()
   val fcr = FcrPage()
-  val available = Seq(hsd, rwr, sms, fcr)
-  var qPages = Map[Int, Page](0 -> hsd, 1 -> rwr/*, 2 -> fcr*/)
+  val inf = InfoPage()
+  val available = Seq(hsd, rwr, sms, fcr, inf)
+  var qPages = Map[Int, Page](0 -> hsd, 1 -> rwr, 2 -> inf)
   var iQPage = 0
   var mainMenuOpen: Boolean = false
 
@@ -190,7 +191,14 @@ object Mfd {
 
       if (boxType != null) {
         atScreen(Mfd.Osb.positions(iOsb)) {
-          rect(symbolScale * Mfd.Osb.boxWidth, symbolScale * Mfd.Osb.boxHeight, color = white, typ = boxType)
+
+          val extraWidth = if (text.length > 3) {
+             text.length.toFloat/3.0f
+          } else {
+            1.0f
+          }
+
+          rect(symbolScale * Mfd.Osb.boxWidth * extraWidth, symbolScale * Mfd.Osb.boxHeight, color = white, typ = boxType)
         }
       }
 

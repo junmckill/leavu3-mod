@@ -18,6 +18,7 @@ object Dlink extends Logging {
 
   @volatile var config: DlinkConfiguration = DlinkConfiguration()
   @volatile var dlinkClient = RestClient(config.host, config.port)
+  @volatile var connected = false
 
   def start(appCfg: Configuration): Unit = {
     val dcsRemote = DcsRemote(appCfg)
@@ -68,14 +69,20 @@ object Dlink extends Logging {
         Try {
           val rawData = JSON.readMap(dlinkClient.getBlocking(config.team, cacheMaxAgeMillis = Some(10000L)))
           snapshot = rawData.collect {
-            case ValidDlinkData(id, dlinkData) => id -> dlinkData
+            case ValidDlinkData(id, dlinkData) =>
+              connected = true
+              id -> dlinkData
           }
         } match {
           case Success(_) =>
           case Failure(e: ServiceException) =>
+            connected = false
             logger.error(s"Data link host replied with an error: $e")
-          case Failure(e: FailedFastException) => // Ignore ..
+          case Failure(e: FailedFastException) =>
+            connected = false
+            // Ignore ..
           case Failure(e) =>
+            connected = false
             logger.error(e, s"Unexpected error when attempting to receive from dlink")
         }
       }
