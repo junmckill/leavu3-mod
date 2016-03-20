@@ -15,10 +15,10 @@ import scala.util.Try
   */
 object Version extends Logging {
 
-  @volatile var latest = "checking.."
-  val current = Try(Resource2String("version.txt")).getOrElse("unknown")
   val versionUrl = "http://build.culvertsoft.se/dcs/leavu3-version.txt"
   val downloadUrl = "http://build.culvertsoft.se/dcs/"
+  var latest = Try(scala.io.Source.fromURL(versionUrl, "UTF-8").mkString).getOrElse("unknown")
+  val current = Try(Resource2String("version.txt")).getOrElse("unknown")
 
   def downloadLatest(): Unit = {
     if(Desktop.isDesktopSupported) {
@@ -29,12 +29,5 @@ object Version extends Logging {
   }
 
   override def toString: String = current
-
-  //////////////////////////////////////////////////////////////////////////
-
-  private val versionGetterTimer = new JavaTimer(isDaemon = true)
-  versionGetterTimer.schedule(Time.now, Duration.fromSeconds(2)) {
-    latest = Try(scala.io.Source.fromURL(versionUrl, "UTF-8").mkString).getOrElse("unknown")
-  }
 
 }
