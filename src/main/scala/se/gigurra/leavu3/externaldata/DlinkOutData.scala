@@ -1,6 +1,7 @@
 package se.gigurra.leavu3.externaldata
 
-import se.gigurra.leavu3.{Configuration, DlinkSettings, Mark, Member}
+import se.gigurra.leavu3.Configuration
+import se.gigurra.leavu3.DlinkSettings
 import se.gigurra.leavu3.util.{RestClient, SimpleTimer}
 import se.gigurra.serviceutils.json.JSON
 import se.gigurra.serviceutils.twitter.logging.Logging

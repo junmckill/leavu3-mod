@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import se.gigurra.leavu3.externaldata.{GameData, _}
 import se.gigurra.leavu3.gfx.RenderContext._
 import se.gigurra.leavu3.gfx.{Blink, PpiProjection}
-import se.gigurra.leavu3.{Configuration, DlinkData, DlinkSettings}
+import se.gigurra.leavu3.{Configuration, DlinkSettings}
 
 import scala.language.postfixOps
 

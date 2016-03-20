@@ -2,7 +2,7 @@ package se.gigurra.leavu3
 
 import javax.swing.JOptionPane
 
-import com.badlogic.gdx.{Gdx, Input}
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.backends.lwjgl.{LwjglApplication, LwjglApplicationConfiguration}
 import se.gigurra.leavu3.externaldata._
 import se.gigurra.leavu3.util.RestClient

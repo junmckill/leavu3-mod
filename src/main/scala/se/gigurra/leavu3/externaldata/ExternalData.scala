@@ -1,7 +1,5 @@
 package se.gigurra.leavu3.externaldata
 
-import se.gigurra.leavu3.DlinkData
-
 /**
   * Created by kjolh on 3/10/2016.
   */

@@ -1,11 +1,10 @@
 package se.gigurra.leavu3.mfd
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType
-import se.gigurra.leavu3.externaldata.{GameData, Key, KeyPress, MouseClick, Vec2}
-import se.gigurra.leavu3.gfx.{PpiProjection, ScreenProjection}
-import se.gigurra.leavu3.{Configuration, DlinkData, DlinkSettings, Instrument}
+import se.gigurra.leavu3.externaldata.{DlinkData, GameData, Key, KeyPress, MouseClick, Vec2}
+import se.gigurra.leavu3.gfx.ScreenProjection
+import se.gigurra.leavu3.{Configuration, DlinkSettings, Instrument}
 
 import scala.language.postfixOps
 import se.gigurra.leavu3.gfx.RenderContext._
