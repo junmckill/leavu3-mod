@@ -1,7 +1,7 @@
 package se.gigurra.leavu3.mfd
 
 import com.badlogic.gdx.graphics.Color
-import se.gigurra.leavu3.externaldata._
+import se.gigurra.leavu3.datamodel._
 import se.gigurra.leavu3.gfx.{PpiProjection, ScreenProjection}
 import se.gigurra.leavu3.gfx.RenderContext._
 import se.gigurra.leavu3.util.{CircleBuffer, CurTime}
@@ -14,12 +14,12 @@ import scala.language.postfixOps
 /**
   * Created by kjolh on 3/12/2016.
   */
-case class HsdPage(implicit config: Configuration, dlinkSettings: DlinkSettings) extends Page("HSD") {
+case class HsdPage(implicit config: Configuration, dlinkSettings: DlinkConfiguration) extends Page("HSD") {
 
   implicit val projection = new PpiProjection
   var shouldMatchIngameScale = true
   var shouldDrawDetailedHsi = true
-  var shouldDrawOwnHeading = false
+  var shouldDrawOwnHeading = true
   val distance = CircleBuffer(10 nmi, 20 nmi, 40 nmi, 80 nmi, 160 nmi).withDefaultValue(40 nmi)
   val deprFactor = CircleBuffer(0.0, 0.5).withDefaultValue(0.5)
   val stdTextSize = 0.75f

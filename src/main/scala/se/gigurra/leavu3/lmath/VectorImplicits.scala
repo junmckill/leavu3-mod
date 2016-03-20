@@ -1,7 +1,7 @@
 package se.gigurra.leavu3.lmath
 
 import com.badlogic.gdx.math.{Vector2, Vector3}
-import se.gigurra.leavu3.externaldata.{Vec2, Vec3}
+import se.gigurra.leavu3.datamodel.{Vec2, Vec3}
 
 import scala.language.implicitConversions
 

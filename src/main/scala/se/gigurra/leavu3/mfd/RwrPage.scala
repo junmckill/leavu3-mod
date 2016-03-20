@@ -2,17 +2,17 @@ package se.gigurra.leavu3.mfd
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
-import se.gigurra.leavu3.externaldata.{GameData, _}
+import se.gigurra.leavu3.datamodel.{GameData, _}
 import se.gigurra.leavu3.gfx.RenderContext._
 import se.gigurra.leavu3.gfx.{Blink, PpiProjection}
-import se.gigurra.leavu3.{Configuration, DlinkSettings}
+import se.gigurra.leavu3.datamodel.Configuration
 
 import scala.language.postfixOps
 
 /**
   * Created by kjolh on 3/12/2016.
   */
-case class RwrPage(implicit config: Configuration, dlinkSettings: DlinkSettings) extends Page("RWR") {
+case class RwrPage(implicit config: Configuration, dlinkSettings: DlinkConfiguration) extends Page("RWR") {
   implicit val projection = new PpiProjection
   val stdTextSize = 0.75f
   val distance = 100 nmi

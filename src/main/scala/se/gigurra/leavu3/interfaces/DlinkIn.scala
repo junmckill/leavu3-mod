@@ -2,8 +2,7 @@ package se.gigurra.leavu3.interfaces
 
 import com.twitter.finagle.FailedFastException
 import se.gigurra.heisenberg.MapDataParser
-import se.gigurra.leavu3.DlinkSettings
-import se.gigurra.leavu3.externaldata.DlinkData
+import se.gigurra.leavu3.datamodel.{DlinkConfiguration, DlinkData}
 import se.gigurra.leavu3.util.{RestClient, SimpleTimer}
 import se.gigurra.serviceutils.json.JSON
 import se.gigurra.serviceutils.twitter.logging.Logging
@@ -14,7 +13,7 @@ import scala.util.{Failure, Success, Try}
 
 object DlinkIn extends Logging {
 
-  def startPoller(config: DlinkSettings): Unit = {
+  def startPoller(config: DlinkConfiguration): Unit = {
 
     val client = RestClient(config.host, config.port)
 

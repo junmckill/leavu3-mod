@@ -6,11 +6,10 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20._
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType
-import com.badlogic.gdx.math.{Vector2, Vector3}
-import se.gigurra.leavu3.{Configuration, DlinkSettings}
-import se.gigurra.leavu3.externaldata.{Vec2, Vec3}
+import com.badlogic.gdx.math.Vector2
+import se.gigurra.leavu3.datamodel.{DlinkConfiguration, Vec2, Vec3}
 import se.gigurra.leavu3.interfaces.Snapshots
-import se.gigurra.leavu3.lmath.{Matrix4Stack, UnitConversions}
+import se.gigurra.leavu3.lmath.UnitConversions
 
 trait RenderHelpers extends UnitConversions { _: RenderContext.type =>
 
@@ -182,7 +181,7 @@ trait RenderHelpers extends UnitConversions { _: RenderContext.type =>
 }
 
 object self {
-  def dlinkCallsign(implicit c: DlinkSettings): String = c.callsign
+  def dlinkCallsign(implicit c: DlinkConfiguration): String = c.callsign
   def planeId: Int = Snapshots.gameData.metaData.planeId
   def modelTime: Double = Snapshots.gameData.metaData.modelTime
   def coalition: Int = Snapshots.gameData.selfData.coalitionId

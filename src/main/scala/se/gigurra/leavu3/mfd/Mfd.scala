@@ -2,16 +2,16 @@ package se.gigurra.leavu3.mfd
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType
-import se.gigurra.leavu3.externaldata.{DlinkData, GameData, Vec2}
+import se.gigurra.leavu3.app.Instrument
+import se.gigurra.leavu3.datamodel.{Configuration, DlinkConfiguration, DlinkData, GameData, Vec2}
 import se.gigurra.leavu3.gfx.ScreenProjection
-import se.gigurra.leavu3.{Configuration, DlinkSettings, Instrument}
 
 import scala.language.postfixOps
 import se.gigurra.leavu3.gfx.RenderContext._
 import se.gigurra.leavu3.interfaces.{Key, KeyPress, MouseClick}
 import se.gigurra.leavu3.lmath.Box
 
-case class Mfd(implicit config: Configuration, dlinkSettings: DlinkSettings)
+case class Mfd(implicit config: Configuration, dlinkSettings: DlinkConfiguration)
   extends Instrument(config, dlinkSettings) {
 
   implicit val _p = ScreenProjection()

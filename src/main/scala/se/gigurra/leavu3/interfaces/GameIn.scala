@@ -2,9 +2,8 @@ package se.gigurra.leavu3.interfaces
 
 import com.twitter.finagle.FailedFastException
 import com.twitter.util.Duration
-import se.gigurra.leavu3.Configuration
-import se.gigurra.leavu3.externaldata.Waypoint
-import se.gigurra.leavu3.externaldata.GameData
+import se.gigurra.leavu3.datamodel.Waypoint
+import se.gigurra.leavu3.datamodel.{Configuration, GameData}
 import se.gigurra.leavu3.util.{Resource2String, RestClient, SimpleTimer}
 import se.gigurra.serviceutils.json.JSON
 import se.gigurra.serviceutils.twitter.logging.Logging

@@ -1,8 +1,8 @@
 package se.gigurra.leavu3.interfaces
 
-import se.gigurra.leavu3.externaldata.{Mark, Member}
+import se.gigurra.leavu3.datamodel.{Configuration, DlinkConfiguration, Mark, Member}
 import se.gigurra.leavu3.util.{RestClient, SimpleTimer}
-import se.gigurra.leavu3.{Configuration, DlinkSettings}
+import se.gigurra.leavu3.datamodel.DlinkConfiguration
 import se.gigurra.serviceutils.json.JSON
 import se.gigurra.serviceutils.twitter.logging.Logging
 import se.gigurra.serviceutils.twitter.service.ServiceException
@@ -23,7 +23,7 @@ object DlinkOut extends Logging {
     marks -= id
   }
 
-  def startPoller(masterConfig: Configuration, config: DlinkSettings): Unit = {
+  def startPoller(masterConfig: Configuration, config: DlinkConfiguration): Unit = {
     if (masterConfig.relayDlink) {
 
       val client = RestClient(config.host, config.port)

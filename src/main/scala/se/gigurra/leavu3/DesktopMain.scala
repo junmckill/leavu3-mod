@@ -4,6 +4,8 @@ import javax.swing.JOptionPane
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.backends.lwjgl.{LwjglApplication, LwjglApplicationConfiguration}
+import se.gigurra.leavu3.app.GdxAppListener
+import se.gigurra.leavu3.datamodel.{Configuration, DlinkConfiguration}
 import se.gigurra.leavu3.interfaces._
 import se.gigurra.leavu3.util.RestClient
 import se.gigurra.leavu3.windowstweaks.WindowTweaks
@@ -66,13 +68,13 @@ object DesktopMain extends Logging {
     config
   }
 
-  private def downloadDlinkConfig(config: Configuration): DlinkSettings = {
+  private def downloadDlinkConfig(config: Configuration): DlinkConfiguration = {
     logger.info(s"Downloading datalink settings from dcs-remote ..")
 
     val client = RestClient(config.dcsRemoteAddress, config.dcsRemotePort)
     Try(client.getBlocking(s"static-data/dlink-settings")) match {
       case Success(data) =>
-        val out = JSON.read[DlinkSettings](data)
+        val out = JSON.read[DlinkConfiguration](data)
         logger.info(s"Dlink settings downloaded:\n ${JSON.write(out)}")
         out
       case Failure(e) =>

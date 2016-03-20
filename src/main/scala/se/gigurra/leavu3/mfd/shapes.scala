@@ -1,6 +1,6 @@
 package se.gigurra.leavu3.mfd
 
-import se.gigurra.leavu3.externaldata.Vec2
+import se.gigurra.leavu3.datamodel.Vec2
 import se.gigurra.leavu3.gfx.RenderContext._
 
 object shapes {

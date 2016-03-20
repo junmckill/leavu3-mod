@@ -1,6 +1,6 @@
 package se.gigurra.leavu3.windowstweaks
 
-import se.gigurra.leavu3.Configuration
+import se.gigurra.leavu3.datamodel.Configuration
 import se.gigurra.serviceutils.twitter.logging.Logging
 
 /**

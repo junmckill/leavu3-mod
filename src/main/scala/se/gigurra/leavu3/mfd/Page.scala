@@ -1,6 +1,6 @@
 package se.gigurra.leavu3.mfd
 
-import se.gigurra.leavu3.externaldata.{DlinkData, GameData}
+import se.gigurra.leavu3.datamodel.{DlinkData, GameData}
 import se.gigurra.leavu3.interfaces.MouseClick
 import se.gigurra.serviceutils.twitter.logging.Logging
 

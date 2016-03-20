@@ -1,6 +1,6 @@
 package se.gigurra.leavu3.lmath
 
-import se.gigurra.leavu3.externaldata.{Target, Contact}
+import se.gigurra.leavu3.datamodel.{Target, Contact}
 import se.gigurra.leavu3.gfx.RenderContext
 
 trait RichContact {  _: RenderContext.type =>

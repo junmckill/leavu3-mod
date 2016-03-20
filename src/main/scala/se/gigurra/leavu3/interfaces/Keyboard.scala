@@ -4,8 +4,7 @@ import java.util.concurrent.ConcurrentLinkedQueue
 
 import com.badlogic.gdx.Gdx
 import com.twitter.finagle.FailedFastException
-import se.gigurra.leavu3.Configuration
-import se.gigurra.leavu3.externaldata.Vec2
+import se.gigurra.leavu3.datamodel.{Configuration, Vec2}
 import se.gigurra.leavu3.util.{RestClient, SimpleTimer}
 import se.gigurra.serviceutils.json.JSON
 import se.gigurra.serviceutils.twitter.logging.Logging
