@@ -1,6 +1,6 @@
 package se.gigurra.leavu3.datamodel
 
-import com.twitter.util.{Duration, JavaTimer}
+import com.twitter.util.{Duration, Future, JavaTimer, NonFatal}
 import se.gigurra.heisenberg.MapData._
 import se.gigurra.heisenberg.Schema
 import se.gigurra.leavu3.interfaces.DcsRemote
@@ -117,13 +117,15 @@ object UnitType extends Schema[UnitType] with Logging {
       val script =s"{name=LoGetNameByType${t.typ}}"
       val url = s"export/$script"
 
-      dcsRemote.get(url, cacheMaxAgeMillis = Some(3600000L), timeout = Duration.fromSeconds(1)).onSuccess { json =>
+      dcsRemote.get(url, Some(3600000L), Duration.fromSeconds(1)).map { json =>
         val name = JSON.readMap(json)("name").asInstanceOf[String]
         mappedTypes.put(t.typ, UnitTypeData.apply(name, isKnown = true, t.typ))
         pendingTypes.remove(t.typ)
         logger.info(s"Mapped type ${t.typ} -> $name")
-      }.onFailure { e =>
-        pendingTypes.remove(t.typ)
+      }.rescue {
+        case NonFatal(e) =>
+          pendingTypes.remove(t.typ)
+          Future.Unit
       }
     }
 
