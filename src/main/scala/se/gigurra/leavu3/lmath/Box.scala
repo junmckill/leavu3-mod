@@ -1,6 +1,6 @@
 package se.gigurra.leavu3.lmath
 
-import se.gigurra.leavu3.externaldata.Vec2
+import se.gigurra.leavu3.datamodel.Vec2
 
 /**
   * Created by kjolh on 3/19/2016.

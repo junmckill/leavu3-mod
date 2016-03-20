@@ -1,18 +1,17 @@
 package se.gigurra.leavu3.mfd
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType
-import se.gigurra.leavu3.externaldata.{GameData, Key, KeyPress, MouseClick, Vec2}
-import se.gigurra.leavu3.gfx.{PpiProjection, ScreenProjection}
-import se.gigurra.leavu3.{Configuration, DlinkData, DlinkSettings, Instrument}
+import se.gigurra.leavu3.app.Instrument
+import se.gigurra.leavu3.datamodel.{Configuration, DlinkData, GameData, Vec2}
+import se.gigurra.leavu3.gfx.ScreenProjection
 
 import scala.language.postfixOps
 import se.gigurra.leavu3.gfx.RenderContext._
+import se.gigurra.leavu3.interfaces.{DcsRemote, Key, KeyPress, MouseClick}
 import se.gigurra.leavu3.lmath.Box
 
-case class Mfd(implicit config: Configuration, dlinkSettings: DlinkSettings)
-  extends Instrument(config, dlinkSettings) {
+case class Mfd(implicit dcsRemote: DcsRemote, config: Configuration) extends Instrument(dcsRemote, config) {
 
   implicit val _p = ScreenProjection()
 
@@ -44,7 +43,6 @@ case class Mfd(implicit config: Configuration, dlinkSettings: DlinkSettings)
   }
 
   def drawMainMenu(): Unit = {
-    // TODO: Draw something
     for (pos <- Mfd.Osb.positions) {
       batched {
         atScreen(pos) {

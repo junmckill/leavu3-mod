@@ -1,11 +1,11 @@
 package se.gigurra.leavu3.mfd
 
 import com.badlogic.gdx.graphics.Color
-import se.gigurra.leavu3.externaldata._
-import se.gigurra.leavu3.gfx.PpiProjection
+import se.gigurra.leavu3.datamodel._
+import se.gigurra.leavu3.gfx.{PpiProjection, ScreenProjection}
 import se.gigurra.leavu3.gfx.RenderContext._
 import se.gigurra.leavu3.util.{CircleBuffer, CurTime}
-import se.gigurra.leavu3._
+import se.gigurra.leavu3.interfaces.{DcsRemote, Dlink, MouseClick}
 
 import scala.collection.mutable
 import scala.language.postfixOps
@@ -13,15 +13,17 @@ import scala.language.postfixOps
 /**
   * Created by kjolh on 3/12/2016.
   */
-case class HsdPage(implicit config: Configuration, dlinkSettings: DlinkSettings) extends Page("HSD") {
+case class HsdPage(implicit dcsRemote: DcsRemote, config: Configuration) extends Page("HSD") {
 
   implicit val projection = new PpiProjection
   var shouldMatchIngameScale = true
   var shouldDrawDetailedHsi = true
+  var shouldDrawOwnHeading = true
   val distance = CircleBuffer(10 nmi, 20 nmi, 40 nmi, 80 nmi, 160 nmi).withDefaultValue(40 nmi)
   val deprFactor = CircleBuffer(0.0, 0.5).withDefaultValue(0.5)
   val stdTextSize = 0.75f
   val OSB_DEPR = 1
+  val OSB_HDG = 2
   val OSB_SCALE = 17
   val OSB_HSI = 3
   val OSB_DEL = 7
@@ -30,7 +32,8 @@ case class HsdPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
     i match {
       case OSB_DEPR => deprFactor.stepDown()
       case OSB_HSI => shouldDrawDetailedHsi = !shouldDrawDetailedHsi
-      case OSB_DEL => DlinkOutData.deleteMark(dlinkSettings.callsign)
+      case OSB_HDG => shouldDrawOwnHeading = !shouldDrawOwnHeading
+      case OSB_DEL => Dlink.Out.deleteMark(Dlink.config.callsign)
       case _ => // Nothing yet
     }
   }
@@ -41,7 +44,7 @@ case class HsdPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
     val relativeBra = offs.asBra
     val bra = relativeBra.copy(bearingRaw = self.heading + relativeBra.bearing)
     val clickPos = self.position + bra.toOffset
-    DlinkOutData.addMark(Mark(dlinkSettings.callsign, clickPos))
+    Dlink.Out.addMark(Mark(Dlink.config.callsign, clickPos))
   }
 
   override def draw(game: GameData, dlinkIn: Map[String, DlinkData]): Unit = {
@@ -59,7 +62,7 @@ case class HsdPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
       drawTdc(game)
     }
     drawBullsEyeNumbers(game)
-    drawBraEyeNumbers(game)
+    drawBraNumbers(game)
     drawOsbs(game)
   }
 
@@ -224,7 +227,7 @@ case class HsdPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
 
     draw { (name, member, id, mark) =>
       batched {
-        mark.id.take(2).drawRightOf(YELLOW)
+        mark.id.drawRightOf(scale = stdTextSize * 0.8f, color = YELLOW)
       }
     }
 
@@ -409,7 +412,7 @@ case class HsdPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
 
   }
 
-  def drawBraEyeNumbers(game: GameData) = {
+  def drawBraNumbers(game: GameData) = {
 
     def mkBraString(prefix: String, bra: Bra): String = s"$prefix : ${bra.brString}"
 
@@ -452,13 +455,23 @@ case class HsdPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
 
   }
 
+  val screenprojection = ScreenProjection()
+
   def drawOsbs(game: GameData): Unit = {
     import Mfd.Osb._
     drawBoxed(OSB_DEPR, "DEP", boxed = deprFactor.index != 0)
+    drawBoxed(OSB_HDG, "HDG", boxed = shouldDrawOwnHeading)
     drawBoxed(OSB_HSI, "HSI", boxed = shouldDrawDetailedHsi)
-    if (DlinkOutData.hasMark(dlinkSettings.callsign))
+    if (Dlink.Out.hasMark(Dlink.config.callsign))
       drawBoxed(OSB_DEL, "DEL", boxed = false)
     drawBoxed(OSB_SCALE, (distance.get * m_to_nmi).round.toString, boxed = false)
+    if (shouldDrawOwnHeading) {
+      batched {
+        atScreen(Mfd.Osb.positions(2) - Vec2(0.0, 0.1)) {
+          self.heading.round.toString.pad(3, '0').drawCentered(WHITE)(screenprojection, config)
+        }
+      }
+    }
   }
 
 }

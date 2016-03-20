@@ -1,8 +1,7 @@
 package se.gigurra.leavu3.gfx
 
 import com.badlogic.gdx.graphics.Color
-import se.gigurra.leavu3.Configuration
-import se.gigurra.leavu3.externaldata.{Vec3, Vec2}
+import se.gigurra.leavu3.datamodel.{Configuration, Vec2, Vec3}
 
 object getLines {
   def apply(s: String): Seq[String] = {

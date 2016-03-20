@@ -1,7 +1,6 @@
 package se.gigurra.leavu3.mfd
 
-import se.gigurra.leavu3.DlinkData
-import se.gigurra.leavu3.externaldata.GameData
+import se.gigurra.leavu3.datamodel.{DlinkData, GameData}
 
 /**
   * Created by kjolh on 3/12/2016.

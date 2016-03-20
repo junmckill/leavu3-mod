@@ -4,7 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
-import se.gigurra.leavu3.Configuration
+import se.gigurra.leavu3.datamodel.Configuration
 import se.gigurra.leavu3.lmath.{Matrix4Stack, RichContact, VectorImplicits}
 
 import scala.collection.mutable

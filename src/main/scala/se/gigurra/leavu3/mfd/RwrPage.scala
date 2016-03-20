@@ -2,17 +2,18 @@ package se.gigurra.leavu3.mfd
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
-import se.gigurra.leavu3.externaldata.{GameData, _}
+import se.gigurra.leavu3.datamodel.{GameData, _}
 import se.gigurra.leavu3.gfx.RenderContext._
 import se.gigurra.leavu3.gfx.{Blink, PpiProjection}
-import se.gigurra.leavu3.{Configuration, DlinkData, DlinkSettings}
+import se.gigurra.leavu3.datamodel.Configuration
+import se.gigurra.leavu3.interfaces.DcsRemote
 
 import scala.language.postfixOps
 
 /**
   * Created by kjolh on 3/12/2016.
   */
-case class RwrPage(implicit config: Configuration, dlinkSettings: DlinkSettings) extends Page("RWR") {
+case class RwrPage(implicit dcsRemote: DcsRemote, config: Configuration) extends Page("RWR") {
   implicit val projection = new PpiProjection
   val stdTextSize = 0.75f
   val distance = 100 nmi
@@ -74,6 +75,7 @@ case class RwrPage(implicit config: Configuration, dlinkSettings: DlinkSettings)
     def color: Color = {
       e.signalType match {
         case Emitter.RADAR_SEARCH   => BROWN
+        case Emitter.RADAR_TWS      => BROWN
         case Emitter.RADAR_LOCK     => YELLOW
         case Emitter.MISSILE_LAUNCH => Blink(Seq(YELLOW, RED), blinkSpeed)
         case Emitter.MISSILE_ACTIVE => Blink(Seq(YELLOW, RED), blinkSpeed)

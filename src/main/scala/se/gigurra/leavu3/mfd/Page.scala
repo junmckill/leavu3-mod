@@ -1,7 +1,7 @@
 package se.gigurra.leavu3.mfd
 
-import se.gigurra.leavu3.DlinkData
-import se.gigurra.leavu3.externaldata.{GameData, MouseClick}
+import se.gigurra.leavu3.datamodel.{DlinkData, GameData}
+import se.gigurra.leavu3.interfaces.MouseClick
 import se.gigurra.serviceutils.twitter.logging.Logging
 
 abstract class Page(val name: String) extends Logging {
