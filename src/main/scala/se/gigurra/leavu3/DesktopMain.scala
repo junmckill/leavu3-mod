@@ -4,10 +4,9 @@ import javax.swing.JOptionPane
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.backends.lwjgl.{LwjglApplication, LwjglApplicationConfiguration}
-import se.gigurra.leavu3.app.GdxAppListener
-import se.gigurra.leavu3.datamodel.{Configuration, DlinkConfiguration}
+import se.gigurra.leavu3.app.App
+import se.gigurra.leavu3.datamodel.Configuration
 import se.gigurra.leavu3.interfaces._
-import se.gigurra.leavu3.util.RestClient
 import se.gigurra.leavu3.windowstweaks.WindowTweaks
 import se.gigurra.serviceutils.json.JSON
 import se.gigurra.serviceutils.twitter.logging.{Capture, Logging}
@@ -22,16 +21,16 @@ object DesktopMain extends Logging {
     Capture.stdErrToFile(s"leavu3-log.txt", append = true)
 
     val config = loadConfig(args.headOption.getOrElse("leavu3-cfg.json"))
-    val dlinkConfig = downloadDlinkConfig(config)
+    val dcsRemote = DcsRemote(config)
+
     val lwjglConfig = loadLwjglConfig(config)
-    val appListener = new GdxAppListener(config, dlinkConfig, () => onInitDisplay(config))
+    val appListener = new App(dcsRemote, config, () => onInitDisplay(config))
     new LwjglApplication(appListener, lwjglConfig)
     Gdx.input.setInputProcessor(appListener)
 
-    GameIn.startPoller(config)
-    DlinkOut.startPoller(config, dlinkConfig)
-    DlinkIn.startPoller(dlinkConfig)
-    Keyboard.startPolling(config)
+    GameIn.start(dcsRemote, config.gameDataFps)
+    Dlink.start(dcsRemote, config.relayDlink)
+    Keyboard.start(dcsRemote, config)
 
   } match {
     case Success(_) =>
@@ -66,22 +65,6 @@ object DesktopMain extends Logging {
     val config = Configuration.readFromFile(path)
     logger.info(s"Config:\n ${JSON.write(config)}")
     config
-  }
-
-  private def downloadDlinkConfig(config: Configuration): DlinkConfiguration = {
-    logger.info(s"Downloading datalink settings from dcs-remote ..")
-
-    val client = RestClient(config.dcsRemoteAddress, config.dcsRemotePort)
-    Try(client.getBlocking(s"static-data/dlink-settings")) match {
-      case Success(data) =>
-        val out = JSON.read[DlinkConfiguration](data)
-        logger.info(s"Dlink settings downloaded:\n ${JSON.write(out)}")
-        out
-      case Failure(e) =>
-        val message = s"Could not connect to dcs-remote"
-        logger.error(message)
-        throw new RuntimeException(message, e)
-    }
   }
 
 }

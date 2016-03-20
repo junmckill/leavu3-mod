@@ -6,13 +6,14 @@ import se.gigurra.leavu3.datamodel.{GameData, _}
 import se.gigurra.leavu3.gfx.RenderContext._
 import se.gigurra.leavu3.gfx.{Blink, PpiProjection}
 import se.gigurra.leavu3.datamodel.Configuration
+import se.gigurra.leavu3.interfaces.DcsRemote
 
 import scala.language.postfixOps
 
 /**
   * Created by kjolh on 3/12/2016.
   */
-case class RwrPage(implicit config: Configuration, dlinkSettings: DlinkConfiguration) extends Page("RWR") {
+case class RwrPage(implicit dcsRemote: DcsRemote, config: Configuration) extends Page("RWR") {
   implicit val projection = new PpiProjection
   val stdTextSize = 0.75f
   val distance = 100 nmi

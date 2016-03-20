@@ -5,8 +5,7 @@ import se.gigurra.leavu3.datamodel._
 import se.gigurra.leavu3.gfx.{PpiProjection, ScreenProjection}
 import se.gigurra.leavu3.gfx.RenderContext._
 import se.gigurra.leavu3.util.{CircleBuffer, CurTime}
-import se.gigurra.leavu3._
-import se.gigurra.leavu3.interfaces.{DlinkOut, MouseClick}
+import se.gigurra.leavu3.interfaces.{DcsRemote, Dlink, MouseClick}
 
 import scala.collection.mutable
 import scala.language.postfixOps
@@ -14,7 +13,7 @@ import scala.language.postfixOps
 /**
   * Created by kjolh on 3/12/2016.
   */
-case class HsdPage(implicit config: Configuration, dlinkSettings: DlinkConfiguration) extends Page("HSD") {
+case class HsdPage(implicit dcsRemote: DcsRemote, config: Configuration) extends Page("HSD") {
 
   implicit val projection = new PpiProjection
   var shouldMatchIngameScale = true
@@ -34,7 +33,7 @@ case class HsdPage(implicit config: Configuration, dlinkSettings: DlinkConfigura
       case OSB_DEPR => deprFactor.stepDown()
       case OSB_HSI => shouldDrawDetailedHsi = !shouldDrawDetailedHsi
       case OSB_HDG => shouldDrawOwnHeading = !shouldDrawOwnHeading
-      case OSB_DEL => DlinkOut.deleteMark(dlinkSettings.callsign)
+      case OSB_DEL => Dlink.Out.deleteMark(Dlink.config.callsign)
       case _ => // Nothing yet
     }
   }
@@ -45,7 +44,7 @@ case class HsdPage(implicit config: Configuration, dlinkSettings: DlinkConfigura
     val relativeBra = offs.asBra
     val bra = relativeBra.copy(bearingRaw = self.heading + relativeBra.bearing)
     val clickPos = self.position + bra.toOffset
-    DlinkOut.addMark(Mark(dlinkSettings.callsign, clickPos))
+    Dlink.Out.addMark(Mark(Dlink.config.callsign, clickPos))
   }
 
   override def draw(game: GameData, dlinkIn: Map[String, DlinkData]): Unit = {
@@ -463,7 +462,7 @@ case class HsdPage(implicit config: Configuration, dlinkSettings: DlinkConfigura
     drawBoxed(OSB_DEPR, "DEP", boxed = deprFactor.index != 0)
     drawBoxed(OSB_HDG, "HDG", boxed = shouldDrawOwnHeading)
     drawBoxed(OSB_HSI, "HSI", boxed = shouldDrawDetailedHsi)
-    if (DlinkOut.hasMark(dlinkSettings.callsign))
+    if (Dlink.Out.hasMark(Dlink.config.callsign))
       drawBoxed(OSB_DEL, "DEL", boxed = false)
     drawBoxed(OSB_SCALE, (distance.get * m_to_nmi).round.toString, boxed = false)
     if (shouldDrawOwnHeading) {

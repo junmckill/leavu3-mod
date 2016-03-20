@@ -8,7 +8,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType
 import com.badlogic.gdx.math.Vector2
 import se.gigurra.leavu3.datamodel.{DlinkConfiguration, Vec2, Vec3}
-import se.gigurra.leavu3.interfaces.Snapshots
+import se.gigurra.leavu3.interfaces.{Dlink, GameIn}
 import se.gigurra.leavu3.lmath.UnitConversions
 
 trait RenderHelpers extends UnitConversions { _: RenderContext.type =>
@@ -181,16 +181,16 @@ trait RenderHelpers extends UnitConversions { _: RenderContext.type =>
 }
 
 object self {
-  def dlinkCallsign(implicit c: DlinkConfiguration): String = c.callsign
-  def planeId: Int = Snapshots.gameData.metaData.planeId
-  def modelTime: Double = Snapshots.gameData.metaData.modelTime
-  def coalition: Int = Snapshots.gameData.selfData.coalitionId
-  def pitch: Float = Snapshots.gameData.selfData.pitch
-  def roll: Float = Snapshots.gameData.selfData.roll
-  def heading: Float = Snapshots.gameData.selfData.heading
-  def position: Vec3 = Snapshots.gameData.selfData.position
-  def velocity: Vec3 = Snapshots.gameData.flightModel.velocity
-  def acceleration: Vec3 = Snapshots.gameData.flightModel.acceleration
+  def dlinkCallsign: String = Dlink.config.callsign
+  def planeId: Int = GameIn.snapshot.metaData.planeId
+  def modelTime: Double = GameIn.snapshot.metaData.modelTime
+  def coalition: Int = GameIn.snapshot.selfData.coalitionId
+  def pitch: Float = GameIn.snapshot.selfData.pitch
+  def roll: Float = GameIn.snapshot.selfData.roll
+  def heading: Float = GameIn.snapshot.selfData.heading
+  def position: Vec3 = GameIn.snapshot.selfData.position
+  def velocity: Vec3 = GameIn.snapshot.flightModel.velocity
+  def acceleration: Vec3 = GameIn.snapshot.flightModel.acceleration
 }
 
 trait Projection[+T] {

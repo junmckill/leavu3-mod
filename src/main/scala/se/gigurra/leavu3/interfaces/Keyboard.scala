@@ -18,14 +18,13 @@ object Keyboard extends Logging {
 
   val inputQue = new ConcurrentLinkedQueue[KeyPress]
 
-  def startPolling(configuration: Configuration): Unit = {
+  def start(dcsRemote: DcsRemote, configuration: Configuration): Unit = {
 
-    val client = RestClient(configuration.dcsRemoteAddress, configuration.dcsRemotePort)
     var oldKeysPressed = Set.empty[Int]
 
     SimpleTimer.fromFps(configuration.gameDataFps) {
       Try {
-        val kbData = client.getBlocking("keyboard", cacheMaxAgeMillis = Some(Int.MaxValue))
+        val kbData = dcsRemote.getBlocking("keyboard", cacheMaxAgeMillis = Some(Int.MaxValue))
         val keysPressed = JSON.readMap(kbData).keys.map(_.toInt).toSet.map((x: Int) => x - configuration.keyBindingOffset)
         if (keysPressed != oldKeysPressed)
           for (press <- keysPressed -- oldKeysPressed) {

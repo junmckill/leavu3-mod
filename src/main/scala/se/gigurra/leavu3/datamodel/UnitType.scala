@@ -3,7 +3,7 @@ package se.gigurra.leavu3.datamodel
 import com.twitter.util.{Duration, JavaTimer}
 import se.gigurra.heisenberg.MapData._
 import se.gigurra.heisenberg.Schema
-import se.gigurra.leavu3.util.{Eventually, RestClient}
+import se.gigurra.leavu3.interfaces.DcsRemote
 import se.gigurra.serviceutils.json.JSON
 import se.gigurra.serviceutils.twitter.logging.Logging
 
@@ -107,21 +107,19 @@ object UnitType extends Schema[UnitType] with Logging {
   type TYPE = (Int, Int, Int, Int)
   val pendingTypes = new concurrent.TrieMap[TYPE, Boolean]()
   val mappedTypes = new concurrent.TrieMap[TYPE, UnitTypeData]()
-  var clientSingleton = Eventually[RestClient]()
 
   val timer = new JavaTimer(isDaemon = true)
 
-  def getData(t: UnitType)(implicit c: Configuration): UnitTypeData = {
+  def getData(t: UnitType)(implicit dcsRemote: DcsRemote): UnitTypeData = {
 
     if (!mappedTypes.contains(t.typ) && !pendingTypes.contains(t.typ)) {
 
       pendingTypes.put(t.typ, true)
 
-      val client = clientSingleton.get(RestClient(c.dcsRemoteAddress, c.dcsRemotePort))
       val script =s"{name=LoGetNameByType${t.typ}}"
       val url = s"export/$script"
 
-      client.get(url, cacheMaxAgeMillis = Some(3600000L), timeout = Duration.fromSeconds(1)).onSuccess { json =>
+      dcsRemote.get(url, cacheMaxAgeMillis = Some(3600000L), timeout = Duration.fromSeconds(1)).onSuccess { json =>
         val name = JSON.readMap(json)("name").asInstanceOf[String]
         mappedTypes.put(t.typ, UnitTypeData.apply(name, isKnown = true, t.typ))
         pendingTypes.remove(t.typ)
@@ -134,5 +132,5 @@ object UnitType extends Schema[UnitType] with Logging {
     mappedTypes.getOrElse(t.typ, UnitTypeData.UKN)
   }
 
-  implicit def UnitType2Data(t: UnitType)(implicit c: Configuration): UnitTypeData = getData(t)
+  implicit def UnitType2Data(t: UnitType)(implicit c: DcsRemote): UnitTypeData = getData(t)
 }

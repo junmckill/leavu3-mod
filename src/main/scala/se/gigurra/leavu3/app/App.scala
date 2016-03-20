@@ -2,7 +2,7 @@ package se.gigurra.leavu3.app
 
 import com.badlogic.gdx.{ApplicationListener, InputProcessor}
 import se.gigurra.leavu3.datamodel.{Configuration, DlinkConfiguration}
-import se.gigurra.leavu3.interfaces.{Keyboard, MouseClick, Snapshots}
+import se.gigurra.leavu3.interfaces._
 import se.gigurra.serviceutils.twitter.logging.Logging
 
 import scala.util.{Failure, Success, Try}
@@ -10,14 +10,14 @@ import scala.util.{Failure, Success, Try}
 /**
   * Created by kjolh on 3/20/2016.
   */
-case class GdxAppListener(initialConfiguration: Configuration,
-                          dlinkSettings: DlinkConfiguration,
-                          onCreate: () => Unit)
+case class App(dcsRemote: DcsRemote,
+               appCfg: Configuration,
+               onCreate: () => Unit)
   extends ApplicationListener
     with InputProcessor
     with Logging {
 
-  val instrumentClassName = initialConfiguration.instrument
+  val instrumentClassName = appCfg.instrument
   val instrumentClass: Class[Instrument] =
     Try(Class.forName(instrumentClassName)) match {
       case Success(cls) =>
@@ -27,7 +27,7 @@ case class GdxAppListener(initialConfiguration: Configuration,
         throw e
     }
   logger.info(s"Creating instrument: $instrumentClass")
-  lazy val instrument = instrumentClass.getConstructor(classOf[Configuration], classOf[DlinkConfiguration]).newInstance(initialConfiguration, dlinkSettings)
+  lazy val instrument = instrumentClass.getConstructor(classOf[DcsRemote], classOf[Configuration]).newInstance(dcsRemote, appCfg)
 
   override def resize(width: Int, height: Int): Unit = {
   }
@@ -41,7 +41,7 @@ case class GdxAppListener(initialConfiguration: Configuration,
   override def render(): Unit = {
     while(!Keyboard.inputQue.isEmpty)
       instrument.keyPressed(Keyboard.inputQue.poll)
-    instrument.update(Snapshots.gameData, Snapshots.dlinkIn)
+    instrument.update(GameIn.snapshot, Dlink.snapshot)
   }
 
   override def resume(): Unit = {

@@ -18,18 +18,17 @@ import scala.util.{Failure, Success, Try}
 object GameIn extends Logging {
 
   val path = "export/dcs_remote_export_data()"
+  @volatile var snapshot: GameData = new GameData(Map.empty)
 
-  def startPoller(configuration: Configuration): Unit = {
+  def start(dcsRemote: DcsRemote, fps: Int): Unit = {
 
-    ScriptInject.startInjecting(configuration)
+    ScriptInject.start(dcsRemote)
 
-    val client = RestClient(configuration.dcsRemoteAddress, configuration.dcsRemotePort)
-
-    SimpleTimer.fromFps(configuration.gameDataFps) {
-      Try(client.getBlocking(path, cacheMaxAgeMillis = Some((1000.0 / configuration.gameDataFps / 2.0).toLong))) match {
+    SimpleTimer.fromFps(fps) {
+      Try(dcsRemote.getBlocking(path, cacheMaxAgeMillis = Some((1000.0 / fps.toDouble / 2.0).toLong))) match {
         case Success(stringData) =>
           val newData = JSON.read[GameData](stringData)
-          Snapshots.gameData = process(newData)
+          snapshot = process(newData)
         case Failure(e: ServiceException) => logger.warning(s"Dcs Remote replied: Could not fetch game data from Dcs Remote: $e")
         case Failure(e: FailedFastException) => // Ignore ..
         case Failure(e) => logger.error(s"Could not fetch game data from Dcs Remote: $e")
@@ -82,18 +81,16 @@ object GameIn extends Logging {
 
     val luaDataExportScript = Resource2String("lua_scripts/LoDataExport.lua")
 
-    def startInjecting(configuration: Configuration): Unit = {
-
-      val client = RestClient(configuration.dcsRemoteAddress, configuration.dcsRemotePort)
+    def start(dcsRemote: DcsRemote): Unit = {
 
       SimpleTimer.apply(Duration.fromSeconds(10)) {
-        Try(JSON.read[GameData](client.getBlocking(GameIn.path))) match {
+        Try(JSON.read[GameData](dcsRemote.getBlocking(GameIn.path))) match {
           case Failure(e: FailedFastException) => // Ignore ..
           case Failure(e: ServiceException) =>
             logger.warning(s"Dcs Remote replied: Unable to inject game export script: $e")
           case Failure(_) | Success(BadGameData()) =>
             logger.info(s"Injecting data export script .. -> ${GameIn.path}")
-            client.postBlocking("export", luaDataExportScript)
+            dcsRemote.postBlocking("export", luaDataExportScript)
           case _ =>
           // It's already loaded
         }
