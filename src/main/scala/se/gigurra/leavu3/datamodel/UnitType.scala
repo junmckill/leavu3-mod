@@ -20,6 +20,7 @@ case class UnitTypeData(fullName: String,
 object UnitTypeData {
   val DEFAULT_POWER_MAPPING_EXPONENT = 2.0
   val AWACS_POWER_MAPPING_EXPONENT = 7.0
+  val EW_POWER_MAPPING_EXPONENT = 32.0
   val DEFAULT_MAX_RANGE_INDICATION = 1.0
   val DEFAULT_ARH_MAX_RANGE_INDICATION = 0.4
   val UKN = UnitTypeData("unknown", "UKN", isKnown = false, (0,0,0,0), DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
@@ -66,8 +67,8 @@ object UnitTypeData {
     // AWACS / EWs
     case x if x.startsWith("dog")       => Data("DE",           DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
     case x if x.startsWith("e-3")       => Data("E3",           AWACS_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
-    case x if x.startsWith("1l13")      => Data("EW",           AWACS_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
-    case x if x.startsWith("55g6")      => Data("EW",           AWACS_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
+    case x if x.startsWith("1l13")      => Data("EW",           EW_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
+    case x if x.startsWith("55g6")      => Data("EW",           EW_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
 
     // Active missiles
     case x if x.startsWith("aim-120")   => Data("M120",         DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_ARH_MAX_RANGE_INDICATION)
