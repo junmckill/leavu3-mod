@@ -47,12 +47,12 @@ object UnitTypeData {
     // Fighters
     case x if x.startsWith("mig-29")    => Data("29",           DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
     case x if x.startsWith("su-27")     => Data("29",           DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
+    case x if x.startsWith("su-33")     => Data("29",           DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
     case x if x.startsWith("su-3")      => Data("30",           DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
     case x if x.startsWith("su-")       => Data(firstNumber(x), DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
     case x if x.startsWith("mig-")      => Data(firstNumber(x), DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
     case x if x.startsWith("f-")        => Data(firstNumber(x), DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
-
-    case x if x.startsWith("e-3")       => Data("E3",           AWACS_POWER_MAPPING_EXPONENT,   DEFAULT_MAX_RANGE_INDICATION)
+    case x if x.startsWith("m-2000")    => Data("M2",           DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
 
     // SAMs
     case x if x.startsWith("s-300")     => Data("10",           DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
@@ -60,11 +60,14 @@ object UnitTypeData {
     case x if x.startsWith("tunguska")  => Data("19",           DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
     case x if x.startsWith("tor")       => Data("15",           DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
     case x if x.startsWith("buk")       => Data("11",           DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
+    case x if x.startsWith("patriot")   => Data("PT",           DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
+    case x if x.startsWith("hawk")      => Data("HK",           DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
 
-    // EWs
+    // AWACS / EWs
     case x if x.startsWith("dog")       => Data("DE",           DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
-    case x if x.startsWith("1l13")      => Data("EW",           DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
-    case x if x.startsWith("55g6")      => Data("EW",           DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
+    case x if x.startsWith("e-3")       => Data("E3",           AWACS_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
+    case x if x.startsWith("1l13")      => Data("EW",           AWACS_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
+    case x if x.startsWith("55g6")      => Data("EW",           AWACS_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
 
     // Active missiles
     case x if x.startsWith("aim-120")   => Data("M120",         DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_ARH_MAX_RANGE_INDICATION)
@@ -88,7 +91,7 @@ case class UnitType(source: SourceData = Map.empty) extends SafeParsed[UnitType.
     (level1, level2, level3, level4)
   }
 
-  def isFlyer: Boolean = level1 == UnitType.AIR ||level1 == UnitType.WEAPON
+  def isFlyer: Boolean = level1 == UnitType.AIR || level1 == UnitType.WEAPON
 }
 
 object UnitType extends Schema[UnitType] with Logging {

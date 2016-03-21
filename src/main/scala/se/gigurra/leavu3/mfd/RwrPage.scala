@@ -151,9 +151,17 @@ case class RwrPage(implicit config: Configuration) extends Page("RWR") {
       lines(Seq(lineStart -> edgeOffset), threat.color)
 
       batched {
-        at(self.position + edgeOffset * 1.05f, heading = bearing - self.heading) {
-          threat.rwrName.drawCentered(threat.color, scale = 0.7f)
+
+        if (threat.range / distance > 0.5) {
+          at(self.position + edgeOffset * 1.05f, heading = bearing - self.heading) {
+            threat.rwrName.drawCentered(threat.color, scale = 0.7f)
+          }
+        } else {
+          at(self.position + lineStart, heading = bearing - self.heading) {
+            threat.rwrName.drawRightOf(threat.color, scale = 0.7f)
+          }
         }
+
       }
 
     }

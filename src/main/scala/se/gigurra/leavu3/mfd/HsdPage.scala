@@ -286,9 +286,9 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD") {
               nameText.drawCentered(scale = 0.45f, color = BLACK)
             }
           }
-        } else at(memberPosition) {
+        } else at(memberPosition) { // HOJ
           val b = targetPosition - member.position: Vec2
-          lines(Seq(Vec2() -> b) * 10000.0, contactColor(target, fromDatalink = true))
+          lines(Seq(Vec2() -> b) * 10000.0, RED)
         }
       }
 
