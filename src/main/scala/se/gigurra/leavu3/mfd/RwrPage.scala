@@ -4,9 +4,9 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import se.gigurra.leavu3.datamodel.{GameData, _}
 import se.gigurra.leavu3.gfx.RenderContext._
-import se.gigurra.leavu3.gfx.{Blink, PpiProjection}
+import se.gigurra.leavu3.gfx.{Blink, PpiProjection, Projection, ScreenProjection}
 import se.gigurra.leavu3.datamodel.Configuration
-import se.gigurra.leavu3.interfaces.DcsRemote
+import se.gigurra.leavu3.util.CircleBuffer
 
 import scala.language.postfixOps
 
@@ -14,23 +14,28 @@ import scala.language.postfixOps
   * Created by kjolh on 3/12/2016.
   */
 case class RwrPage(implicit config: Configuration) extends Page("RWR") {
-  implicit val projection = new PpiProjection
+
+  val ppiProjection = new PpiProjection
+  val screenProjection = new ScreenProjection
+
   val stdTextSize = 0.75f
   val distance = 100 nmi
   val minRangeOffset = distance * 0.05 * config.symbolScale
   val blinkSpeed = 1.0 / 3.0
-  //TODO: Impl Roll stab var shouldHorizonStabilize = true
-  var shouldDrawAll = true
+
+  var a2aFilter = CircleBuffer[LockLevel](LockLevel.Search, LockLevel.Lock, LockLevel.Launch)
+  var a2gFilter = CircleBuffer[LockLevel](LockLevel.Search, LockLevel.Lock, LockLevel.Launch)
+
   var shouldDrawDetailedHsi = true
   val screenEdgeOffset = 0.75f
-  val OSB_ALL = 1
-  //TODO: Impl Roll stab val OSB_HOR = 2
+  val OSB_A2A = 1
+  val OSB_A2G = 2
   val OSB_HSI = 3
 
   object airThreat {
     val w = 0.015
     val h = 0.035
-    def draw(threat: Emitter): Unit = {
+    def draw[_: Projection](threat: Emitter): Unit = {
       val a = Vec2(0,0) * symbolScale
       val b = Vec2(w,h) * symbolScale
       val c = Vec2(-w,h) * symbolScale
@@ -40,7 +45,7 @@ case class RwrPage(implicit config: Configuration) extends Page("RWR") {
 
   object groundThreat {
     val w = airThreat.h // Must be same as airThreat.h to ensure line connects properly!
-    def draw(threat: Emitter): Unit = {
+    def draw[_: Projection](threat: Emitter): Unit = {
       rect(w * symbolScale, w * symbolScale, at = Vec2(0.0, w/2 *symbolScale), typ = threat.fillType, color = threat.color)
     }
   }
@@ -48,7 +53,8 @@ case class RwrPage(implicit config: Configuration) extends Page("RWR") {
   override def pressOsb(i: Int): Unit = {
     i match {
       //TODO: Impl Roll stab case OSB_HOR => shouldHorizonStabilize = !shouldHorizonStabilize
-      case OSB_ALL => shouldDrawAll = !shouldDrawAll
+      case OSB_A2A => a2aFilter.stepUp()
+      case OSB_A2G => a2gFilter.stepUp()
       case OSB_HSI => shouldDrawDetailedHsi = !shouldDrawDetailedHsi
       case _ => // Nothing yet
     }
@@ -61,7 +67,8 @@ case class RwrPage(implicit config: Configuration) extends Page("RWR") {
       drawNotchBlocks(game)
       drawTargetBearings(game)
       drawThreats(game)
-    }
+    }(ppiProjection)
+    drawInfoText(game)
     drawOsbs(game)
   }
 
@@ -106,16 +113,22 @@ case class RwrPage(implicit config: Configuration) extends Page("RWR") {
   }
 
   def drawTargetBearings(game: GameData): Unit = for (target <- game.sensors.targets.locked) {
+    implicit val _p = ppiProjection
     val a = minRangeOffset * (target.position - self.position : Vec2).normalized
     val b = distance * (target.position - self.position : Vec2).normalized
     lines(Seq(a -> b), DARK_GRAY)
   }
 
   def threatFilter(e: Emitter): Boolean = {
-    if(shouldDrawAll) true else !e.isSearch
+    if (e.typ.isFlyer) {
+      e.level >= a2aFilter
+    } else {
+      e.level >= a2gFilter
+    }
   }
 
   def drawThreats(game: GameData): Unit = {
+    implicit val _p = ppiProjection
 
     val allEmitters = game.electronicWarf.rwr.emitters
 
@@ -147,6 +160,7 @@ case class RwrPage(implicit config: Configuration) extends Page("RWR") {
   }
 
   def drawHsi(game: GameData): Unit = {
+    implicit val _p = ppiProjection
     circle(radius = distance * 1.00, color = DARK_GRAY)
     lines(
       shapes.hsi.flag * symbolScale + Vec2(0.0, distance * 1.00),
@@ -160,6 +174,7 @@ case class RwrPage(implicit config: Configuration) extends Page("RWR") {
   }
 
   def drawSelf(game: GameData): Unit = {
+    implicit val _p = ppiProjection
     transform(_.rotate(-self.heading)) {
       lines(shapes.self.coords * symbolScale, CYAN)
       circle(0.005 * symbolScale, color = CYAN, typ = FILL)
@@ -168,6 +183,7 @@ case class RwrPage(implicit config: Configuration) extends Page("RWR") {
   }
 
   def drawNotchBlocks(game: GameData): Unit = {
+    implicit val _p = ppiProjection
 
     for (azimuth <- Seq(-90.0f, 90.0f)) {
       val bearing = azimuth + self.heading
@@ -183,10 +199,52 @@ case class RwrPage(implicit config: Configuration) extends Page("RWR") {
     }
   }
 
+  def drawInfoText(game: GameData): Unit = {
+    implicit val _p = screenProjection
+
+    val scale = config.symbolScale * 0.02 / font.getSpaceWidth
+
+    batched { atScreen(-0.9, 0.9) {
+
+      transform(_
+        .scalexy(scale)) {
+
+        var n = 0
+        def drawTextLine(str: String, color: Color): Unit = {
+          transform(_.translate(y = -n.toFloat * font.getLineHeight))(str.drawRaw(xAlign = 0.5f, color = color))
+          n += 1
+        }
+
+        def getFilterColor(level: LockLevel): Color = {
+          level match {
+            case LockLevel.Search => LIGHT_GRAY
+            case LockLevel.Lock => TAN
+            case _ => BROWN
+          }
+        }
+
+        drawTextLine("Filters", LIGHT_GRAY)
+        drawTextLine(" a2a : " + a2aFilter.get, getFilterColor(a2aFilter))
+        drawTextLine(" a2g : " + a2gFilter.get, getFilterColor(a2gFilter))
+
+      }
+    }}
+  }
+
   def drawOsbs(game: GameData): Unit = {
+    implicit val _p = screenProjection
     import Mfd.Osb._
-    //TODO: Impl Roll stab drawBoxed(OSB_HOR, "HOR", shouldHorizonStabilize)
-    drawBoxed(OSB_ALL, "ALL", shouldDrawAll)
+
+    def drawFilterOsb(i: Int, str: String, setting: LockLevel): Unit = {
+      setting match {
+        case LockLevel.Search => drawHighlighted(i, str)
+        case LockLevel.Lock => drawBoxed(i, str)
+        case _ => Mfd.Osb.draw(i, str)
+      }
+    }
+
+    drawFilterOsb(OSB_A2A, "A2A", a2aFilter)
+    drawFilterOsb(OSB_A2G, "A2G", a2gFilter)
     drawBoxed(OSB_HSI, "HSI", shouldDrawDetailedHsi)
   }
 }
