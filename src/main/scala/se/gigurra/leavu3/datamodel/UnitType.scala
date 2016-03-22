@@ -142,7 +142,6 @@ object UnitType extends Schema[UnitType] with Logging {
 
       DcsRemote.get(url, Some(3600000L), Duration.fromSeconds(1)).map { json =>
         val name = JSON.readMap(json)("name").asInstanceOf[String]
-        println(t.typ -> name)
         mappedTypes.put(t.typ, UnitTypeData.apply(name, isKnown = true, t.typ))
         pendingTypes.remove(t.typ)
         logger.info(s"Mapped type ${t.typ} -> $name")
