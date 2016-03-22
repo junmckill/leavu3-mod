@@ -8,10 +8,10 @@ import se.gigurra.leavu3.gfx.ScreenProjection
 
 import scala.language.postfixOps
 import se.gigurra.leavu3.gfx.RenderContext._
-import se.gigurra.leavu3.interfaces.{DcsRemote, Key, KeyPress, MouseClick}
+import se.gigurra.leavu3.interfaces.{Key, KeyPress, MouseClick}
 import se.gigurra.leavu3.lmath.Box
 
-case class Mfd(implicit dcsRemote: DcsRemote, config: Configuration) extends Instrument(dcsRemote, config) {
+case class Mfd(implicit config: Configuration) extends Instrument(config) {
 
   implicit val _p = ScreenProjection()
 
@@ -170,23 +170,26 @@ object Mfd {
 
     def drawBoxed(iOsb: Int,
                   text: String,
-                  boxed: Boolean = true)(implicit config: Configuration): Unit = {
-      draw(iOsb, text, if (boxed) LINE else null)
+                  boxed: Boolean = true,
+                  color: Color = null)(implicit config: Configuration): Unit = {
+      draw(iOsb, text, if (boxed) LINE else null, color)
     }
 
     def drawHighlighted(iOsb: Int,
                         text: String,
-                        highlighted: Boolean = true)(implicit config: Configuration): Unit = {
-      draw(iOsb, text, if (highlighted) FILL else null)
+                        highlighted: Boolean = true,
+                        color: Color = null)(implicit config: Configuration): Unit = {
+      draw(iOsb, text, if (highlighted) FILL else null, color)
     }
 
     def draw(iOsb: Int,
              text: String,
-             boxType: ShapeType = null)(implicit config: Configuration): Unit = {
+             boxType: ShapeType = null,
+             color: Color = null)(implicit config: Configuration): Unit = {
 
       implicit val _p = ScreenProjection()
 
-      val white = LIGHT_GRAY
+      val white = if (color != null) color else LIGHT_GRAY
       val black = BLACK
 
       if (boxType != null) {

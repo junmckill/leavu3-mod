@@ -13,9 +13,11 @@ import scala.language.postfixOps
 /**
   * Created by kjolh on 3/12/2016.
   */
-case class HsdPage(implicit dcsRemote: DcsRemote, config: Configuration) extends Page("HSD") {
+case class HsdPage(implicit config: Configuration) extends Page("HSD") {
 
-  implicit val projection = new PpiProjection
+  val ppiProjection = new PpiProjection
+  val screenProjection = new ScreenProjection
+
   var shouldMatchIngameScale = true
   var shouldDrawDetailedHsi = true
   var shouldDrawOwnHeading = true
@@ -49,7 +51,7 @@ case class HsdPage(implicit dcsRemote: DcsRemote, config: Configuration) extends
 
   override def draw(game: GameData, dlinkIn: Map[String, DlinkData]): Unit = {
     matchIngameScale(game)
-    viewport(viewportSize = distance * 2.0, offs = Vec2(0.0, -distance * deprFactor), heading = self.heading) {
+    viewport(viewportSize = distance * 2.0, offs = Vec2(0.0, -distance * deprFactor), heading = self.heading){
       drawSelf(game)
       drawHsi(game)
       drawWaypoints(game)
@@ -60,9 +62,11 @@ case class HsdPage(implicit dcsRemote: DcsRemote, config: Configuration) extends
       drawDlinkMarks(dlinkIn)
       drawLockedTargets(game)
       drawTdc(game)
-    }
+    }(ppiProjection)
     drawBullsEyeNumbers(game)
     drawBraNumbers(game)
+    drawOwnHeading(game)
+    drawModes(game)
     drawOsbs(game)
   }
 
@@ -74,6 +78,7 @@ case class HsdPage(implicit dcsRemote: DcsRemote, config: Configuration) extends
   }
 
   def drawHsi(game: GameData): Unit = {
+    implicit val p = ppiProjection
     circle(radius = distance     * 0.50, color = DARK_GRAY)
     circle(radius = distance     * 1.00)
     circle(radius = distance     * 1.50)
@@ -96,6 +101,7 @@ case class HsdPage(implicit dcsRemote: DcsRemote, config: Configuration) extends
   }
 
   def drawSelf(game: GameData): Unit = {
+    implicit val p = ppiProjection
     transform(_.rotate(-self.heading)) {
       lines(shapes.self.coords * symbolScale, CYAN)
       circle(0.005 * symbolScale, color = CYAN, typ = FILL)
@@ -103,6 +109,7 @@ case class HsdPage(implicit dcsRemote: DcsRemote, config: Configuration) extends
   }
 
   def drawWaypoints(game: GameData): Unit = {
+    implicit val p = ppiProjection
 
     def wpByIndex(i: Int): Option[Waypoint] = {
       game.route.waypoints.find(_.index == i)
@@ -131,6 +138,7 @@ case class HsdPage(implicit dcsRemote: DcsRemote, config: Configuration) extends
   }
 
   def drawScanZone(game: GameData): Unit = {
+    implicit val p = ppiProjection
     val sensors = game.sensors.status
     if (sensors.sensorOn) {
       val sttScanZoneOverride = game.pdt.isDefined &&
@@ -143,6 +151,7 @@ case class HsdPage(implicit dcsRemote: DcsRemote, config: Configuration) extends
   }
 
   def drawAiWingmen(game: GameData): Unit = {
+    implicit val p = ppiProjection
     for (wingman <- game.aiWingmen) {
       val radius = 0.015 * symbolScale
       at(wingman.position, wingman.heading) {
@@ -167,6 +176,7 @@ case class HsdPage(implicit dcsRemote: DcsRemote, config: Configuration) extends
   var wingmenTgtsLastTminus2 = Seq.empty[Vec3]
 
   def drawAiWingmenTargets(game: GameData): Unit = {
+    implicit val p = ppiProjection
     val radius = 0.015 * symbolScale
 
     // Hack in heading of tgts if possible
@@ -206,6 +216,7 @@ case class HsdPage(implicit dcsRemote: DcsRemote, config: Configuration) extends
 
 
   def drawDlinkMarks(dlinkIn: Map[String, DlinkData]): Unit = {
+    implicit val p = ppiProjection
 
     val radius = 0.015 * symbolScale
 
@@ -234,6 +245,7 @@ case class HsdPage(implicit dcsRemote: DcsRemote, config: Configuration) extends
   }
 
   def drawDlinkMembersAndTargets(dlinkIn: Map[String, DlinkData]): Unit = {
+    implicit val p = ppiProjection
 
     val dlinksOfInterest = dlinkIn.filter(m => m._2.data.planeId != self.planeId || m._1 != self.dlinkCallsign)
 
@@ -274,9 +286,9 @@ case class HsdPage(implicit dcsRemote: DcsRemote, config: Configuration) extends
               nameText.drawCentered(scale = 0.45f, color = BLACK)
             }
           }
-        } else at(memberPosition) {
+        } else at(memberPosition) { // HOJ
           val b = targetPosition - member.position: Vec2
-          lines(Seq(Vec2() -> b) * 10000.0, contactColor(target, fromDatalink = true))
+          lines(Seq(Vec2() -> b) * 10000.0, RED)
         }
       }
 
@@ -295,6 +307,7 @@ case class HsdPage(implicit dcsRemote: DcsRemote, config: Configuration) extends
   }
 
   def drawLockedTargets(game: GameData): Unit = {
+    implicit val p = ppiProjection
 
     val radius = 0.020 * symbolScale
 
@@ -349,6 +362,8 @@ case class HsdPage(implicit dcsRemote: DcsRemote, config: Configuration) extends
   }
 
   def drawTdc(game: GameData): Unit = {
+    implicit val p = ppiProjection
+
     game.tdcPosition foreach { tdc =>
       at(tdc, self.heading) {
         val d = 0.02
@@ -360,17 +375,20 @@ case class HsdPage(implicit dcsRemote: DcsRemote, config: Configuration) extends
 
       at(tdc) {
         val coverage = game.sensors.status.scanZone.altitudeCoverage
+        val elevationText = game.sensors.status.scanZone.direction.elevation.round.toString
         val coverageText =
           s"""${(coverage.max * m_to_kft).round}
              |${(coverage.min * m_to_kft).round}""".stripMargin
         batched {
           coverageText.drawRightOf(scale = 0.5f, color = WHITE)
+          elevationText.drawLeftOf(scale = 0.5f, color = WHITE)
         }
       }
     }
   }
 
   def drawBullsEyeNumbers(game: GameData) = {
+    implicit val p = screenProjection
 
     def mkBraString(prefix: String, bra: Bra): String = s"$prefix : ${bra.brString}"
 
@@ -413,6 +431,7 @@ case class HsdPage(implicit dcsRemote: DcsRemote, config: Configuration) extends
   }
 
   def drawBraNumbers(game: GameData) = {
+    implicit val p = screenProjection
 
     def mkBraString(prefix: String, bra: Bra): String = s"$prefix : ${bra.brString}"
 
@@ -455,9 +474,8 @@ case class HsdPage(implicit dcsRemote: DcsRemote, config: Configuration) extends
 
   }
 
-  val screenprojection = ScreenProjection()
-
   def drawOsbs(game: GameData): Unit = {
+    implicit val p = screenProjection
     import Mfd.Osb._
     drawBoxed(OSB_DEPR, "DEP", boxed = deprFactor.index != 0)
     drawBoxed(OSB_HDG, "HDG", boxed = shouldDrawOwnHeading)
@@ -465,13 +483,42 @@ case class HsdPage(implicit dcsRemote: DcsRemote, config: Configuration) extends
     if (Dlink.Out.hasMark(Dlink.config.callsign))
       drawBoxed(OSB_DEL, "DEL", boxed = false)
     drawBoxed(OSB_SCALE, (distance.get * m_to_nmi).round.toString, boxed = false)
+  }
+
+  def drawOwnHeading(game: GameData): Unit = {
+    implicit val p = screenProjection
     if (shouldDrawOwnHeading) {
       batched {
         atScreen(Mfd.Osb.positions(2) - Vec2(0.0, 0.1)) {
-          self.heading.round.toString.pad(3, '0').drawCentered(WHITE)(screenprojection, config)
+          self.heading.round.toString.pad(3, '0').drawCentered(WHITE)
         }
       }
     }
   }
 
+  def drawModes(game: GameData): Unit = {
+    implicit val p = screenProjection
+    val sensors = game.sensors.status
+    val scale = config.symbolScale * 0.02 / font.getSpaceWidth
+
+    batched {
+      atScreen(-0.9, 0.65) {
+
+        transform(_
+          .scalexy(scale)) {
+
+          var n = 0
+          def drawTextLine(value: Any, color: Color): Unit = {
+            transform(_.translate(y = -n.toFloat * font.getLineHeight)) {
+              value.toString.drawRaw(xAlign = 0.5f, color = color)
+            }
+            n += 1
+          }
+
+          drawTextLine(s"${game.aircraftMode.master} / ${game.aircraftMode.submode}", LIGHT_GRAY)
+          drawTextLine(s"${sensors.prf.selection} / ${sensors.prf.current}", LIGHT_GRAY)
+        }
+      }
+    }
+  }
 }

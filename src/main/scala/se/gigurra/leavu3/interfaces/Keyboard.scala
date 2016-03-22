@@ -5,7 +5,8 @@ import java.util.concurrent.ConcurrentLinkedQueue
 import com.badlogic.gdx.Gdx
 import com.twitter.finagle.FailedFastException
 import se.gigurra.leavu3.datamodel.{Configuration, Vec2}
-import se.gigurra.leavu3.util.{RestClient, SimpleTimer}
+import se.gigurra.leavu3.gfx.Drawable
+import se.gigurra.leavu3.util.SimpleTimer
 import se.gigurra.serviceutils.json.JSON
 import se.gigurra.serviceutils.twitter.logging.Logging
 
@@ -18,21 +19,21 @@ object Keyboard extends Logging {
 
   val inputQue = new ConcurrentLinkedQueue[KeyPress]
 
-  def start(configuration: Configuration): Unit = {
-
-    val dcsRemote = DcsRemote(configuration)
+  def start(configuration: Configuration, drawable: Drawable): Unit = {
 
     var oldKeysPressed = Set.empty[Int]
 
     SimpleTimer.fromFps(configuration.gameDataFps) {
       Try {
-        val kbData = dcsRemote.getBlocking("keyboard", cacheMaxAgeMillis = Some(Int.MaxValue))
+        val kbData = DcsRemote.getBlocking("keyboard", cacheMaxAgeMillis = Some(Int.MaxValue))
         val keysPressed = JSON.readMap(kbData).keys.map(_.toInt).toSet.map((x: Int) => x - configuration.keyBindingOffset)
-        if (keysPressed != oldKeysPressed)
+        if (keysPressed != oldKeysPressed) {
           for (press <- keysPressed -- oldKeysPressed) {
             val event = KeyPress(press, keysPressed)
             inputQue.add(event)
           }
+          drawable.draw()
+        }
         oldKeysPressed = keysPressed
       } match {
         case Success(_) =>

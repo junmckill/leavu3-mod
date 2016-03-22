@@ -3,8 +3,8 @@ package se.gigurra.leavu3
 import javax.swing.JOptionPane
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.backends.lwjgl.{LwjglApplication, LwjglApplicationConfiguration}
-import se.gigurra.leavu3.app.App
+import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration
+import se.gigurra.leavu3.app.{App, Version}
 import se.gigurra.leavu3.datamodel.Configuration
 import se.gigurra.leavu3.interfaces._
 import se.gigurra.leavu3.windowstweaks.WindowTweaks
@@ -20,16 +20,21 @@ object DesktopMain extends Logging {
     Capture.stdOutToFile(s"leavu3-debug-log.txt", append = true)
     Capture.stdErrToFile(s"leavu3-log.txt", append = true)
 
+    logger.info(s"Starting leavu version: $Version")
+
     val config = loadConfig(args.headOption.getOrElse("leavu3-cfg.json"))
+
+    DcsRemote.init(config)
 
     val lwjglConfig = loadLwjglConfig(config)
     val appListener = new App(config, () => onInitDisplay(config))
-    new LwjglApplication(appListener, lwjglConfig)
+    val drawable = new DynamicFpsLwjglApplication(appListener, lwjglConfig)
     Gdx.input.setInputProcessor(appListener)
 
-    GameIn.start(config)
+    GameIn.start(config, drawable)
     Dlink.start(config)
-    Keyboard.start(config)
+    Keyboard.start(config, drawable)
+
 
   } match {
     case Success(_) =>
@@ -53,8 +58,8 @@ object DesktopMain extends Logging {
       height = config.height
       forceExit = config.forceExit
       vSyncEnabled = config.vSyncEnabled
-      foregroundFPS = config.foregroundFPS.toInt
-      backgroundFPS = config.backgroundFPS.toInt
+      foregroundFPS = 1 // We will override this and trigger drawing ourselves
+      backgroundFPS = 1 // We will override this and trigger drawing ourselves
       samples = config.aaSamples
       resizable = !config.borderless
     }

@@ -9,8 +9,6 @@
   "alwaysOnTop"      : false,
   "forceExit"        : true,
   "vSyncEnabled"     : true,
-  "foregroundFPS"    : 30,
-  "backgroundFPS"    : 30,
   "gameDataFps"      : 40,
   "dcsRemoteAddress" : "127.0.0.1",
   "dcsRemotePort"    : 12340,
@@ -18,5 +16,6 @@
   "instrument"       : "se.gigurra.leavu3.mfd.Mfd",
   "symbolScale"      : 1.25,
   "relayDlink"       : true,
-  "keyBindingOffset" : 0
+  "keyBindingOffset" : 0,
+  "rwrSeparateSrTr"  : false
 }
