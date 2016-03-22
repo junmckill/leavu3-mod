@@ -1,9 +1,7 @@
 package se.gigurra.leavu3.datamodel
 
-import java.time.Instant
-
 import se.gigurra.heisenberg.MapData._
-import se.gigurra.heisenberg.{Schema, Parsed}
+import se.gigurra.heisenberg.Schema
 import se.gigurra.leavu3.util.CurTime
 
 object SensorFlags {

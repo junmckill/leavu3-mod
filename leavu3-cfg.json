@@ -16,5 +16,6 @@
   "instrument"       : "se.gigurra.leavu3.mfd.Mfd",
   "symbolScale"      : 1.25,
   "relayDlink"       : true,
-  "keyBindingOffset" : 0
+  "keyBindingOffset" : 0,
+  "rwrSeparateSrTr"  : false
 }

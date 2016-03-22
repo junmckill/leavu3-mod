@@ -28,6 +28,7 @@ case class Configuration(source: SourceData = Map.empty) extends Parsed[Configur
   val noFocusOnClick    = parse(schema.noFocusOnClick)
   val alwaysOnTop       = parse(schema.alwaysOnTop)
   val keyBindingOffset  = parse(schema.keyBindingOffset)
+  val rwrSeparateSrTr   = parse(schema.rwrSeparateSrTr)
 }
 
 object Configuration extends Schema[Configuration] with Logging {
@@ -49,6 +50,7 @@ object Configuration extends Schema[Configuration] with Logging {
   val noFocusOnClick    = required[Boolean] ("noFocusOnClick",    default = false)
   val alwaysOnTop       = required[Boolean] ("alwaysOnTop",       default = false)
   val keyBindingOffset  = required[Int]     ("keyBindingOffset",  default = 0)
+  val rwrSeparateSrTr   = required[Boolean] ("rwrSeparateSrTr",   default = false)
 
   def readFromFile(s: String = "leavu3-cfg.json"): Configuration = {
     logger.info(s"Loading configuration file: $s")
