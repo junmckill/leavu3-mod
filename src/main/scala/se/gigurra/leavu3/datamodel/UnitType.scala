@@ -53,24 +53,27 @@ object UnitTypeData {
     case x if x.startsWith("e-3")     => Data("E3",           AWACS_POWER_MAPPING_EXPONENT,   DEFAULT_MAX_RANGE_INDICATION)
     // SAMs
     case x if x.startsWith("hawk cwar") => Data("55", DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
-    case x if x.startsWith("hawk sr") => Data("50", DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
+    case x if x.startsWith("hawk sr") => Data("HA", DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
     case x if x.startsWith("hawk tr") => Data("46", DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
-    case x if x.startsWith("patriot") => Data("P", DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
-    case x if x.startsWith("p-19")    => Data("FFB", DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
-    case x if x.startsWith("snr s-125 tr") => Data("3", DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
-    case x if x.startsWith("kub 1S91 str") => Data("6", DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
-    case x if x.startsWith("sa-11 buk sr") => Data("SD", DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
+    case x if x.startsWith("patriot-rls_p_1") => Data("FFB", DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
+    case x if x.startsWith("mt-lb_p_1") => Data("3", DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
+    case x if x.startsWith("kub") => Data("6", DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
+    case x if x.startsWith("buk 9s18m1 sr") => Data("SD", DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
+    case x if x.startsWith("buk 9a310m1 ln") => Data("11", DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
     case x if x.startsWith("dog")     => Data("DE", DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
-    case x if x.startsWith("s-300ps 40b6md sr") => Data("CS", DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
-    case x if x.startsWith("s-300ps 64h6e sr")  => Data("BB", DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
-    case x if x.startsWith("s-300ps 40b6m tr")  => Data("10", DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
+    case x if x.startsWith("s-300ps 40b6md sr")  => Data("CS", DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
+    case x if x.startsWith("s-300ps 64h6e sr")   => Data("BB", DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
+    case x if x.startsWith("s-300ps 40b6m tr")   => Data("10", DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
     case x if x.startsWith("roland")  => Data("RO", DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
-    case x if x.startsWith("2s6")     => Data("19", DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
+    case x if x.startsWith("tunguska")     => Data("19", DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
     case x if x.startsWith("osa")     => Data("8", DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
     case x if x.startsWith("tor")     => Data("15", DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
+    case x if x.startsWith("shilka zsu-23-4")     => Data("AA", DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
     case x if x.startsWith("sa-")     => Data(firstNumber(x), DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
+    case x if x.startsWith("patriot") => Data("P", DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
     // EWRs - 1L13, 55G6
-    case x if x.startsWith("ewr")     => Data("EW", DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
+    case x if x.startsWith("1l13")     => Data("EW", DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
+    case x if x.startsWith("55g6")     => Data("EW", DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
     // Ships
     // Missiles
     case x if x.startsWith("aim-120") => Data("M120",         DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_ARH_MAX_RANGE_INDICATION)
@@ -127,6 +130,7 @@ object UnitType extends Schema[UnitType] with Logging {
 
       dcsRemote.get(url, cacheMaxAgeMillis = Some(3600000L), timeout = Duration.fromSeconds(1)).onSuccess { json =>
         val name = JSON.readMap(json)("name").asInstanceOf[String]
+        println(t.typ -> name)
         mappedTypes.put(t.typ, UnitTypeData.apply(name, isKnown = true, t.typ))
         pendingTypes.remove(t.typ)
         logger.info(s"Mapped type ${t.typ} -> $name")
