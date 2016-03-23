@@ -87,6 +87,13 @@ object UnitTypeData {
     case x if x.startsWith("55g6")                      => Data("EW", EW_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
 
     // Ships
+    case x if x.startsWith("piotr")                     => Data("HN", DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
+    case x if x.startsWith("molniya")                   => Data("PS", DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
+    case x if x.startsWith("rezky")                     => Data("TP", DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
+    case x if x.startsWith("takr")                      => Data("SW", DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
+    case x if x.startsWith("moscow")                    => Data("T2", DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
+    case x if x.startsWith("neustr")                    => Data("TP", DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
+    case x if x.startsWith("albatros")                  => Data("HP", DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
 
     // Missiles
     case x if x.startsWith("aim-120")                   => Data("M120", DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_ARH_MAX_RANGE_INDICATION)
