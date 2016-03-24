@@ -1,5 +1,7 @@
 package se.gigurra.leavu3.util
 
+import java.net.InetAddress
+
 import com.twitter.finagle.Http
 import com.twitter.finagle.http._
 import com.twitter.util._
@@ -9,6 +11,9 @@ import se.gigurra.serviceutils.twitter.service.ServiceException
   * Created by kjolh on 3/10/2016.
   */
 case class RestClient(addr: String, port: Int)(implicit val timer: JavaTimer = new JavaTimer(isDaemon = true)) {
+
+  // Check valid address first
+  InetAddress.getByName(addr)
 
   private val client = Http.client.newService(s"$addr:$port")
 

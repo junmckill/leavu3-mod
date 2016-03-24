@@ -36,8 +36,8 @@ object Dlink extends Logging {
     def handleDlinkConfig(newConfig: DlinkConfiguration): Unit = {
       if (newConfig != config) {
         logger.info(s"Updating dlink settings to: \n ${JSON.write(newConfig)}")
+        dlinkClient = RestClient(newConfig.host, newConfig.port)(dlinkClient.timer)
         config = newConfig
-        dlinkClient = RestClient(config.host, config.port)(dlinkClient.timer)
         In.onNewConfig()
         Out.onNewConfig()
       }
@@ -46,7 +46,11 @@ object Dlink extends Logging {
     def start(): Unit = {
       SimpleTimer(Duration.fromSeconds(3)) {
         Try(downloadDlinkConfig()) match {
-          case Success(newConfig) => handleDlinkConfig(newConfig)
+          case Success(newConfig) => Try(handleDlinkConfig(newConfig)) match {
+            case Success(_) =>
+            case Failure(e) =>
+              logger.error(s"Unable to update data link configuration: $e")
+          }
           case Failure(e) => logger.warning(s"Unable to update data link configuration: $e")
         }
       }
