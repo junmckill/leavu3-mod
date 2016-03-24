@@ -94,6 +94,9 @@ object UnitTypeData {
     case x if x.startsWith("moscow")                    => Data("T2", DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
     case x if x.startsWith("neustr")                    => Data("TP", DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
     case x if x.startsWith("albatros")                  => Data("HP", DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
+    case x if x.startsWith("sg-47")                     => Data("AE", DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
+    case x if x.startsWith("ffg-7")                     => Data("49", DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
+    case x if x.startsWith("cvn-70")                    => Data("48", DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
 
     // Missiles
     case x if x.startsWith("aim-120")                   => Data("M120", DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_ARH_MAX_RANGE_INDICATION)
