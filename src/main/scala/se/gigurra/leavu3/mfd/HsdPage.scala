@@ -32,7 +32,7 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD") {
   val OSB_DEL = 7
   val OSB_UNITS = 9
 
-  def distance: CircleBuffer[Double] = displayUnits.distance
+  def distScale: CircleBuffer[Double] = displayUnits.distance
 
   override def pressOsb(i: Int): Unit = {
     i match {
@@ -47,7 +47,7 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD") {
 
   override def mouseClicked(click: MouseClick): Unit =  {
     val screenCenter = Vec2(0.0, -deprFactor)
-    val offs = (click.ortho11 - screenCenter) * distance
+    val offs = (click.ortho11 - screenCenter) * distScale
     val relativeBra = offs.asBra
     val bra = relativeBra.copy(bearingRaw = self.heading + relativeBra.bearing)
     val clickPos = self.position + bra.toOffset
@@ -56,7 +56,7 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD") {
 
   override def draw(game: GameData, dlinkIn: Map[String, DlinkData]): Unit = {
     matchIngameScale(game)
-    viewport(viewportSize = distance * 2.0, offs = Vec2(0.0, -distance * deprFactor), heading = self.heading){
+    viewport(viewportSize = distScale * 2.0, offs = Vec2(0.0, -distScale * deprFactor), heading = self.heading){
       drawSelf(game)
       drawHsi(game)
       drawWaypoints(game)
@@ -77,28 +77,28 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD") {
 
   def matchIngameScale(game: GameData) = {
     if (shouldMatchIngameScale) {
-      val x = distance.items.minBy(x => math.abs(x - game.sensors.status.scale.distance))
-      distance.set(x)
+      val x = distScale.items.minBy(x => math.abs(x - game.sensors.status.scale.distance))
+      distScale.set(x)
     }
   }
 
   def drawHsi(game: GameData): Unit = {
     implicit val p = ppiProjection
-    circle(radius = distance     * 0.50, color = DARK_GRAY)
-    circle(radius = distance     * 1.00)
-    circle(radius = distance     * 1.50)
-    lines(shapes.hsi.flag * symbolScale + Vec2(0.0, distance * 0.50),
-      shapes.hsi.flag * symbolScale + Vec2(0.0, distance * 1.00),
-      shapes.hsi.flag * symbolScale + Vec2(0.0, distance * 1.50),
-      shapes.hsi.eastPin * symbolScale + Vec2(distance * 0.50, 0.0),
-      shapes.hsi.eastPin * symbolScale + Vec2(distance * 1.00, 0.0),
-      shapes.hsi.eastPin * symbolScale + Vec2(distance * 1.50, 0.0),
-      shapes.hsi.westPin * symbolScale + Vec2(-distance * 0.50, 0.0),
-      shapes.hsi.westPin * symbolScale + Vec2(-distance * 1.00, 0.0),
-      shapes.hsi.westPin * symbolScale + Vec2(-distance * 1.50, 0.0),
-      shapes.hsi.southPin * symbolScale + Vec2(0.0, -distance * 0.50),
-      shapes.hsi.southPin * symbolScale + Vec2(0.0, -distance * 1.00),
-      shapes.hsi.southPin * symbolScale + Vec2(0.0, -distance * 1.50)
+    circle(radius = distScale     * 0.50, color = DARK_GRAY)
+    circle(radius = distScale     * 1.00)
+    circle(radius = distScale     * 1.50)
+    lines(shapes.hsi.flag * symbolScale + Vec2(0.0, distScale * 0.50),
+      shapes.hsi.flag * symbolScale + Vec2(0.0, distScale * 1.00),
+      shapes.hsi.flag * symbolScale + Vec2(0.0, distScale * 1.50),
+      shapes.hsi.eastPin * symbolScale + Vec2(distScale * 0.50, 0.0),
+      shapes.hsi.eastPin * symbolScale + Vec2(distScale * 1.00, 0.0),
+      shapes.hsi.eastPin * symbolScale + Vec2(distScale * 1.50, 0.0),
+      shapes.hsi.westPin * symbolScale + Vec2(-distScale * 0.50, 0.0),
+      shapes.hsi.westPin * symbolScale + Vec2(-distScale * 1.00, 0.0),
+      shapes.hsi.westPin * symbolScale + Vec2(-distScale * 1.50, 0.0),
+      shapes.hsi.southPin * symbolScale + Vec2(0.0, -distScale * 0.50),
+      shapes.hsi.southPin * symbolScale + Vec2(0.0, -distScale * 1.00),
+      shapes.hsi.southPin * symbolScale + Vec2(0.0, -distScale * 1.50)
     )
     if (shouldDrawDetailedHsi) {
       lines(shapes.hsi.detail(screen2World, config.symbolScale))
@@ -487,7 +487,7 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD") {
     drawBoxed(OSB_HSI, "HSI", boxed = shouldDrawDetailedHsi)
     if (Dlink.Out.hasMark(Dlink.config.callsign))
       drawBoxed(OSB_DEL, "DEL", boxed = false)
-    drawBoxed(OSB_SCALE, (distance.get * displayUnits.m_to_distUnit).round.toString, boxed = false)
+    drawBoxed(OSB_SCALE, (distScale.get * displayUnits.m_to_distUnit).round.toString, boxed = false)
     Mfd.Osb.draw(OSB_UNITS, displayUnits.name.toUpperCase.take(3))
   }
 
