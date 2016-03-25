@@ -32,7 +32,7 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD") {
   val OSB_DEL = 7
   val OSB_UNITS = 9
 
-  def distScale: CircleBuffer[Double] = displayUnits.distance
+  def distScale: CircleBuffer[Double] = displayUnits.distScale
 
   override def pressOsb(i: Int): Unit = {
     i match {
@@ -535,7 +535,7 @@ object HsdPage {
   case class DisplayUnits(name: String,
                           m_to_altUnit: Double,
                           m_to_distUnit: Double,
-                          distance: CircleBuffer[Double])
+                          distScale: CircleBuffer[Double])
 
   val imperialDistances = CircleBuffer(10 nmi, 20 nmi, 40 nmi, 80 nmi, 160 nmi).withDefaultValue(40 nmi)
   val metricDistances = CircleBuffer(20 km, 40 km, 80 km, 160 km, 320 km).withDefaultValue(80 km)
