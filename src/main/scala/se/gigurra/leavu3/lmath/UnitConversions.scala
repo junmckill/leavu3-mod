@@ -17,5 +17,6 @@ trait UnitConversions {
   implicit class MeterValues[T: Numeric](x: T) {
     def d = implicitly[Numeric[T]].toDouble(x)
     def nmi: Double = d * nmi_to_m
+    def km: Double = d * km_to_m
   }
 }

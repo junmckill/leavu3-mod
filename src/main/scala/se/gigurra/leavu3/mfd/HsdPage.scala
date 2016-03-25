@@ -9,6 +9,7 @@ import se.gigurra.leavu3.interfaces.{Dlink, MouseClick}
 
 import scala.collection.mutable
 import scala.language.postfixOps
+import HsdPage._
 
 /**
   * Created by kjolh on 3/12/2016.
@@ -21,9 +22,8 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD") {
   var shouldMatchIngameScale = true
   var shouldDrawDetailedHsi = true
   var shouldDrawOwnHeading = true
-  val distance = CircleBuffer(10 nmi, 20 nmi, 40 nmi, 80 nmi, 160 nmi).withDefaultValue(40 nmi)
   val deprFactor = CircleBuffer(0.0, 0.5).withDefaultValue(0.5)
-  val displayUnits = CircleBuffer(DisplayUnits("imperial", m_to_kft, m_to_nmi), DisplayUnits("metric", m_to_km, m_to_km))
+  val displayUnits = CircleBuffer(DisplayUnits("imperial", m_to_kft, m_to_nmi, imperialDistances), DisplayUnits("metric", m_to_km, m_to_km, metricDistances))
   val stdTextSize = 0.75f
   val OSB_DEPR = 1
   val OSB_HDG = 2
@@ -31,6 +31,8 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD") {
   val OSB_HSI = 3
   val OSB_DEL = 7
   val OSB_UNITS = 9
+
+  def distance: CircleBuffer[Double] = displayUnits.distance
 
   override def pressOsb(i: Int): Unit = {
     i match {
@@ -526,6 +528,16 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD") {
     }
   }
 
-  case class DisplayUnits(name: String, m_to_altUnit: Double, m_to_distUnit: Double)
+}
+
+object HsdPage {
+
+  case class DisplayUnits(name: String,
+                          m_to_altUnit: Double,
+                          m_to_distUnit: Double,
+                          distance: CircleBuffer[Double])
+
+  val imperialDistances = CircleBuffer(10 nmi, 20 nmi, 40 nmi, 80 nmi, 160 nmi).withDefaultValue(40 nmi)
+  val metricDistances = CircleBuffer(20 km, 40 km, 80 km, 160 km, 320 km).withDefaultValue(80 km)
 }
 
