@@ -23,12 +23,14 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD") {
   var shouldDrawOwnHeading = true
   val distance = CircleBuffer(10 nmi, 20 nmi, 40 nmi, 80 nmi, 160 nmi).withDefaultValue(40 nmi)
   val deprFactor = CircleBuffer(0.0, 0.5).withDefaultValue(0.5)
+  val displayUnits = CircleBuffer(DisplayUnits("imperial", m_to_kft, m_to_nmi), DisplayUnits("metric", m_to_km, m_to_km))
   val stdTextSize = 0.75f
   val OSB_DEPR = 1
   val OSB_HDG = 2
   val OSB_SCALE = 17
   val OSB_HSI = 3
   val OSB_DEL = 7
+  val OSB_UNITS = 9
 
   override def pressOsb(i: Int): Unit = {
     i match {
@@ -36,6 +38,7 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD") {
       case OSB_HSI => shouldDrawDetailedHsi = !shouldDrawDetailedHsi
       case OSB_HDG => shouldDrawOwnHeading = !shouldDrawOwnHeading
       case OSB_DEL => Dlink.Out.deleteMark(Dlink.config.callsign)
+      case OSB_UNITS => displayUnits.stepUp()
       case _ => // Nothing yet
     }
   }
@@ -163,7 +166,7 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD") {
     batched {
       for (wingman <- game.aiWingmen) {
         at(wingman.position) {
-          val altText = (wingman.position.z * m_to_kft).round.toString
+          val altText = (wingman.position.z * displayUnits.m_to_altUnit).round.toString
           altText.drawLeftOf(scale = stdTextSize, color = CYAN)
           val nameText = "AI"
           nameText.drawRightOf(scale = stdTextSize * 0.8f, color = CYAN)
@@ -202,7 +205,7 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD") {
     batched {
       for (tgtPos <- game.aiWingmenTgts) {
         at(tgtPos) {
-          val text = (tgtPos.z * m_to_kft).round.toString
+          val text = (tgtPos.z * displayUnits.m_to_altUnit).round.toString
           text.drawLeftOf(scale = stdTextSize, color = RED)
         }
       }
@@ -262,7 +265,7 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD") {
 
       batched {
         at(memberPosition) {
-          val altText = (memberPosition.z * m_to_kft).round.toString
+          val altText = (memberPosition.z * displayUnits.m_to_altUnit).round.toString
           altText.drawLeftOf(scale = stdTextSize, color = CYAN)
           val nameText = name.take(2)
           nameText.drawRightOf(scale = stdTextSize, color = CYAN)
@@ -280,7 +283,7 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD") {
           }
           at(targetPosition) {
             batched {
-              val altText = (targetPosition.z * m_to_kft).round.toString
+              val altText = (targetPosition.z * displayUnits.m_to_altUnit).round.toString
               altText.drawLeftOf(scale = stdTextSize, color = contactColor(target, fromDatalink = true))
               val nameText = name.take(2)
               nameText.drawCentered(scale = 0.45f, color = BLACK)
@@ -352,7 +355,7 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD") {
     batched {
       for (contact <- positionsDesignated) {
         at(contact.position) {
-          val text = (contact.position.z * m_to_kft).round.toString
+          val text = (contact.position.z * displayUnits.m_to_altUnit).round.toString
           text.drawLeftOf(scale = stdTextSize, color = contactColor(contact, fromDatalink = false))
           (contact.index + 1).toString.drawCentered(scale = stdTextSize, color = BLACK)
         }
@@ -377,8 +380,8 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD") {
         val coverage = game.sensors.status.scanZone.altitudeCoverage
         val elevationText = game.sensors.status.scanZone.direction.elevation.round.toString
         val coverageText =
-          s"""${(coverage.max * m_to_kft).round}
-             |${(coverage.min * m_to_kft).round}""".stripMargin
+          s"""${(coverage.max * displayUnits.m_to_altUnit).round}
+             |${(coverage.min * displayUnits.m_to_altUnit).round}""".stripMargin
         batched {
           coverageText.drawRightOf(scale = 0.5f, color = WHITE)
           elevationText.drawLeftOf(scale = 0.5f, color = WHITE)
@@ -390,7 +393,7 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD") {
   def drawBullsEyeNumbers(game: GameData) = {
     implicit val p = screenProjection
 
-    def mkBraString(prefix: String, bra: Bra): String = s"$prefix : ${bra.brString}"
+    def mkBraString(prefix: String, bra: Bra): String = s"$prefix : ${bra.brString(displayUnits.m_to_distUnit)}"
 
     val bullsEye = game.route.currentWaypoint
     val selfBra = (self.position - bullsEye.position).asBra
@@ -433,7 +436,7 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD") {
   def drawBraNumbers(game: GameData) = {
     implicit val p = screenProjection
 
-    def mkBraString(prefix: String, bra: Bra): String = s"$prefix : ${bra.brString}"
+    def mkBraString(prefix: String, bra: Bra): String = s"$prefix : ${bra.brString(displayUnits.m_to_distUnit)}"
 
     val scale = config.symbolScale * 0.02 / font.getSpaceWidth
 
@@ -482,7 +485,8 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD") {
     drawBoxed(OSB_HSI, "HSI", boxed = shouldDrawDetailedHsi)
     if (Dlink.Out.hasMark(Dlink.config.callsign))
       drawBoxed(OSB_DEL, "DEL", boxed = false)
-    drawBoxed(OSB_SCALE, (distance.get * m_to_nmi).round.toString, boxed = false)
+    drawBoxed(OSB_SCALE, (distance.get * displayUnits.m_to_distUnit).round.toString, boxed = false)
+    Mfd.Osb.draw(OSB_UNITS, displayUnits.name.toUpperCase.take(3))
   }
 
   def drawOwnHeading(game: GameData): Unit = {
@@ -521,4 +525,7 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD") {
       }
     }
   }
+
+  case class DisplayUnits(name: String, m_to_altUnit: Double, m_to_distUnit: Double)
 }
+
