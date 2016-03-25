@@ -5,7 +5,7 @@ import se.gigurra.leavu3.datamodel._
 import se.gigurra.leavu3.gfx.{PpiProjection, ScreenProjection}
 import se.gigurra.leavu3.gfx.RenderContext._
 import se.gigurra.leavu3.util.{CircleBuffer, CurTime}
-import se.gigurra.leavu3.interfaces.{DcsRemote, Dlink, MouseClick}
+import se.gigurra.leavu3.interfaces.{Dlink, MouseClick}
 
 import scala.collection.mutable
 import scala.language.postfixOps

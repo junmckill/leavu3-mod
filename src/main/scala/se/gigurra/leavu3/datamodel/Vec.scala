@@ -1,48 +1,8 @@
 package se.gigurra.leavu3.datamodel
 
 import com.badlogic.gdx.math.{Vector2, Vector3}
-import se.gigurra.leavu3.lmath.{NormalizeDegrees, UnitConversions}
 
 import scala.language.implicitConversions
-
-case class Bra(bearingRaw: Double, range: Double, deltaAltitude: Double) extends UnitConversions {
-
-  def toOffset: Vec3 = {
-    val scale = math.cos(deltaAltitude / range)
-    val y = range * math.cos(bearing.toRadians) * scale
-    val x = range * math.sin(bearing.toRadians) * scale
-    Vec3(x, y, deltaAltitude)
-  }
-
-  def bearing: Double = NormalizeDegrees._0360(bearingRaw)
-
-  def bearingString: String = {
-
-    def padBearing(in: String): String = {
-      in.length match {
-        case 0 => "000"
-        case 1 => "00" + in
-        case 2 => "0" + in
-        case _ =>  in
-      }
-    }
-
-    padBearing(bearing.round.toString)
-  }
-
-  def distString: String = {
-    (range * m_to_nmi).round.toString
-  }
-
-  def brString: String = {
-    s"$bearingString $distString"
-  }
-
-  override def toString: String = {
-    s"Bra($brString)"
-  }
-
-}
 
 case class Vec3(x: Double = 0.0, y: Double = 0.0, z: Double = 0.0) {
   def +(delta: Double): Vec3 = new Vec3(this.x + delta, this.y + delta, this.z + delta)
