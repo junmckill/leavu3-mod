@@ -15,7 +15,9 @@ import scala.collection.mutable
 case class RestClient(addr: String, port: Int)(implicit val timer: JavaTimer = DefaultTimer.underlying) {
 
   // Check valid address first
-  InetAddress.getByName(addr)
+  try InetAddress.getByName(addr) catch {
+    case NonFatal(e) => throw new RuntimeException(s"Unable to connect to $addr:$port", e)
+  }
 
   private val client = Http.client.newService(s"$addr:$port")
   private val pending = new mutable.HashMap[String, Unit]()
