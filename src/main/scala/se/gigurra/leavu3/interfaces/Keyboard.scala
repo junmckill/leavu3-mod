@@ -6,7 +6,7 @@ import com.badlogic.gdx.Gdx
 import com.twitter.finagle.FailedFastException
 import se.gigurra.leavu3.datamodel.{Configuration, Vec2}
 import se.gigurra.leavu3.gfx.Drawable
-import se.gigurra.leavu3.util.SimpleTimer
+import se.gigurra.leavu3.util.{DefaultTimer, IdenticalRequestPending}
 import se.gigurra.serviceutils.json.JSON
 import se.gigurra.serviceutils.twitter.logging.Logging
 
@@ -23,22 +23,22 @@ object Keyboard extends Logging {
 
     var oldKeysPressed = Set.empty[Int]
 
-    SimpleTimer.fromFps(configuration.gameDataFps) {
-      Try {
-        val kbData = DcsRemote.getBlocking("keyboard", cacheMaxAgeMillis = Some(Int.MaxValue))
-        val keysPressed = JSON.readMap(kbData).keys.map(_.toInt).toSet.map((x: Int) => x - configuration.keyBindingOffset)
-        if (keysPressed != oldKeysPressed) {
-          for (press <- keysPressed -- oldKeysPressed) {
-            val event = KeyPress(press, keysPressed)
-            inputQue.add(event)
+    DefaultTimer.fps(configuration.gameDataFps) {
+      DcsRemote.get("keyboard", maxAge = Some(Int.MaxValue))
+        .map(JSON.readMap(_).keys.map(_.toInt).toSet.map((x: Int) => x - configuration.keyBindingOffset))
+        .map { keysPressed =>
+          if (keysPressed != oldKeysPressed) {
+            for (press <- keysPressed -- oldKeysPressed) {
+              val event = KeyPress(press, keysPressed)
+              inputQue.add(event)
+            }
+            drawable.draw()
           }
-          drawable.draw()
-        }
-        oldKeysPressed = keysPressed
-      } match {
-        case Success(_) =>
-        case Failure(e: FailedFastException) => // Ignore ..
-        case Failure(e) => logger.warning(s"Unable to read keyboard state from dcs remote: $e")
+          oldKeysPressed = keysPressed
+      }.onFailure {
+        case e: IdenticalRequestPending => // Ignore ..
+        case e: FailedFastException => // Ignore ..
+        case e => logger.warning(s"Unable to read keyboard state from dcs remote: $e")
       }
     }
   }

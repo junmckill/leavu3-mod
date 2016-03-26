@@ -1,10 +1,10 @@
 package se.gigurra.leavu3.interfaces
 
 import com.twitter.finagle.FailedFastException
-import com.twitter.util.Duration
+import com.twitter.util.{Await, Future}
 import se.gigurra.heisenberg.MapDataParser
 import se.gigurra.leavu3.datamodel.{Configuration, DlinkConfiguration, DlinkData, Mark, Member}
-import se.gigurra.leavu3.util.{RestClient, SimpleTimer}
+import se.gigurra.leavu3.util.{DefaultTimer, IdenticalRequestPending, RestClient}
 import se.gigurra.serviceutils.json.JSON
 import se.gigurra.serviceutils.twitter.logging.Logging
 import se.gigurra.serviceutils.twitter.service.ServiceException
@@ -23,7 +23,7 @@ object Dlink extends Logging {
   def start(appCfg: Configuration): Unit = {
 
     logger.info(s"Downloading datalink settings from dcs-remote ..")
-    CfgUpdate.handleDlinkConfig(downloadDlinkConfig())
+    CfgUpdate.handleDlinkConfig(Await.result(downloadDlinkConfig()))
     logger.info(s"Dlink settings downloaded:\n ${JSON.write(config)}")
     In.start()
     if (appCfg.relayDlink)
@@ -36,7 +36,7 @@ object Dlink extends Logging {
     def handleDlinkConfig(newConfig: DlinkConfiguration): Unit = {
       if (newConfig != config) {
         logger.info(s"Updating dlink settings to: \n ${JSON.write(newConfig)}")
-        dlinkClient = RestClient(newConfig.host, newConfig.port)(dlinkClient.timer)
+        dlinkClient = dlinkClient.withNewRemote(newConfig.host, newConfig.port)
         config = newConfig
         In.onNewConfig()
         Out.onNewConfig()
@@ -44,14 +44,11 @@ object Dlink extends Logging {
     }
 
     def start(): Unit = {
-      SimpleTimer(Duration.fromSeconds(3)) {
-        Try(downloadDlinkConfig()) match {
-          case Success(newConfig) => Try(handleDlinkConfig(newConfig)) match {
-            case Success(_) =>
-            case Failure(e) =>
-              logger.error(s"Unable to update data link configuration: $e")
-          }
-          case Failure(e) => logger.warning(s"Unable to update data link configuration: $e")
+      DefaultTimer.seconds(3) {
+        downloadDlinkConfig().map(handleDlinkConfig).onFailure {
+          case e: IdenticalRequestPending =>
+          case e: FailedFastException =>
+          case e => logger.warning(s"Unable to update data link configuration: $e")
         }
       }
     }
@@ -73,26 +70,27 @@ object Dlink extends Logging {
 
     def start(): Unit = {
 
-      SimpleTimer.fromFps(1) {
-        Try {
-          val rawData = JSON.readMap(dlinkClient.getBlocking(config.team, cacheMaxAgeMillis = Some(10000L)))
+      DefaultTimer.fps(1) {
+        dlinkClient.get(config.team, maxAge = Some(10000L)).map { jsonString =>
+          val rawData = JSON.readMap(jsonString)
           val everyoneOnNetwork = rawData.collect { case ValidDlinkData(id, dlinkData) => id -> dlinkData }
           allTeams = everyoneOnNetwork.groupBy(_._2.selfData.coalitionId)
           ownTeam = allTeams.getOrElse(GameIn.snapshot.selfData.coalitionId, Map.empty)
           connected = true
-        } match {
-          case Success(_) =>
-          case Failure(e: ServiceException) =>
+        }.onFailure {
+          case e: IdenticalRequestPending =>
+            // Do nothing
+          case e: ServiceException =>
             connected = false
             allTeams = Map.empty
             ownTeam = Map.empty
             logger.error(s"Data link host replied with an error: $e")
-          case Failure(e: FailedFastException) =>
+          case e: FailedFastException =>
             connected = false
             allTeams = Map.empty
             ownTeam = Map.empty
           // Ignore ..
-          case Failure(e) =>
+          case e =>
             connected = false
             allTeams = Map.empty
             ownTeam = Map.empty
@@ -135,36 +133,36 @@ object Dlink extends Logging {
 
     def start(): Unit = {
 
-      SimpleTimer.fromFps(2) {
+      DefaultTimer.fps(2) {
+
         val source = GameIn.snapshot
         if (source.err.isEmpty && source.age < 3.0) {
-          val self = Member.marshal(
-            Member.planeId -> source.metaData.planeId,
-            Member.modelTime -> source.metaData.modelTime,
-            Member.position -> source.selfData.position,
-            Member.velocity -> source.flightModel.velocity,
-            Member.targets -> source.sensors.targets.locked,
-            Member.selfData -> source.metaData.selfData,
-            Member.markPos -> marks
-          )
-          val json = JSON.write(self)
-          Try(dlinkClient.putBlocking(s"${config.team}/${config.callsign}", json)) match {
-            case Success(_) =>
-            case Failure(e: ServiceException) =>
-              logger.error(s"Data link host replied with an error: $e")
-            case Failure(e) =>
-              logger.error(e, s"Unexpected error when attempting to send to dlink")
+
+          dlinkClient.put(s"${config.team}/${config.callsign}") {
+
+            val self = Member.marshal(
+              Member.planeId -> source.metaData.planeId,
+              Member.modelTime -> source.metaData.modelTime,
+              Member.position -> source.selfData.position,
+              Member.velocity -> source.flightModel.velocity,
+              Member.targets -> source.sensors.targets.locked,
+              Member.selfData -> source.metaData.selfData,
+              Member.markPos -> marks
+            )
+            JSON.write(self)
           }
+        }.onFailure {
+          case e: IdenticalRequestPending => // ignore
+          case e: FailedFastException => // ignore
+          case e: ServiceException => logger.error(s"Data link host replied with an error: $e")
+          case e => logger.error(e, s"Unexpected error when attempting to send to dlink")
         }
       }
     }
   }
 
-  private def downloadDlinkConfig(): DlinkConfiguration = {
-    Try(DcsRemote.getBlocking(s"static-data/dlink-settings")) match {
-      case Success(data) => JSON.read[DlinkConfiguration](data)
-      case Failure(e) => throw new RuntimeException(s"Could not download data link configuration from dcs-remote", e)
-    }
+  private def downloadDlinkConfig(): Future[DlinkConfiguration] = {
+    DcsRemote.get(s"static-data/dlink-settings").map(JSON.read[DlinkConfiguration])
   }
 
 }

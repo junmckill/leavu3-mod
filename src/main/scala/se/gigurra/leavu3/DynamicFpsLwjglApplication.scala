@@ -4,6 +4,7 @@ import com.badlogic.gdx.ApplicationListener
 import com.badlogic.gdx.backends.lwjgl.{LwjglApplication, LwjglApplicationConfiguration}
 import com.twitter.util.{Duration, JavaTimer}
 import se.gigurra.leavu3.gfx.Drawable
+import se.gigurra.leavu3.util.DefaultTimer
 import se.gigurra.serviceutils.twitter.logging.Logging
 
 import scala.util.control.NonFatal
@@ -16,11 +17,10 @@ class DynamicFpsLwjglApplication(listener: ApplicationListener, config: LwjglApp
     with Drawable
     with Logging {
 
-  private val timer = new JavaTimer(isDaemon = true)
   @volatile private var hasDrawn = false
 
   // Minimum frame rate drawing (10 fps)
-  timer.schedule(Duration.fromFractionalSeconds(0.1)) {
+  DefaultTimer.fps(10) {
     if (!hasDrawn)
       draw()
     hasDrawn = false
@@ -34,10 +34,6 @@ class DynamicFpsLwjglApplication(listener: ApplicationListener, config: LwjglApp
       case NonFatal(e) =>
         logger.error(e, s"Failed to trigger redraw")
     }
-  }
-
-  def close(): Unit = {
-    timer.stop()
   }
 
 }
