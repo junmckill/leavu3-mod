@@ -17,5 +17,6 @@
   "symbolScale"      : 1.25,
   "relayDlink"       : true,
   "keyBindingOffset" : 0,
-  "rwrSeparateSrTr"  : false
+  "rwrSeparateSrTr"  : false,
+  "units"            : "imperial"
 }

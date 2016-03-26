@@ -18,6 +18,14 @@ case class CircleBuffer[T](item0: T, rest: T*) {
     override def default = items.indexWhere(_ == t)
   }
 
+  def setBy(f: T => Boolean,
+            default: => T = throw new RuntimeException("CircleBuffer[..]: Cannot set to value which isn't contained")): this.type = {
+    items.indexWhere(f) match {
+      case -1 => set(default)
+      case i => this.i = i
+    }
+    this
+  }
   def default: Int = 0
   def stepUp(): Unit = i = (i + 1) % size
   def stepDown(): Unit = i = (size + i - 1) % size

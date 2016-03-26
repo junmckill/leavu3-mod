@@ -29,6 +29,12 @@ case class Configuration(source: SourceData = Map.empty) extends Parsed[Configur
   val alwaysOnTop       = parse(schema.alwaysOnTop)
   val keyBindingOffset  = parse(schema.keyBindingOffset)
   val rwrSeparateSrTr   = parse(schema.rwrSeparateSrTr)
+  val initialUnits      = parse(schema.units)
+
+  require(title.length > 0, "Configured title must be > 0")
+  require(width > 0, "Configured width must be > 0")
+  require(height > 0, "Configured height must be > 0")
+  require(initialUnits == "imperial" || initialUnits == "metric", "Unknown units specified i confiuration")
 }
 
 object Configuration extends Schema[Configuration] with Logging {
@@ -51,6 +57,7 @@ object Configuration extends Schema[Configuration] with Logging {
   val alwaysOnTop       = required[Boolean] ("alwaysOnTop",       default = false)
   val keyBindingOffset  = required[Int]     ("keyBindingOffset",  default = 0)
   val rwrSeparateSrTr   = required[Boolean] ("rwrSeparateSrTr",   default = false)
+  val units             = required[String]  ("units",             default = "imperial")
 
   def readFromFile(s: String = "leavu3-cfg.json"): Configuration = {
     logger.info(s"Loading configuration file: $s")
