@@ -31,12 +31,12 @@ case class Bra(bearingRaw: Double, range: Double, deltaAltitude: Double) extends
     padBearing(bearing.round.toString)
   }
 
-  def distString: String = {
-    (range * m_to_nmi).round.toString
+  def distString(m_to_distUnit: Double): String = {
+    (range * m_to_distUnit).round.toString
   }
 
-  def brString: String = {
-    s"$bearingString $distString"
+  def brString(m_to_distUnit: Double): String = {
+    s"$bearingString ${distString(m_to_distUnit)}"
   }
 
 }

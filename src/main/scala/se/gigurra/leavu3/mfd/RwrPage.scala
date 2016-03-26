@@ -19,8 +19,8 @@ case class RwrPage(implicit config: Configuration) extends Page("RWR") {
   val screenProjection = new ScreenProjection
 
   val stdTextSize = 0.75f
-  val distance = 100 nmi
-  val minRangeOffset = distance * 0.05 * config.symbolScale
+  val distScale = 100 nmi
+  val minRangeOffset = distScale * 0.05 * config.symbolScale
   val blinkSpeed = 1.0 / 3.0
 
   var a2aFilter = CircleBuffer[LockLevel](LockLevel.Search, LockLevel.Lock, LockLevel.Launch)
@@ -61,7 +61,7 @@ case class RwrPage(implicit config: Configuration) extends Page("RWR") {
   }
 
   override def draw(game: GameData, dlinkIn: Map[String, DlinkData]): Unit = {
-    viewport(viewportSize = distance * 2.0 / screenEdgeOffset, offs = Vec2(0.0, 0.0), heading = self.heading) {
+    viewport(viewportSize = distScale * 2.0 / screenEdgeOffset, offs = Vec2(0.0, 0.0), heading = self.heading) {
       drawSelf(game)
       drawHsi(game)
       drawNotchBlocks(game)
@@ -75,7 +75,7 @@ case class RwrPage(implicit config: Configuration) extends Page("RWR") {
   implicit class RichEmitter(e: Emitter) {
 
     def range: Double = {
-      val scalable = distance - minRangeOffset
+      val scalable = distScale - minRangeOffset
       minRangeOffset + scalable * (1.0 - math.pow(e.power, e.typ.power2RangeExponent)) * e.typ.maxRangeIndication
     }
 
@@ -115,7 +115,7 @@ case class RwrPage(implicit config: Configuration) extends Page("RWR") {
   def drawTargetBearings(game: GameData): Unit = for (target <- game.sensors.targets.locked) {
     implicit val _p = ppiProjection
     val a = minRangeOffset * (target.position - self.position : Vec2).normalized
-    val b = distance * (target.position - self.position : Vec2).normalized
+    val b = distScale * (target.position - self.position : Vec2).normalized
     lines(Seq(a -> b), DARK_GRAY)
   }
 
@@ -147,12 +147,12 @@ case class RwrPage(implicit config: Configuration) extends Page("RWR") {
       }
 
       val lineStart = offset.normalized * (bra.range + airThreat.h * symbolScale)
-      val edgeOffset = offset.normalized * distance
+      val edgeOffset = offset.normalized * distScale
       lines(Seq(lineStart -> edgeOffset), threat.color)
 
       batched {
 
-        if (threat.range / distance > 0.5) {
+        if (threat.range / distScale > 0.5) {
           at(self.position + edgeOffset * 1.05f, heading = bearing - self.heading) {
             threat.rwrName.drawCentered(threat.color, scale = 0.7f)
           }
@@ -169,12 +169,12 @@ case class RwrPage(implicit config: Configuration) extends Page("RWR") {
 
   def drawHsi(game: GameData): Unit = {
     implicit val _p = ppiProjection
-    circle(radius = distance * 1.00, color = DARK_GRAY)
+    circle(radius = distScale * 1.00, color = DARK_GRAY)
     lines(
-      shapes.hsi.flag * symbolScale + Vec2(0.0, distance * 1.00),
-      shapes.hsi.eastPin * symbolScale + Vec2(distance * 1.00, 0.0),
-      shapes.hsi.westPin * symbolScale + Vec2(-distance * 1.00, 0.0),
-      shapes.hsi.southPin * symbolScale + Vec2(0.0, -distance * 1.00)
+      shapes.hsi.flag * symbolScale + Vec2(0.0, distScale * 1.00),
+      shapes.hsi.eastPin * symbolScale + Vec2(distScale * 1.00, 0.0),
+      shapes.hsi.westPin * symbolScale + Vec2(-distScale * 1.00, 0.0),
+      shapes.hsi.southPin * symbolScale + Vec2(0.0, -distScale * 1.00)
     )
     if (shouldDrawDetailedHsi) {
       lines(shapes.hsi.detail(screen2World * screenEdgeOffset, config.symbolScale))
@@ -195,7 +195,7 @@ case class RwrPage(implicit config: Configuration) extends Page("RWR") {
 
     for (azimuth <- Seq(-90.0f, 90.0f)) {
       val bearing = azimuth + self.heading
-      val bra = Bra(bearingRaw = bearing, range = distance, deltaAltitude = 0.0)
+      val bra = Bra(bearingRaw = bearing, range = distScale, deltaAltitude = 0.0)
       val offset = bra.toOffset
 
       val w = 0.02
