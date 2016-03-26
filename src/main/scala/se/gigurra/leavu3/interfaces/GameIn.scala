@@ -1,17 +1,15 @@
 package se.gigurra.leavu3.interfaces
 
 import com.twitter.finagle.FailedFastException
-import com.twitter.util.Duration
-import se.gigurra.leavu3.datamodel.Waypoint
-import se.gigurra.leavu3.datamodel.{Configuration, GameData}
+import com.twitter.util.{Duration, Future}
+import se.gigurra.leavu3.datamodel.{Configuration, GameData, Waypoint}
 import se.gigurra.leavu3.gfx.Drawable
-import se.gigurra.leavu3.util.{Resource2String, SimpleTimer}
+import se.gigurra.leavu3.util.{DefaultTimer, IdenticalRequestPending, Resource2String}
 import se.gigurra.serviceutils.json.JSON
 import se.gigurra.serviceutils.twitter.logging.Logging
 import se.gigurra.serviceutils.twitter.service.ServiceException
 
 import scala.collection.mutable
-import scala.util.{Failure, Success, Try}
 
 /**
   * Created by kjolh on 3/20/2016.
@@ -32,26 +30,27 @@ object GameIn extends Logging {
   object Updater {
     def start(appCfg: Configuration, drawable: Drawable): Unit = {
       val fps = appCfg.gameDataFps
+      val maxAge = (1000.0 / fps.toDouble / 2.0).toLong
 
-      SimpleTimer.fromFps(fps) {
-        Try(DcsRemote.getBlocking(path, cacheMaxAgeMillis = Some((1000.0 / fps.toDouble / 2.0).toLong))) match {
-          case Success(stringData) =>
-            val newData = JSON.read[GameData](stringData)
-            snapshot = process(newData)
-            dcsRemoteConnected = true
-            dcsGameConnected = true
-            drawable.draw()
-          case Failure(e: ServiceException) =>
+      DefaultTimer.fps(fps) {
+        DcsRemote.get(path, Some(maxAge)).map(JSON.read[GameData]).map { gameData =>
+          snapshot = process(gameData)
+          dcsRemoteConnected = true
+          dcsGameConnected = true
+          drawable.draw()
+        }.onFailure {
+          case e: IdenticalRequestPending => // Ignore
+          case e: ServiceException =>
             logger.warning(s"Dcs Remote replied: Could not fetch game data from Dcs Remote: $e")
             dcsRemoteConnected = true
             dcsGameConnected = false
             snapshot = GameData()
-          case Failure(e: FailedFastException) =>
+          case e: FailedFastException =>
             dcsRemoteConnected = false
             dcsGameConnected = false
             snapshot = GameData()
           // Ignore ..
-          case Failure(e) =>
+          case e =>
             logger.error(s"Could not fetch game data from Dcs Remote: $e")
             dcsRemoteConnected = false
             dcsGameConnected = false
@@ -108,18 +107,20 @@ object GameIn extends Logging {
 
     def start(appCfg: Configuration): Unit = {
 
-      DcsRemote.getBlocking("123")
-
-      SimpleTimer.apply(Duration.fromSeconds(10)) {
-        Try(JSON.read[GameData](DcsRemote.getBlocking(GameIn.path))) match {
-          case Failure(e: FailedFastException) => // Ignore ..
-          case Failure(e: ServiceException) =>
-            logger.warning(s"Dcs Remote replied: Unable to inject game export script: $e")
-          case Failure(_) | Success(BadGameData()) =>
-            logger.info(s"Injecting data export script .. -> ${GameIn.path}")
-            DcsRemote.postBlocking("export", luaDataExportScript)
-          case _ =>
-          // It's already loaded
+      DefaultTimer.seconds(1) {
+        if (dcsGameConnected && !snapshot.isValid) {
+          DcsRemote.get(GameIn.path).map(JSON.read[GameData]).flatMap {
+            case BadGameData() =>
+              logger.info(s"Injecting data export script .. -> ${GameIn.path}")
+              DcsRemote.post("export")(luaDataExportScript)
+            case _ =>
+              Future.Unit // Good to go!
+          }.onFailure {
+            case e: IdenticalRequestPending => // Ignore ..
+            case e: FailedFastException => // Ignore ..
+            case e: ServiceException => logger.warning(s"Dcs Remote replied: Unable to inject game export script: $e")
+            case e => logger.error(e, s"Unable to inject export script")
+          }
         }
       }
     }

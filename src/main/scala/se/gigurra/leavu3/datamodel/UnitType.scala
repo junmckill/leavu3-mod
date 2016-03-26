@@ -138,28 +138,21 @@ object UnitType extends Schema[UnitType] with Logging {
   val DESTROYED = 6
 
   type TYPE = (Int, Int, Int, Int)
-  val pendingTypes = new concurrent.TrieMap[TYPE, Boolean]()
   val mappedTypes = new concurrent.TrieMap[TYPE, UnitTypeData]()
 
   def getData(t: UnitType)(implicit configuration: Configuration): UnitTypeData = {
 
-    if (!mappedTypes.contains(t.typ) && !pendingTypes.contains(t.typ)) {
-
-      pendingTypes.put(t.typ, true)
+    if (!mappedTypes.contains(t.typ)) {
 
       val script =s"{name=LoGetNameByType${t.typ}}"
       val url = s"export/$script"
 
-      DcsRemote.get(url, Some(3600000L), Duration.fromSeconds(1)).map { json =>
+      DcsRemote.get(url, maxAge = Some(3600000L)).map { json =>
         val name = JSON.readMap(json)("name").asInstanceOf[String]
         mappedTypes.put(t.typ, UnitTypeData.apply(name, isKnown = true, t.typ))
-        pendingTypes.remove(t.typ)
         logger.info(s"Mapped type ${t.typ} -> $name")
-      }.rescue {
-        case NonFatal(e) =>
-          pendingTypes.remove(t.typ)
-          Future.Unit
       }
+
     }
 
     mappedTypes.getOrElse(t.typ, UnitTypeData.UKN)
