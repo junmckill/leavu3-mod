@@ -17,8 +17,11 @@ import scala.util.{Failure, Success, Try}
 object Dlink extends Logging {
 
   @volatile var config: DlinkConfiguration = DlinkConfiguration()
-  @volatile var dlinkClient = RestClient(config.host, config.port, "Data link")
-  @volatile var connected = false
+  @volatile var dlinkClient: Option[RestClient] = None
+  @volatile var nameLookupOk = false
+  @volatile var recvOk = false
+
+  def connected: Boolean = nameLookupOk && recvOk
 
   def start(appCfg: Configuration): Unit = {
 
@@ -34,12 +37,13 @@ object Dlink extends Logging {
   object CfgUpdate {
 
     def handleDlinkConfig(newConfig: DlinkConfiguration): Unit = {
-      if (newConfig != config) {
+      if (newConfig != config || !nameLookupOk) {
         logger.info(s"Updating dlink settings to: \n ${JSON.write(newConfig)}")
-        dlinkClient = dlinkClient.withNewRemote(newConfig.host, newConfig.port)
         config = newConfig
-        In.onNewConfig()
-        Out.onNewConfig()
+        In.clear()
+        Out.clear()
+        dlinkClient = Try(RestClient(newConfig.host, newConfig.port, "Data Link")).toOption
+        nameLookupOk = dlinkClient.isDefined
       }
     }
 
@@ -63,7 +67,7 @@ object Dlink extends Logging {
     def blue: Map[String, DlinkData] = allTeams.getOrElse(2, Map.empty)
     def red: Map[String, DlinkData] = allTeams.getOrElse(1, Map.empty)
 
-    def onNewConfig(): Unit = {
+    def clear(): Unit = {
       ownTeam = Map.empty
       allTeams = Map.empty
     }
@@ -71,31 +75,31 @@ object Dlink extends Logging {
     def start(): Unit = {
 
       DefaultTimer.fps(1) {
-        dlinkClient.get(config.team, maxAge = Some(10000L)).map { jsonString =>
+        dlinkClient.foreach(_.get(config.team, maxAge = Some(10000L)).map { jsonString =>
           val rawData = JSON.readMap(jsonString)
           val everyoneOnNetwork = rawData.collect { case ValidDlinkData(id, dlinkData) => id -> dlinkData }
           allTeams = everyoneOnNetwork.groupBy(_._2.selfData.coalitionId)
           ownTeam = allTeams.getOrElse(GameIn.snapshot.selfData.coalitionId, Map.empty)
-          connected = true
+          recvOk = true
         }.onFailure {
           case e: IdenticalRequestPending =>
             // Do nothing
           case e: ServiceException =>
-            connected = false
+            recvOk = false
             allTeams = Map.empty
             ownTeam = Map.empty
             logger.error(s"Data link host replied with an error: $e")
           case e: FailedFastException =>
-            connected = false
+            recvOk = false
             allTeams = Map.empty
             ownTeam = Map.empty
           // Ignore ..
           case e =>
-            connected = false
+            recvOk = false
             allTeams = Map.empty
             ownTeam = Map.empty
             logger.error(e, s"Unexpected error when attempting to receive from dlink")
-        }
+        })
       }
     }
 
@@ -127,7 +131,7 @@ object Dlink extends Logging {
 
     def deleteMark(id: String): Unit = marks -= id
 
-    def onNewConfig(): Unit = {
+    def clear(): Unit = {
       marks = Map.empty
     }
 
@@ -138,24 +142,26 @@ object Dlink extends Logging {
         val source = GameIn.snapshot
         if (source.err.isEmpty && source.age < 3.0) {
 
-          dlinkClient.put(s"${config.team}/${config.callsign}") {
+          dlinkClient.foreach {
+            _.put(s"${config.team}/${config.callsign}") {
 
-            val self = Member.marshal(
-              Member.planeId -> source.metaData.planeId,
-              Member.modelTime -> source.metaData.modelTime,
-              Member.position -> source.selfData.position,
-              Member.velocity -> source.flightModel.velocity,
-              Member.targets -> source.sensors.targets.locked,
-              Member.selfData -> source.metaData.selfData,
-              Member.markPos -> marks
-            )
-            JSON.write(self)
+              val self = Member.marshal(
+                Member.planeId -> source.metaData.planeId,
+                Member.modelTime -> source.metaData.modelTime,
+                Member.position -> source.selfData.position,
+                Member.velocity -> source.flightModel.velocity,
+                Member.targets -> source.sensors.targets.locked,
+                Member.selfData -> source.metaData.selfData,
+                Member.markPos -> marks
+              )
+              JSON.write(self)
+            }.onFailure {
+              case e: IdenticalRequestPending => // ignore
+              case e: FailedFastException => // ignore
+              case e: ServiceException => logger.error(s"Data link host replied with an error: $e")
+              case e => logger.error(e, s"Unexpected error when attempting to send to dlink")
+            }
           }
-        }.onFailure {
-          case e: IdenticalRequestPending => // ignore
-          case e: FailedFastException => // ignore
-          case e: ServiceException => logger.error(s"Data link host replied with an error: $e")
-          case e => logger.error(e, s"Unexpected error when attempting to send to dlink")
         }
       }
     }
