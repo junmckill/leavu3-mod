@@ -17,7 +17,7 @@ import scala.util.{Failure, Success, Try}
 object Dlink extends Logging {
 
   @volatile var config: DlinkConfiguration = DlinkConfiguration()
-  @volatile var dlinkClient = RestClient(config.host, config.port)
+  @volatile var dlinkClient = RestClient(config.host, config.port, "Data link")
   @volatile var connected = false
 
   def start(appCfg: Configuration): Unit = {

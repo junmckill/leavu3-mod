@@ -12,11 +12,11 @@ import scala.collection.mutable
 /**
   * Created by kjolh on 3/10/2016.
   */
-case class RestClient(addr: String, port: Int)(implicit val timer: JavaTimer = DefaultTimer.underlying) {
+case class RestClient(addr: String, port: Int, name: String)(implicit val timer: JavaTimer = DefaultTimer.underlying) {
 
   // Check valid address first
   try InetAddress.getByName(addr) catch {
-    case NonFatal(e) => throw new RuntimeException(s"Unable to connect to $addr:$port", e)
+    case NonFatal(e) => throw new RuntimeException(s"Unable to connect to $name @ $addr:$port", e)
   }
 
   private val client = Http.client.newService(s"$addr:$port")
@@ -24,7 +24,7 @@ case class RestClient(addr: String, port: Int)(implicit val timer: JavaTimer = D
   private val timeout = Duration.fromSeconds(3)
 
   def withNewRemote(addr: String, port: Int): RestClient = {
-    RestClient(addr, port)(timer)
+    RestClient(addr, port, name)(timer)
   }
 
   def get(path: String, maxAge: Option[Long] = None): Future[String] = {

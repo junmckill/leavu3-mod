@@ -8,7 +8,7 @@ import scala.language.implicitConversions
 import scala.util.control.NonFatal
 
 case class DcsRemote private (config: Configuration) {
-  val client = RestClient(config.dcsRemoteAddress, config.dcsRemotePort)
+  val client = RestClient(config.dcsRemoteAddress, config.dcsRemotePort, "Dcs Remote")
   try Await.result(client.get(s"static-data")) catch {
     case NonFatal(e) => throw new RuntimeException(s"Failed to communicate with dcs remote!", e)
   }
