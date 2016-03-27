@@ -1,7 +1,7 @@
 package se.gigurra.leavu3.interfaces
 
 import com.twitter.finagle.FailedFastException
-import com.twitter.util.{Duration, Future}
+import com.twitter.util.Future
 import se.gigurra.leavu3.datamodel.{Configuration, GameData, Waypoint}
 import se.gigurra.leavu3.gfx.Drawable
 import se.gigurra.leavu3.util.{DefaultTimer, IdenticalRequestPending, Resource2String}
@@ -19,7 +19,8 @@ object GameIn extends Logging {
   val path = "export/dcs_remote_export_data()"
 
   @volatile var snapshot = GameData()
-  @volatile var dcsRemoteConnected = true // App doesnt even start otherwise!
+  @volatile var dcsRemoteConnected = true
+  // App doesnt even start otherwise!
   @volatile var dcsGameConnected = false
 
   def start(appCfg: Configuration, drawable: Drawable): Unit = {
@@ -33,12 +34,16 @@ object GameIn extends Logging {
       val maxAge = (1000.0 / fps.toDouble / 2.0).toLong
 
       DefaultTimer.fps(fps) {
-        DcsRemote.get(path, Some(maxAge)).map(JSON.read[GameData]).map { gameData =>
-          snapshot = process(gameData)
-          dcsRemoteConnected = true
-          dcsGameConnected = true
-          drawable.draw()
-        }.onFailure {
+        DcsRemote
+          .get(path, Some(maxAge))
+          .map(JSON.read[GameData])
+          .map(postProcess)
+          .map { newSnapshot =>
+            snapshot = newSnapshot
+            dcsRemoteConnected = true
+            dcsGameConnected = true
+            drawable.draw()
+          }.onFailure {
           case e: IdenticalRequestPending => // Ignore
           case e: ServiceException =>
             logger.warning(s"Dcs Remote replied: Could not fetch game data from Dcs Remote: $e")
@@ -49,7 +54,6 @@ object GameIn extends Logging {
             dcsRemoteConnected = false
             dcsGameConnected = false
             snapshot = GameData()
-          // Ignore ..
           case e =>
             logger.error(s"Could not fetch game data from Dcs Remote: $e")
             dcsRemoteConnected = false
@@ -62,7 +66,7 @@ object GameIn extends Logging {
 
   private val knownNavWaypoints = new mutable.HashMap[Int, Waypoint]
 
-  private def process(newData: GameData): GameData = {
+  private def postProcess(newData: GameData): GameData = {
     // TODO: Fuse with old data where required
     // Known states that needs fusion:
     // - rws detections (only visible a few frames) - Needs manual storage
@@ -130,4 +134,5 @@ object GameIn extends Logging {
     }
 
   }
+
 }
