@@ -24,8 +24,6 @@ object Dlink extends Logging {
   def connected: Boolean = nameLookupOk && recvOk
 
   def start(appCfg: Configuration): Unit = {
-
-    logger.info(s"Downloading datalink settings from dcs-remote ..")
     In.start()
     if (appCfg.relayDlink)
       Out.start()
