@@ -9,7 +9,7 @@ abstract class SafeParsed[S <: Schema[_]](implicit schema: S) extends Parsed[S](
 
   override protected def parse[FieldType : MapDataProducer](field: FieldOption[FieldType], orElse: => Option[FieldType]): Option[FieldType] = {
     try {
-      super.parse(field)
+      super.parse(field, orElse)
     } catch {
       case e: Exception => field.getDefault
     }
@@ -25,7 +25,7 @@ abstract class SafeParsed[S <: Schema[_]](implicit schema: S) extends Parsed[S](
 
   override protected def parse[FieldType : MapDataProducer](field: FieldRequired[FieldType], orElse: => FieldType): FieldType = {
     try {
-      super.parse(field)
+      super.parse(field, orElse)
     } catch {
       case e: Exception =>
         field.getDefault.getOrElse(throw new RuntimeException(s"No default value set for field $field on ${this.getClass}"))
