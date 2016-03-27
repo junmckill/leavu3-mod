@@ -1,7 +1,7 @@
 package se.gigurra.leavu3.interfaces
 
 import com.twitter.finagle.FailedFastException
-import com.twitter.util.{Await, Future}
+import com.twitter.util.Future
 import se.gigurra.heisenberg.MapDataParser
 import se.gigurra.leavu3.datamodel.{Configuration, DlinkConfiguration, DlinkData, Mark, Member}
 import se.gigurra.leavu3.util.{DefaultTimer, IdenticalRequestPending, RestClient}
@@ -18,10 +18,9 @@ object Dlink extends Logging {
 
   @volatile var config: DlinkConfiguration = DlinkConfiguration()
   @volatile var dlinkClient: Option[RestClient] = None
-  @volatile var nameLookupOk = false
   @volatile var recvOk = false
 
-  def connected: Boolean = nameLookupOk && recvOk
+  def connected: Boolean = dlinkClient.isDefined && recvOk
 
   def start(appCfg: Configuration): Unit = {
     In.start()
@@ -33,13 +32,12 @@ object Dlink extends Logging {
   object CfgUpdate {
 
     def handleDlinkConfig(newConfig: DlinkConfiguration): Unit = {
-      if (newConfig != config || !nameLookupOk) {
+      if (newConfig != config || dlinkClient.isEmpty) {
         logger.info(s"Updating dlink settings to: \n ${JSON.write(newConfig)}")
         config = newConfig
         In.clear()
         Out.clear()
         dlinkClient = Try(RestClient(newConfig.host, newConfig.port, "Data Link")).toOption
-        nameLookupOk = dlinkClient.isDefined
       }
     }
 
