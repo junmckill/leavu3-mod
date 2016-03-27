@@ -69,32 +69,33 @@ object Dlink extends Logging {
     def start(): Unit = {
 
       DefaultTimer.fps(1) {
-        dlinkClient.foreach(_.get(config.team, maxAge = Some(10000L)).map { jsonString =>
-          val rawData = JSON.readMap(jsonString)
-          val everyoneOnNetwork = rawData.collect { case ValidDlinkData(id, dlinkData) => id -> dlinkData }
+        dlinkClient.foreach(_
+          .get(config.team, maxAge = Some(10000L))
+          .map(JSON.readMap)
+          .map(membersByName)
+          .map { everyoneOnNetwork =>
           allTeams = everyoneOnNetwork.groupBy(_._2.selfData.coalitionId)
           ownTeam = allTeams.getOrElse(GameIn.snapshot.selfData.coalitionId, Map.empty)
           recvOk = true
         }.onFailure {
           case e: IdenticalRequestPending =>
-            // Do nothing
           case e: ServiceException =>
             recvOk = false
-            allTeams = Map.empty
-            ownTeam = Map.empty
+            clear()
             logger.error(s"Data link host replied with an error: $e")
           case e: FailedFastException =>
             recvOk = false
-            allTeams = Map.empty
-            ownTeam = Map.empty
-          // Ignore ..
+            clear()
           case e =>
             recvOk = false
-            allTeams = Map.empty
-            ownTeam = Map.empty
+            clear()
             logger.error(e, s"Unexpected error when attempting to receive from dlink")
         })
       }
+    }
+
+    def membersByName(data: Map[String, Any]): Map[String, DlinkData] = {
+      data.collect { case ValidDlinkData(id, dlinkData) => id -> dlinkData }
     }
 
     object ValidDlinkData {
@@ -114,6 +115,7 @@ object Dlink extends Logging {
       data.selfData.coalitionId == GameIn.snapshot.selfData.coalitionId
     }
   }
+
 
   object Out extends Logging {
 
