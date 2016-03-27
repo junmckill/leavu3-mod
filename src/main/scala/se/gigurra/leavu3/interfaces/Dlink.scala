@@ -26,8 +26,6 @@ object Dlink extends Logging {
   def start(appCfg: Configuration): Unit = {
 
     logger.info(s"Downloading datalink settings from dcs-remote ..")
-    CfgUpdate.handleDlinkConfig(Await.result(downloadDlinkConfig()))
-    logger.info(s"Dlink settings downloaded:\n ${JSON.write(config)}")
     In.start()
     if (appCfg.relayDlink)
       Out.start()

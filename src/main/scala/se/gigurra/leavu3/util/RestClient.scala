@@ -23,10 +23,6 @@ case class RestClient(addr: String, port: Int, name: String)(implicit val timer:
   private val pending = new mutable.HashMap[String, Unit]()
   private val timeout = Duration.fromSeconds(3)
 
-  def withNewRemote(addr: String, port: Int): RestClient = {
-    RestClient(addr, port, name)(timer)
-  }
-
   def get(path: String, maxAge: Option[Long] = None): Future[String] = {
     doIfNotAlreadyPending(path)(doGet(path, maxAge))
   }
