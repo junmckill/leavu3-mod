@@ -23,7 +23,7 @@ abstract class Page(val name: String)(implicit config: Configuration) extends Lo
 
   def pressOsb(i: Int): Unit = {}
 
-  def draw(game: GameData, dlinkIn: Map[String, DlinkData]): Unit
+  def draw(game: GameData, dlinkIn: Seq[(String, DlinkData)]): Unit
 
 
   //////////////////////////////////////////////////////////////////////////////

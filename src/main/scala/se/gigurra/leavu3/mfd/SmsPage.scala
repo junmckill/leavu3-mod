@@ -7,7 +7,7 @@ import se.gigurra.leavu3.datamodel.{Configuration, DlinkData, GameData}
   */
 case class SmsPage(implicit config: Configuration) extends Page("SMS") {
 
-  def draw(game: GameData, dlinkIn: Map[String, DlinkData]): Unit = {
+  def draw(game: GameData, dlinkIn: Seq[(String, DlinkData)]): Unit = {
 
   }
 }

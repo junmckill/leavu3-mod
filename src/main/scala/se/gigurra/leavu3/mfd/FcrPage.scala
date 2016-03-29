@@ -7,7 +7,7 @@ import se.gigurra.leavu3.datamodel.{Configuration, DlinkData, GameData}
   */
 case class FcrPage(implicit config: Configuration) extends Page("FCR") {
 
-  def draw(game: GameData, dlinkIn: Map[String, DlinkData]): Unit = {
+  def draw(game: GameData, dlinkIn: Seq[(String, DlinkData)]): Unit = {
 
   }
 }

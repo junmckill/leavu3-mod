@@ -55,7 +55,7 @@ case class RwrPage(implicit config: Configuration) extends Page("RWR") {
     }
   }
 
-  override def draw(game: GameData, dlinkIn: Map[String, DlinkData]): Unit = {
+  override def draw(game: GameData, dlinkIn: Seq[(String, DlinkData)]): Unit = {
     viewport(viewportSize = distScale * 2.0 / screenEdgeOffset, offs = Vec2(0.0, 0.0), heading = self.heading) {
       drawSelf(game)
       drawHsi(game)

@@ -28,7 +28,7 @@ case class App(appCfg: Configuration, onCreate: () => Unit) extends ApplicationA
   override def render(): Unit = {
     while(!Keyboard.inputQue.isEmpty)
       instrument.keyPressed(Keyboard.inputQue.poll)
-    instrument.update(GameIn.snapshot, Dlink.In.ownTeam)
+    instrument.update(GameIn.snapshot, Dlink.In.ownTeam.toSeq.sortBy(_._1))
   }
 
   override def create(): Unit = {

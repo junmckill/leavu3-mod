@@ -49,7 +49,7 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD") {
     Dlink.Out.addMark(Mark(Dlink.config.callsign, clickPos))
   }
 
-  override def draw(game: GameData, dlinkIn: Map[String, DlinkData]): Unit = {
+  override def draw(game: GameData, dlinkIn: Seq[(String, DlinkData)]): Unit = {
     matchIngameScale(game)
     viewport(viewportSize = distScale * 2.0, offs = Vec2(0.0, -distScale * deprFactor), heading = self.heading){
       implicit val p = ppiProjection
@@ -147,7 +147,7 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD") {
     }
   }
 
-  def drawDlinkMarks(dlinkIn: Map[String, DlinkData]): Unit = {
+  def drawDlinkMarks(dlinkIn: Seq[(String, DlinkData)]): Unit = {
     for {
       (name, member) <- dlinkIn
       (id, mark) <- member.marks
@@ -156,7 +156,7 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD") {
     }
   }
 
-  def drawDlinkMembersAndTargets(dlinkIn: Map[String, DlinkData]): Unit = {
+  def drawDlinkMembersAndTargets(dlinkIn: Seq[(String, DlinkData)]): Unit = {
     implicit val p = ppiProjection
 
     val dlinksOfInterest = dlinkIn.filter(m => m._2.data.planeId != self.planeId || m._1 != self.dlinkCallsign)

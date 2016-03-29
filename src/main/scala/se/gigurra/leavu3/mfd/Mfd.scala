@@ -31,7 +31,7 @@ case class Mfd(implicit config: Configuration) extends Instrument(config) {
 
   def osb2Qp(osb: Int): Int = 13 - osb
 
-  def drawPage(game: GameData, dlinkIn: Map[String, DlinkData]): Unit = {
+  def drawPage(game: GameData, dlinkIn: Seq[(String, DlinkData)]): Unit = {
     currentPage.foreach(_.draw(game, dlinkIn))
   }
 
@@ -53,7 +53,7 @@ case class Mfd(implicit config: Configuration) extends Instrument(config) {
     }
   }
 
-  def update(game: GameData, dlinkIn: Map[String, DlinkData]): Unit = frame {
+  def update(game: GameData, dlinkIn: Seq[(String, DlinkData)]): Unit = frame {
     mainMenuOpen = false // Add support for menu later when we have more than 3 pages implemented
     if (mainMenuOpen) {
       drawMainMenu()

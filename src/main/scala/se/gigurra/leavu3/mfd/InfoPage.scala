@@ -43,7 +43,7 @@ case class InfoPage(implicit config: Configuration) extends Page("INF") {
     }
   }
 
-  override def draw(game: GameData, dlinkIn: Map[String, DlinkData]): Unit = {
+  override def draw(game: GameData, dlinkIn: Seq[(String, DlinkData)]): Unit = {
 
     val updateAvailable = Version.current != Version.latest
     val scale = config.symbolScale * 0.02 / font.getSpaceWidth
