@@ -152,7 +152,7 @@ abstract class Page(val name: String)(implicit config: Configuration) extends Lo
         if (textToTheSide) {
           idText.drawRightOf(scale = stdTextSize * 0.75f, color = color)
         } else {
-          idText.drawCentered(scale = stdTextSize * 0.50f, color = BLACK)
+          idText.drawCentered(scale = stdTextSize * 0.50f, color = if (fill) BLACK else color)
         }
       }
     }
