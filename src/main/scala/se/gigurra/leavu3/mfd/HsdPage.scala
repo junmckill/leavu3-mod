@@ -168,7 +168,7 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD") {
 
       drawContact(memberPosition, Some(member.heading), CYAN, name.take(2))
 
-      for (target <- member.targets) {
+      for (target <- member.targets.reverse) { // draw lowest index (=highest prio) last
 
         val targetPosition = target.position + target.velocity * lag
 
@@ -224,7 +224,7 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD") {
       lines(Seq(Vec2() -> offs) * 10000.0, YELLOW)
     }
 
-    for (contact <- positionsDesignated) {
+    for (contact <- positionsDesignated.reverse) { // draw lowest index (=highest prio) last
       drawContact(
         position = contact.position,
         heading = Some(contact.heading),
