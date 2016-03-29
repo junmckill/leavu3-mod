@@ -75,26 +75,7 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD") {
   }
 
   def drawHsi(game: GameData): Unit = {
-    implicit val p = ppiProjection
-    circle(radius = distScale     * 0.50, color = DARK_GRAY)
-    circle(radius = distScale     * 1.00)
-    circle(radius = distScale     * 1.50)
-    lines(shapes.hsi.flag * symbolScale + Vec2(0.0, distScale * 0.50),
-      shapes.hsi.flag * symbolScale + Vec2(0.0, distScale * 1.00),
-      shapes.hsi.flag * symbolScale + Vec2(0.0, distScale * 1.50),
-      shapes.hsi.eastPin * symbolScale + Vec2(distScale * 0.50, 0.0),
-      shapes.hsi.eastPin * symbolScale + Vec2(distScale * 1.00, 0.0),
-      shapes.hsi.eastPin * symbolScale + Vec2(distScale * 1.50, 0.0),
-      shapes.hsi.westPin * symbolScale + Vec2(-distScale * 0.50, 0.0),
-      shapes.hsi.westPin * symbolScale + Vec2(-distScale * 1.00, 0.0),
-      shapes.hsi.westPin * symbolScale + Vec2(-distScale * 1.50, 0.0),
-      shapes.hsi.southPin * symbolScale + Vec2(0.0, -distScale * 0.50),
-      shapes.hsi.southPin * symbolScale + Vec2(0.0, -distScale * 1.00),
-      shapes.hsi.southPin * symbolScale + Vec2(0.0, -distScale * 1.50)
-    )
-    if (shouldDrawDetailedHsi) {
-      lines(shapes.hsi.detail(screen2World, config.symbolScale))
-    }
+    drawHsi(close = true, middle = true, far = true, tics = shouldDrawDetailedHsi)(ppiProjection)
   }
 
   def drawSelf(game: GameData): Unit = {

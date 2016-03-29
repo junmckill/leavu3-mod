@@ -20,9 +20,9 @@ object shapes {
     val westPin  = Seq(Vec2(0.00,  0.00) -> Vec2(+h/2, 0.00))
     val southPin = Seq(Vec2(0.00,  0.00) -> Vec2(0.00, +h/2))
 
-    def detail(screen2World: Float, symScale: Float) : Seq[(Vec2, Vec2)] = {
-      val r0 = screen2World.toDouble
-      val r1 = r0 -  screen2World * symScale * h/4
+    def detail(radius: Float) : Seq[(Vec2, Vec2)] = {
+      val r0 = radius.toDouble
+      val r1 = r0 -  radius * h / 2.0
       val n = 36
       for (i <- 0 until n) yield {
         val angle = (360.0 * i.toDouble / n.toDouble).toRadians

@@ -163,17 +163,7 @@ case class RwrPage(implicit config: Configuration) extends Page("RWR") {
   }
 
   def drawHsi(game: GameData): Unit = {
-    implicit val _p = ppiProjection
-    circle(radius = distScale * 1.00, color = DARK_GRAY)
-    lines(
-      shapes.hsi.flag * symbolScale + Vec2(0.0, distScale * 1.00),
-      shapes.hsi.eastPin * symbolScale + Vec2(distScale * 1.00, 0.0),
-      shapes.hsi.westPin * symbolScale + Vec2(-distScale * 1.00, 0.0),
-      shapes.hsi.southPin * symbolScale + Vec2(0.0, -distScale * 1.00)
-    )
-    if (shouldDrawDetailedHsi) {
-      lines(shapes.hsi.detail(screen2World * screenEdgeOffset, config.symbolScale))
-    }
+    drawHsi(close = false, middle = true, far = false, tics = shouldDrawDetailedHsi)(ppiProjection)
   }
 
   def drawSelf(game: GameData): Unit = {
