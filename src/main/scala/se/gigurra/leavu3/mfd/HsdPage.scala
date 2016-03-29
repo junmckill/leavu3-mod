@@ -288,7 +288,7 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD") {
               val altText = (targetPosition.z * displayUnits.m_to_altUnit).round.toString
               altText.drawLeftOf(scale = stdTextSize, color = contactColor(target, fromDatalink = true))
               val nameText = name.take(2)
-              nameText.drawCentered(scale = 0.45f, color = BLACK)
+              nameText.drawRightOf(scale = stdTextSize, color = contactColor(target, fromDatalink = true))
             }
           }
         } else at(memberPosition) { // HOJ
