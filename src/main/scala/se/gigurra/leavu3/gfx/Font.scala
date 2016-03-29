@@ -32,7 +32,7 @@ case class Font(font: BitmapFont, size: Float)
   }
 
   def widthOf(lines: Seq[String]): Float = {
-    val longestLine = lines.maxBy(_.length)
+    val longestLine = if (lines.nonEmpty) lines.maxBy(_.length) else ""
     font.getSpaceWidth * longestLine.length.toFloat
   }
 
