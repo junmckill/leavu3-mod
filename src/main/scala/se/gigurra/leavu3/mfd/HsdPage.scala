@@ -14,16 +14,12 @@ import HsdPage._
 /**
   * Created by kjolh on 3/12/2016.
   */
-case class HsdPage(implicit config: Configuration) extends Page("HSD") {
-
-  val ppiProjection = new PpiProjection
-  val screenProjection = new ScreenProjection
+case class HsdPage(implicit config: Configuration) extends Page("HSD", config) {
 
   var shouldMatchIngameScale = true
   var shouldDrawDetailedHsi = true
   var shouldDrawOwnHeading = true
   val deprFactor = CircleBuffer(0.0, 0.5).withDefaultValue(0.5)
-  val displayUnits = DisplayUnits.displayUnits.setBy(_.name == config.initialUnits)
   val stdTextSize = 0.75f
   val OSB_DEPR = 1
   val OSB_HDG = 2
@@ -529,24 +525,3 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD") {
   }
 
 }
-
-object HsdPage {
-
-  case class DisplayUnits(name: String,
-                          m_to_altUnit: Double,
-                          m_to_distUnit: Double,
-                          distScale: CircleBuffer[Double])
-
-  object DisplayUnits {
-
-    val imperialDistances = CircleBuffer(10 nmi, 20 nmi, 40 nmi, 80 nmi, 160 nmi).withDefaultValue(40 nmi)
-    val metricDistances = CircleBuffer(20 km, 40 km, 80 km, 160 km, 320 km).withDefaultValue(80 km)
-
-    val imperialUnits = DisplayUnits("imperial", m_to_kft, m_to_nmi, imperialDistances)
-    val metricUnits = DisplayUnits("metric", m_to_km, m_to_km, metricDistances)
-
-    val displayUnits = CircleBuffer(imperialUnits, metricUnits)
-
-  }
-}
-

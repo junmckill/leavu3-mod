@@ -13,10 +13,7 @@ import scala.language.postfixOps
 /**
   * Created by kjolh on 3/12/2016.
   */
-case class RwrPage(implicit config: Configuration) extends Page("RWR") {
-
-  val ppiProjection = new PpiProjection
-  val screenProjection = new ScreenProjection
+case class RwrPage(implicit config: Configuration) extends Page("RWR", config) {
 
   val stdTextSize = 0.75f
   val distScale = 100 nmi

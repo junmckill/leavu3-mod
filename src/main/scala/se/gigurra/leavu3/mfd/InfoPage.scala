@@ -15,9 +15,9 @@ import scala.language.postfixOps
 /**
   * Created by kjolh on 3/12/2016.
   */
-case class InfoPage(implicit config: Configuration) extends Page("INF") {
+case class InfoPage(implicit config: Configuration) extends Page("INF", config) {
 
-  implicit val projection = new ScreenProjection()
+  implicit val projection = screenProjection
   val OSB_UPDATE_COVER = 2
   val OSB_UPDATE = 3
   val OSB_UPDATE_COVER2 = 4
