@@ -1,6 +1,7 @@
 package se.gigurra.leavu3.mfd
 
-import se.gigurra.leavu3.datamodel.{Configuration, DlinkData, GameData, Vec2, Waypoint}
+import com.badlogic.gdx.graphics.Color
+import se.gigurra.leavu3.datamodel.{Configuration, Contact, DlinkData, GameData, Vec2, Waypoint}
 import se.gigurra.leavu3.gfx.RenderContext._
 import se.gigurra.leavu3.gfx.{PpiProjection, Projection, ScreenProjection}
 import se.gigurra.leavu3.interfaces.MouseClick
@@ -95,4 +96,39 @@ abstract class Page(val name: String)(implicit config: Configuration) extends Lo
       lines(shapes.hsi.detail(distScale.toFloat), DARK_GRAY)
     }
   }
+
+  protected def contactColor(contact: Contact, fromDatalink: Boolean): Color = {
+    if (self.coalition == contact.country) {
+      GREEN
+    } else if (fromDatalink) {
+      RED
+    } else {
+      YELLOW
+    }
+  }
+
+  protected def drawTdc[_: Projection](game: GameData): Unit = {
+    game.tdcPosition foreach { tdc =>
+      at(tdc, self.heading) {
+        val d = 0.02
+        lines(Seq(
+          Vec2(-d, -d) -> Vec2(-d, d),
+          Vec2( d, -d) -> Vec2( d, d)
+        ) * symbolScale, WHITE)
+      }
+
+      at(tdc) {
+        val coverage = game.sensors.status.scanZone.altitudeCoverage
+        val elevationText = game.sensors.status.scanZone.direction.elevation.round.toString
+        val coverageText =
+          s"""${(coverage.max * displayUnits.m_to_altUnit).round}
+             |${(coverage.min * displayUnits.m_to_altUnit).round}""".stripMargin
+        batched {
+          coverageText.drawRightOf(scale = 0.5f, color = WHITE)
+          elevationText.drawLeftOf(scale = 0.5f, color = WHITE)
+        }
+      }
+    }
+  }
+
 }

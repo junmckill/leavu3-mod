@@ -49,6 +49,7 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD") {
   override def draw(game: GameData, dlinkIn: Map[String, DlinkData]): Unit = {
     matchIngameScale(game)
     viewport(viewportSize = distScale * 2.0, offs = Vec2(0.0, -distScale * deprFactor), heading = self.heading){
+      implicit val p = ppiProjection
       drawSelf(game)
       drawHsi(game)
       drawWayPoints(game)
@@ -258,16 +259,6 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD") {
 
   }
 
-  def contactColor(contact: Contact, fromDatalink: Boolean): Color = {
-    if (self.coalition == contact.country) {
-      GREEN
-    } else if (fromDatalink) {
-      RED
-    } else {
-      YELLOW
-    }
-  }
-
   def drawLockedTargets(game: GameData): Unit = {
     implicit val p = ppiProjection
 
@@ -321,32 +312,6 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD") {
       }
     }
 
-  }
-
-  def drawTdc(game: GameData): Unit = {
-    implicit val p = ppiProjection
-
-    game.tdcPosition foreach { tdc =>
-      at(tdc, self.heading) {
-        val d = 0.02
-        lines(Seq(
-          Vec2(-d, -d) -> Vec2(-d, d),
-          Vec2( d, -d) -> Vec2( d, d)
-        ) * symbolScale, WHITE)
-      }
-
-      at(tdc) {
-        val coverage = game.sensors.status.scanZone.altitudeCoverage
-        val elevationText = game.sensors.status.scanZone.direction.elevation.round.toString
-        val coverageText =
-          s"""${(coverage.max * displayUnits.m_to_altUnit).round}
-             |${(coverage.min * displayUnits.m_to_altUnit).round}""".stripMargin
-        batched {
-          coverageText.drawRightOf(scale = 0.5f, color = WHITE)
-          elevationText.drawLeftOf(scale = 0.5f, color = WHITE)
-        }
-      }
-    }
   }
 
   def drawBullsEyeNumbers(game: GameData) = {
