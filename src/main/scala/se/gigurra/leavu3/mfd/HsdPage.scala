@@ -2,33 +2,29 @@ package se.gigurra.leavu3.mfd
 
 import com.badlogic.gdx.graphics.Color
 import se.gigurra.leavu3.datamodel._
-import se.gigurra.leavu3.gfx.{PpiProjection, ScreenProjection}
 import se.gigurra.leavu3.gfx.RenderContext._
 import se.gigurra.leavu3.util.{CircleBuffer, CurTime}
 import se.gigurra.leavu3.interfaces.{Dlink, MouseClick}
 
 import scala.collection.mutable
 import scala.language.postfixOps
-import HsdPage._
 
 /**
   * Created by kjolh on 3/12/2016.
   */
-case class HsdPage(implicit config: Configuration) extends Page("HSD", config) {
+case class HsdPage(implicit config: Configuration) extends Page("HSD") {
 
   var shouldMatchIngameScale = true
   var shouldDrawDetailedHsi = true
   var shouldDrawOwnHeading = true
   val deprFactor = CircleBuffer(0.0, 0.5).withDefaultValue(0.5)
-  val stdTextSize = 0.75f
+
   val OSB_DEPR = 1
   val OSB_HDG = 2
   val OSB_SCALE = 17
   val OSB_HSI = 3
   val OSB_DEL = 7
   val OSB_UNITS = 9
-
-  def distScale: CircleBuffer[Double] = displayUnits.distScale
 
   override def pressOsb(i: Int): Unit = {
     i match {
@@ -55,7 +51,7 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD", config) {
     viewport(viewportSize = distScale * 2.0, offs = Vec2(0.0, -distScale * deprFactor), heading = self.heading){
       drawSelf(game)
       drawHsi(game)
-      drawWaypoints(game)
+      drawWayPoints(game)
       drawScanZone(game)
       drawAiWingmen(game)
       drawAiWingmenTargets(game)
@@ -102,14 +98,10 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD", config) {
   }
 
   def drawSelf(game: GameData): Unit = {
-    implicit val p = ppiProjection
-    transform(_.rotate(-self.heading)) {
-      lines(shapes.self.coords * symbolScale, CYAN)
-      circle(0.005 * symbolScale, color = CYAN, typ = FILL)
-    }
+    drawSelf(0.0)(ppiProjection)
   }
 
-  def drawWaypoints(game: GameData): Unit = {
+  def drawWayPoints(game: GameData): Unit = {
     implicit val p = ppiProjection
 
     def wpByIndex(i: Int): Option[Waypoint] = {
@@ -117,24 +109,12 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD", config) {
     }
 
     for (wp <- game.route.waypoints) {
-      circle(at = wp.position - self.position, radius = 0.015 * symbolScale, color = WHITE)
-      wpByIndex(wp.next) match {
-        case None =>
-        case Some(nextWp) =>
-          val thisOne = wp.position - self.position
-          val nextOne = nextWp.position - self.position
-          lines(Seq(thisOne -> nextOne))
+      wpByIndex(wp.next) foreach { nextWp =>
+        val thisOne = wp.position - self.position
+        val nextOne = nextWp.position - self.position
+        lines(Seq(thisOne -> nextOne), WHITE)
       }
-    }
-    circle(at = game.route.currentWaypoint.position - self.position, radius = 0.015 * symbolScale, typ = FILL, color = WHITE)
-
-    batched {
-      for (wp <- game.route.waypoints) {
-        val text = if (wp.index > 0) (wp.index - 1).toString else "x"
-        at(wp.position) {
-          text.drawRightOf(scale = stdTextSize, color = WHITE)
-        }
-      }
+      drawWpByIndex(wp, wp.index == game.route.currentWaypoint.index)
     }
   }
 

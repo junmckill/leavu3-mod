@@ -13,13 +13,9 @@ import scala.language.postfixOps
 /**
   * Created by kjolh on 3/12/2016.
   */
-case class RwrPage(implicit config: Configuration) extends Page("RWR", config) {
+case class RwrPage(implicit config: Configuration) extends Page("RWR") {
 
-  val stdTextSize = 0.75f
-  val distScale = 100 nmi
-  val minRangeOffset = distScale * 0.05 * config.symbolScale
   val blinkSpeed = 1.0 / 3.0
-
   var a2aFilter = CircleBuffer[LockLevel](LockLevel.Search, LockLevel.Lock, LockLevel.Launch)
   var a2gFilter = CircleBuffer[LockLevel](LockLevel.Search, LockLevel.Lock, LockLevel.Launch)
 
@@ -28,6 +24,8 @@ case class RwrPage(implicit config: Configuration) extends Page("RWR", config) {
   val OSB_A2A = 1
   val OSB_A2G = 2
   val OSB_HSI = 3
+
+  def minRangeOffset = distScale * 0.05 * config.symbolScale
 
   object airThreat {
     val w = 0.015
@@ -112,7 +110,7 @@ case class RwrPage(implicit config: Configuration) extends Page("RWR", config) {
   def drawTargetBearings(game: GameData): Unit = for (target <- game.sensors.targets.locked) {
     implicit val _p = ppiProjection
     val a = minRangeOffset * (target.position - self.position : Vec2).normalized
-    val b = distScale * (target.position - self.position : Vec2).normalized
+    val b = (distScale:Double) * (target.position - self.position : Vec2).normalized
     lines(Seq(a -> b), DARK_GRAY)
   }
 
@@ -179,12 +177,7 @@ case class RwrPage(implicit config: Configuration) extends Page("RWR", config) {
   }
 
   def drawSelf(game: GameData): Unit = {
-    implicit val _p = ppiProjection
-    transform(_.rotate(-self.heading)) {
-      lines(shapes.self.coords * symbolScale, CYAN)
-      circle(0.005 * symbolScale, color = CYAN, typ = FILL)
-      circle(minRangeOffset, color = DARK_GRAY, typ = LINE)
-    }
+    drawSelf(minRangeOffset)(ppiProjection)
   }
 
   def drawNotchBlocks(game: GameData): Unit = {
