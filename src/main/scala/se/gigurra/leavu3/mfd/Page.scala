@@ -1,7 +1,7 @@
 package se.gigurra.leavu3.mfd
 
 import com.badlogic.gdx.graphics.Color
-import se.gigurra.leavu3.datamodel.{Configuration, Contact, DlinkData, GameData, Vec2, Waypoint}
+import se.gigurra.leavu3.datamodel.{Configuration, Contact, DlinkData, GameData, Mark, Member, Vec2, Vec3, Waypoint}
 import se.gigurra.leavu3.gfx.RenderContext._
 import se.gigurra.leavu3.gfx.{PpiProjection, Projection, ScreenProjection}
 import se.gigurra.leavu3.interfaces.MouseClick
@@ -127,6 +127,44 @@ abstract class Page(val name: String)(implicit config: Configuration) extends Lo
           coverageText.drawRightOf(scale = 0.5f, color = WHITE)
           elevationText.drawLeftOf(scale = 0.5f, color = WHITE)
         }
+      }
+    }
+  }
+
+  protected def drawContact[_: Projection](position: Vec3,
+                                           heading: Option[Double],
+                                           color: Color,
+                                           idText: String = "",
+                                           textToTheSide: Boolean = true,
+                                           fill: Boolean = false): Unit = {
+    val radius = 0.015 * symbolScale
+
+    at(position, heading.getOrElse(0.0)) {
+      circle(radius = radius, color = color, typ = if (fill) FILL else LINE)
+      if (heading.isDefined)
+        lines(Seq(Vec2(0.0, radius) -> Vec2(0.0, radius * 3)))
+    }
+
+    batched {
+      at(position) {
+        val altText = (position.z * displayUnits.m_to_altUnit).round.toString
+        altText.drawLeftOf(scale = stdTextSize, color = color)
+        if (textToTheSide) {
+          idText.drawRightOf(scale = stdTextSize * 0.75f, color = color)
+        } else {
+          idText.drawCentered(scale = stdTextSize * 0.50f, color = BLACK)
+        }
+      }
+    }
+  }
+
+  protected def drawDlinkMark[_: Projection](name: String, member: Member, id: String, mark: Mark): Unit = {
+    val radius = 0.015 * symbolScale
+    at(mark.position) {
+      circle(radius = radius, typ = LINE, color = YELLOW)
+      circle(radius = radius * 0.5f, typ = LINE, color = YELLOW)
+      batched {
+        mark.id.drawRightOf(scale = stdTextSize * 0.8f, color = YELLOW)
       }
     }
   }

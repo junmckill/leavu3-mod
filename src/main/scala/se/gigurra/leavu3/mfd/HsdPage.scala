@@ -19,6 +19,9 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD") {
   var shouldDrawOwnHeading = true
   val deprFactor = CircleBuffer(0.0, 0.5).withDefaultValue(0.5)
 
+  var wingmenTgtsLastTminus1 = Seq.empty[Vec3] // To calculate ai wingmen tgt headings
+  var wingmenTgtsLastTminus2 = Seq.empty[Vec3] // To calculate ai wingmen tgt headings
+
   val OSB_DEPR = 1
   val OSB_HDG = 2
   val OSB_SCALE = 17
@@ -114,33 +117,12 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD") {
   }
 
   def drawAiWingmen(game: GameData): Unit = {
-    implicit val p = ppiProjection
     for (wingman <- game.aiWingmen) {
-      val radius = 0.015 * symbolScale
-      at(wingman.position, wingman.heading) {
-        circle(radius = radius, color = CYAN)
-        lines(Seq(Vec2(0.0, radius) -> Vec2(0.0, radius * 3)))
-      }
-    }
-
-    batched {
-      for (wingman <- game.aiWingmen) {
-        at(wingman.position) {
-          val altText = (wingman.position.z * displayUnits.m_to_altUnit).round.toString
-          altText.drawLeftOf(scale = stdTextSize, color = CYAN)
-          val nameText = "AI"
-          nameText.drawRightOf(scale = stdTextSize * 0.8f, color = CYAN)
-        }
-      }
+      drawContact(wingman.position, Some(wingman.heading), CYAN, "AI")(ppiProjection)
     }
   }
 
-  var wingmenTgtsLastTminus1 = Seq.empty[Vec3]
-  var wingmenTgtsLastTminus2 = Seq.empty[Vec3]
-
   def drawAiWingmenTargets(game: GameData): Unit = {
-    implicit val p = ppiProjection
-    val radius = 0.015 * symbolScale
 
     // Hack in heading of tgts if possible
     val shouldDrawHeading =
@@ -148,26 +130,14 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD") {
       game.aiWingmenTgts.size == wingmenTgtsLastTminus2.size
 
     for ((tgtPos, i) <- game.aiWingmenTgts.zipWithIndex) {
-      at(tgtPos) {
-        circle(radius = radius, color = RED)
-        if (shouldDrawHeading) {
-          val tMinus1 = wingmenTgtsLastTminus1(i)
-          val tMinus2 = wingmenTgtsLastTminus2(i)
-          val delta = tMinus1 - tMinus2
-          val heading = math.atan2(delta.x, delta.y).toDegrees
-          rotatedTo(heading) {
-            lines(Seq(Vec2(0.0, radius) -> Vec2(0.0, radius * 3)))
-          }
-        }
-      }
-    }
-
-    batched {
-      for (tgtPos <- game.aiWingmenTgts) {
-        at(tgtPos) {
-          val text = (tgtPos.z * displayUnits.m_to_altUnit).round.toString
-          text.drawLeftOf(scale = stdTextSize, color = RED)
-        }
+      if (shouldDrawHeading) {
+        val tMinus1 = wingmenTgtsLastTminus1(i)
+        val tMinus2 = wingmenTgtsLastTminus2(i)
+        val delta = tMinus1 - tMinus2
+        val heading = math.atan2(delta.x, delta.y).toDegrees
+        drawContact(tgtPos, Some(heading), RED)(ppiProjection)
+      } else {
+        drawContact(tgtPos, None, RED)(ppiProjection)
       }
     }
 
@@ -177,34 +147,13 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD") {
     }
   }
 
-
   def drawDlinkMarks(dlinkIn: Map[String, DlinkData]): Unit = {
-    implicit val p = ppiProjection
-
-    val radius = 0.015 * symbolScale
-
-    def draw(f: (String, Member, String, Mark) => Unit): Unit = {
-      for {
-        (name, member) <- dlinkIn
-        (id, mark) <- member.marks
-      } {
-        at(mark.position) {
-          f(name, member, id, mark)
-        }
-      }
+    for {
+      (name, member) <- dlinkIn
+      (id, mark) <- member.marks
+    } {
+      drawDlinkMark(name, member, id, mark)(ppiProjection)
     }
-
-    draw { (name, member, id, mark) =>
-      circle(radius = radius, typ = LINE, color = YELLOW)
-      circle(radius = radius * 0.5f, typ = LINE, color = YELLOW)
-    }
-
-    draw { (name, member, id, mark) =>
-      batched {
-        mark.id.drawRightOf(scale = stdTextSize * 0.8f, color = YELLOW)
-      }
-    }
-
   }
 
   def drawDlinkMembersAndTargets(dlinkIn: Map[String, DlinkData]): Unit = {
@@ -216,39 +165,21 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD") {
 
       val lag = CurTime.seconds - member.timestamp
       val memberPosition = member.position + member.velocity * lag
-      val radius = 0.015 * symbolScale
 
-      at(memberPosition, member.heading) {
-        circle(radius = radius, typ = FILL, color = CYAN)
-        lines(Seq(Vec2(0.0, radius) -> Vec2(0.0, radius * 3)))
-      }
-
-      batched {
-        at(memberPosition) {
-          val altText = (memberPosition.z * displayUnits.m_to_altUnit).round.toString
-          altText.drawLeftOf(scale = stdTextSize, color = CYAN)
-          val nameText = name.take(2)
-          nameText.drawRightOf(scale = stdTextSize, color = CYAN)
-        }
-      }
+      drawContact(memberPosition, Some(member.heading), CYAN, name.take(2))
 
       for (target <- member.targets) {
 
         val targetPosition = target.position + target.velocity * lag
 
         if (target.isPositionKnown) {
-          at(targetPosition, heading = target.heading) {
-            circle(radius = radius, typ = FILL, color = contactColor(target, fromDatalink = true))
-            lines(Seq(Vec2(0.0, radius) -> Vec2(0.0, radius * 3)))
-          }
-          at(targetPosition) {
-            batched {
-              val altText = (targetPosition.z * displayUnits.m_to_altUnit).round.toString
-              altText.drawLeftOf(scale = stdTextSize, color = contactColor(target, fromDatalink = true))
-              val nameText = name.take(2)
-              nameText.drawRightOf(scale = stdTextSize, color = contactColor(target, fromDatalink = true))
-            }
-          }
+          drawContact(
+            position = targetPosition,
+            heading = Some(target.heading),
+            color = contactColor(target, fromDatalink = true),
+            idText = name.take(2),
+            fill = true
+          )
         } else at(memberPosition) { // HOJ
           val b = targetPosition - member.position: Vec2
           lines(Seq(Vec2() -> b) * 10000.0, RED)
@@ -261,8 +192,6 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD") {
 
   def drawLockedTargets(game: GameData): Unit = {
     implicit val p = ppiProjection
-
-    val radius = 0.020 * symbolScale
 
     val contacts = new mutable.HashMap[Int, Contact] // id -> data
     val order = new mutable.HashMap[Int, Int] // id -> index
@@ -290,28 +219,21 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD") {
       .filterNot(_.isPositionKnown)
       .sortBy(_.index)
 
-    for (contact <- positionsDesignated) {
-      at(contact.position, heading = contact.heading) {
-        circle(radius = radius, typ = FILL, color = contactColor(contact, fromDatalink = false))
-        lines(Seq(Vec2(0.0, radius) -> Vec2(0.0, radius * 3)))
-      }
-    }
-
     for (contact <- bearingsDesignated) {
       val offs = contact.position - self.position : Vec2
       lines(Seq(Vec2() -> offs) * 10000.0, YELLOW)
     }
 
-    batched {
-      for (contact <- positionsDesignated) {
-        at(contact.position) {
-          val text = (contact.position.z * displayUnits.m_to_altUnit).round.toString
-          text.drawLeftOf(scale = stdTextSize, color = contactColor(contact, fromDatalink = false))
-          (contact.index + 1).toString.drawCentered(scale = stdTextSize, color = BLACK)
-        }
-      }
+    for (contact <- positionsDesignated) {
+      drawContact(
+        position = contact.position,
+        heading = Some(contact.heading),
+        color = contactColor(contact, fromDatalink = false),
+        idText = (contact.index + 1).toString,
+        textToTheSide = false,
+        fill = true
+      )
     }
-
   }
 
   def drawBullsEyeNumbers(game: GameData) = {
