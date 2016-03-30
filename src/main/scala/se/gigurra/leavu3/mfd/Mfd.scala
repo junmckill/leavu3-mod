@@ -23,7 +23,7 @@ case class Mfd(implicit config: Configuration) extends Instrument(config) {
   val blank = BlankPage()
   val available = Seq(hsd, rwr, sms, fcr, inf, blank)
   var qPages = config.qps.zipWithIndex.map(p => (p._2, pageByName(p._1))).toMap
-  var iQPage = 0
+  var iQPage = config.initialQp
   var mainMenuOpen: Boolean = false
 
   def pageByName(name: String): Page = {
