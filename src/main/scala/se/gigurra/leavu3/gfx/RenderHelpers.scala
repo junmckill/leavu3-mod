@@ -140,9 +140,20 @@ trait RenderHelpers extends UnitConversions { _: RenderContext.type =>
     projection.viewport(viewportSize, heading, offs)(f)
   }
 
-  def at[_: Projection](position: Vec2,
-                        heading: Double = 0.0)(f: => Unit): Unit = {
+  def at[_: Projection](position: Vec2, heading: Double)(f: => Unit): Unit = {
     projection.at(position, heading)(f)
+  }
+
+  def at[_: Projection](position: Vec2)(f: => Unit): Unit = {
+    at(position, heading = 0.0)(f)
+  }
+
+  def at[_: Projection](x: Double, y: Double)(f: => Unit): Unit = {
+    at(x, y, heading = 0.0)(f)
+  }
+
+  def at[_: Projection](x: Double, y: Double, heading: Double)(f: => Unit): Unit = {
+    at(Vec2(x,y), heading)(f)
   }
 
   def atScreen(x: Double, y: Double)(f: => Unit): Unit = {

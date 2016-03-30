@@ -352,7 +352,7 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD") {
     val scale = config.symbolScale * 0.02 / font.getSpaceWidth
 
     batched {
-      atScreen(-0.9, 0.65) {
+      at(-0.9, 0.65) {
 
         transform(_
           .scalexy(scale)) {
