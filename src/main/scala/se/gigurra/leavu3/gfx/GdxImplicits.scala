@@ -20,6 +20,11 @@ trait GdxImplicits { _: RenderContext.type =>
       val res = String.valueOf(x)
       (0 until math.max(0, len - res.length)).map(_ => c).mkString + res
     }
+
+    def padRight(len: Int, c: Char = ' '): String = {
+      val res = String.valueOf(x)
+      res + (0 until math.max(0, len - res.length)).map(_ => c).mkString
+    }
   }
 
   implicit class DrawableString(text: String) {
