@@ -21,25 +21,23 @@ case class Mfd(implicit config: Configuration) extends Instrument(config) {
   val fcr = FcrPage()
   val inf = InfoPage()
   val available = Seq(hsd, rwr, sms, fcr, inf)
-  var qPages = Map[Int, Page](0 -> hsd, 1 -> rwr, 2 -> inf)
+  var qPages = Map[Int, Page](0 -> hsd, 1 -> rwr, 2 -> sms, 3 -> fcr, 4 -> inf)
   var iQPage = 0
   var mainMenuOpen: Boolean = false
 
   def currentPage: Option[Page] = qPages.get(iQPage)
 
-  def qp2Osb(qp: Int): Int = 13 - qp
+  def qp2Osb(qp: Int): Int = 14 - qp
 
-  def osb2Qp(osb: Int): Int = 13 - osb
+  def osb2Qp(osb: Int): Int = 14 - osb
 
   def drawPage(game: GameData, dlinkIn: Seq[(String, DlinkData)]): Unit = {
     currentPage.foreach(_.draw(game, dlinkIn))
   }
 
   def drawQps(): Unit = {
-    for (iQp <- Seq(0, 1, 2)) {
-      qPages.get(iQp).foreach { page =>
-        Mfd.Osb.drawHighlighted(qp2Osb(iQp), page.name, iQp == iQPage)
-      }
+    for ((iQp, page) <- qPages) {
+      Mfd.Osb.drawHighlighted(qp2Osb(iQp), page.name, iQp == iQPage)
     }
   }
 
@@ -71,7 +69,7 @@ case class Mfd(implicit config: Configuration) extends Instrument(config) {
   }
 
   def isQpOsb(i: Int): Boolean = {
-    11 <= i && i <= 13
+    10 <= i && i <= 14
   }
 
   def pressOsb(i: Int): Unit = {

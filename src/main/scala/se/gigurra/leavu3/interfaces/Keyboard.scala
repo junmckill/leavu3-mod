@@ -121,17 +121,6 @@ object Key {
   val OSB_18 = new Combination(_8, p => p.isControlDown && p.isAltDown)
   val OSB_19 = new Combination(_9, p => p.isControlDown && p.isAltDown)
 
-  object QP_OSB {
-    def unapply(keyPress: KeyPress): Option[Int] = {
-      keyPress match {
-        case OSB_11() => Some(11)
-        case OSB_12() => Some(12)
-        case OSB_13() => Some(13)
-        case _ => None
-      }
-    }
-  }
-
   object OSB {
     def unapply(keyPress: KeyPress): Option[Int] = {
       keyPress match {
