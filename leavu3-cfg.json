@@ -18,5 +18,7 @@
   "relayDlink"       : true,
   "keyBindingOffset" : 0,
   "rwrSeparateSrTr"  : false,
-  "units"            : "imperial"
+  "units"            : "imperial",
+  "initialQp"        : 0,
+  "qps"              : ["HSD", "RWR", "SMS", "FCR", "INF"]
 }

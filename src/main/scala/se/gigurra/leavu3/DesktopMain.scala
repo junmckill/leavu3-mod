@@ -35,7 +35,6 @@ object DesktopMain extends Logging {
     Dlink.start(config)
     Keyboard.start(config, drawable)
 
-
   } match {
     case Success(_) =>
     case Failure(e) =>

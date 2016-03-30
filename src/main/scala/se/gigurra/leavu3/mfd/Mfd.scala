@@ -20,10 +20,15 @@ case class Mfd(implicit config: Configuration) extends Instrument(config) {
   val sms = SmsPage()
   val fcr = FcrPage()
   val inf = InfoPage()
-  val available = Seq(hsd, rwr, sms, fcr, inf)
-  var qPages = Map[Int, Page](0 -> hsd, 1 -> rwr, 2 -> sms, 3 -> fcr, 4 -> inf)
+  val blank = BlankPage()
+  val available = Seq(hsd, rwr, sms, fcr, inf, blank)
+  var qPages = config.qps.zipWithIndex.map(p => (p._2, pageByName(p._1))).toMap
   var iQPage = 0
   var mainMenuOpen: Boolean = false
+
+  def pageByName(name: String): Page = {
+    available.find(_.name == name.toUpperCase).getOrElse(throw new RuntimeException(s"No Mfd Page found for name: $name"))
+  }
 
   def currentPage: Option[Page] = qPages.get(iQPage)
 
