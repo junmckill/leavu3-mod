@@ -9,5 +9,5 @@ case class CountDown(seconds: Double) {
   val t0: Double = CurTime.seconds
   def elapsed: Double = CurTime.seconds - t0
   def timeLeft: Double = math.max(0.0, seconds - elapsed)
-  def isReached: Boolean = timeLeft == 0.0
+  def isReached: Boolean = elapsed >= seconds
 }
