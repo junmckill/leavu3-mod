@@ -48,7 +48,7 @@ case class InfoPage(implicit config: Configuration) extends Page("INF") {
     val updateAvailable = Version.current != Version.latest
     val scale = config.symbolScale * 0.02 / font.getSpaceWidth
 
-    batched { atScreen(-0.8, 0.8) {
+    batched { at(-0.8, 0.8) {
 
       transform(_
         .scalexy(scale)) {

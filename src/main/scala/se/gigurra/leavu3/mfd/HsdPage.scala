@@ -245,7 +245,7 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD") {
     val selfBra = (self.position - bullsEye.position).asBra
     val scale = config.symbolScale * 0.02 / font.getSpaceWidth
 
-    batched { atScreen(-0.9, 0.9) {
+    batched { at(-0.9, 0.9) {
 
       transform(_
         .scalexy(scale)) {
@@ -286,7 +286,7 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD") {
 
     val scale = config.symbolScale * 0.02 / font.getSpaceWidth
 
-    batched { atScreen(0.45, 0.9) {
+    batched { at(0.45, 0.9) {
 
       transform(_
         .scalexy(scale)) {
@@ -339,7 +339,7 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD") {
     implicit val p = screenProjection
     if (shouldDrawOwnHeading) {
       batched {
-        atScreen(Mfd.Osb.positions(2) - Vec2(0.0, 0.1)) {
+        at(Mfd.Osb.positions(2) - Vec2(0.0, 0.1)) {
           self.heading.round.toString.pad(3, '0').drawCentered(WHITE)
         }
       }
@@ -352,7 +352,7 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD") {
     val scale = config.symbolScale * 0.02 / font.getSpaceWidth
 
     batched {
-      atScreen(-0.9, 0.65) {
+      at(-0.9, 0.65) {
 
         transform(_
           .scalexy(scale)) {

@@ -192,7 +192,7 @@ case class RwrPage(implicit config: Configuration) extends Page("RWR") {
 
     val scale = config.symbolScale * 0.02 / font.getSpaceWidth
 
-    batched { atScreen(-0.9, 0.9) {
+    batched { at(-0.9, 0.9) {
 
       transform(_
         .scalexy(scale)) {
