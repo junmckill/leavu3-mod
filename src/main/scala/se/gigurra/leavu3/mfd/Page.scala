@@ -1,7 +1,7 @@
 package se.gigurra.leavu3.mfd
 
 import com.badlogic.gdx.graphics.Color
-import se.gigurra.leavu3.datamodel.{Configuration, Contact, DlinkData, GameData, Mark, Member, Vec2, Vec3, Waypoint}
+import se.gigurra.leavu3.datamodel._
 import se.gigurra.leavu3.gfx.RenderContext._
 import se.gigurra.leavu3.gfx.{PpiProjection, Projection, ScreenProjection}
 import se.gigurra.leavu3.interfaces.MouseClick

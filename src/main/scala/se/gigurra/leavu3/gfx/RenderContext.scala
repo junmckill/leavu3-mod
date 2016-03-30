@@ -7,8 +7,6 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import se.gigurra.leavu3.datamodel.Configuration
 import se.gigurra.leavu3.lmath.{Matrix4Stack, RichContact, VectorImplicits}
 
-import scala.collection.mutable
-
 object RenderContext
   extends GdxImplicits
     with RenderHelpers
@@ -34,7 +32,5 @@ object RenderContext
   def symbolScale(implicit config: Configuration, _p: Projection[_]) = config.symbolScale * screen2World
 
   def symbolScaleF(implicit config: Configuration, _p: Projection[_]) = symbolScale
-
-  val self = se.gigurra.leavu3.gfx.self
 
 }

@@ -7,8 +7,7 @@ import com.badlogic.gdx.graphics.GL20._
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType
 import com.badlogic.gdx.math.Vector2
-import se.gigurra.leavu3.datamodel.{DlinkConfiguration, Vec2, Vec3}
-import se.gigurra.leavu3.interfaces.{Dlink, GameIn}
+import se.gigurra.leavu3.datamodel._
 import se.gigurra.leavu3.lmath.UnitConversions
 
 trait RenderHelpers extends UnitConversions { _: RenderContext.type =>
@@ -178,19 +177,6 @@ trait RenderHelpers extends UnitConversions { _: RenderContext.type =>
 
   def projection[_: Projection]: Projection[_] = implicitly[Projection[_]]
 
-}
-
-object self {
-  def dlinkCallsign: String = Dlink.config.callsign
-  def planeId: Int = GameIn.snapshot.metaData.planeId
-  def modelTime: Double = GameIn.snapshot.metaData.modelTime
-  def coalition: Int = GameIn.snapshot.selfData.coalitionId
-  def pitch: Float = GameIn.snapshot.selfData.pitch
-  def roll: Float = GameIn.snapshot.selfData.roll
-  def heading: Float = GameIn.snapshot.selfData.heading
-  def position: Vec3 = GameIn.snapshot.selfData.position
-  def velocity: Vec3 = GameIn.snapshot.flightModel.velocity
-  def acceleration: Vec3 = GameIn.snapshot.flightModel.acceleration
 }
 
 trait Projection[+T] {
