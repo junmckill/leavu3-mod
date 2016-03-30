@@ -47,8 +47,8 @@ case class Mfd(implicit config: Configuration) extends Instrument(config) {
   }
 
   def drawMainMenu(): Unit = {
-    for (pos <- Mfd.Osb.positions) {
-      batched {
+    batched {
+      for (pos <- Mfd.Osb.positions) {
         at(pos) {
           "Item".drawCentered(Color.WHITE)
         }
@@ -208,11 +208,9 @@ object Mfd {
         }
       }
 
-      batched {
-        val pos = Mfd.Osb.positions(iOsb)
-        at(pos) {
-          text.drawCentered(if (boxType == FILL) black else white)
-        }
+      val pos = Mfd.Osb.positions(iOsb)
+      at(pos) {
+        text.drawCentered(if (boxType == FILL) black else white)
       }
 
     }

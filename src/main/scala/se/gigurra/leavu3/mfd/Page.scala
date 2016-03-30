@@ -43,10 +43,8 @@ abstract class Page(val name: String)(implicit config: Configuration) extends Lo
     circle(at = wp.position - self.position, radius = 0.015 * symbolScale, typ = if (selected) FILL else LINE, color = WHITE)
 
     text foreach { text =>
-      batched {
-        at(wp.position) {
-          text.drawRightOf(scale = stdTextSize, color = WHITE)
-        }
+      at(wp.position) {
+        text.drawRightOf(scale = stdTextSize, color = WHITE)
       }
     }
   }
@@ -123,10 +121,8 @@ abstract class Page(val name: String)(implicit config: Configuration) extends Lo
         val coverageText =
           s"""${(coverage.max * displayUnits.m_to_altUnit).round}
              |${(coverage.min * displayUnits.m_to_altUnit).round}""".stripMargin
-        batched {
-          coverageText.drawRightOf(scale = 0.5f, color = WHITE)
-          elevationText.drawLeftOf(scale = 0.5f, color = WHITE)
-        }
+        coverageText.drawRightOf(scale = 0.5f, color = WHITE)
+        elevationText.drawLeftOf(scale = 0.5f, color = WHITE)
       }
     }
   }
@@ -145,15 +141,13 @@ abstract class Page(val name: String)(implicit config: Configuration) extends Lo
         lines(Seq(Vec2(0.0, radius) -> Vec2(0.0, radius * 3)))
     }
 
-    batched {
-      at(position) {
-        val altText = (position.z * displayUnits.m_to_altUnit).round.toString
-        altText.drawLeftOf(scale = stdTextSize, color = color)
-        if (textToTheSide) {
-          idText.drawRightOf(scale = stdTextSize * 0.75f, color = color)
-        } else {
-          idText.drawCentered(scale = stdTextSize * 0.50f, color = if (fill) BLACK else color)
-        }
+    at(position) {
+      val altText = (position.z * displayUnits.m_to_altUnit).round.toString
+      altText.drawLeftOf(scale = stdTextSize, color = color)
+      if (textToTheSide) {
+        idText.drawRightOf(scale = stdTextSize * 0.75f, color = color)
+      } else {
+        idText.drawCentered(scale = stdTextSize * 0.50f, color = if (fill) BLACK else color)
       }
     }
   }
@@ -163,9 +157,7 @@ abstract class Page(val name: String)(implicit config: Configuration) extends Lo
     at(mark.position) {
       circle(radius = radius, typ = LINE, color = YELLOW)
       circle(radius = radius * 0.5f, typ = LINE, color = YELLOW)
-      batched {
-        mark.id.drawRightOf(scale = stdTextSize * 0.8f, color = YELLOW)
-      }
+      mark.id.drawRightOf(scale = stdTextSize * 0.8f, color = YELLOW)
     }
   }
 

@@ -34,12 +34,22 @@ trait GdxImplicits { _: RenderContext.type =>
                color: Color = null): Unit = {
       if (color != null)
         font.setColor(color)
+
+      val doBatch = !batch.isDrawing
+
+      if (doBatch)
+        batch.begin()
+
       font.draw(
         batch,
         text,
         width  * (xAlign - 0.5f) + xRawOffs,
         height * (yAlign + 0.5f) + yRawOffs
       )
+
+      if (doBatch)
+        batch.end()
+
     }
 
     def drawCentered[_: Projection](color: Color = null, scale: Float = 1.0f)(implicit configuration: Configuration): Unit = {

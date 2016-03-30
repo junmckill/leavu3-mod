@@ -145,18 +145,14 @@ case class RwrPage(implicit config: Configuration) extends Page("RWR") {
       val edgeOffset = offset.normalized * distScale
       lines(Seq(lineStart -> edgeOffset), threat.color)
 
-      batched {
-
-        if (threat.range / distScale > 0.5) {
-          at(self.position + edgeOffset * 1.05f, heading = bearing - self.heading) {
-            threat.rwrName.drawCentered(threat.color, scale = 0.7f)
-          }
-        } else {
-          at(self.position + lineStart, heading = bearing - self.heading) {
-            threat.rwrName.drawRightOf(threat.color, scale = 0.7f)
-          }
+      if (threat.range / distScale > 0.5) {
+        at(self.position + edgeOffset * 1.05f, heading = bearing - self.heading) {
+          threat.rwrName.drawCentered(threat.color, scale = 0.7f)
         }
-
+      } else {
+        at(self.position + lineStart, heading = bearing - self.heading) {
+          threat.rwrName.drawRightOf(threat.color, scale = 0.7f)
+        }
       }
 
     }
