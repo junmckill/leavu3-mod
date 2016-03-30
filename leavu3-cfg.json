@@ -19,6 +19,6 @@
   "keyBindingOffset" : 0,
   "rwrSeparateSrTr"  : false,
   "units"            : "imperial",
-  "initialQp"        : 2,
+  "initialQp"        : 0,
   "qps"              : ["HSD", "RWR", "SMS", "FCR", "INF"]
 }
