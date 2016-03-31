@@ -9,6 +9,8 @@ case class Targets(source: SourceData = Map.empty) extends SafeParsed[Targets.ty
   val locked   = parse(schema.locked)
 
   def pdt: Option[Target] = locked.headOption
+
+  def withRwsMemory(rwsContacts: Seq[Contact]): Targets = marshal(this, schema.detected -> rwsContacts)
 }
 
 object Targets extends Schema[Targets] {

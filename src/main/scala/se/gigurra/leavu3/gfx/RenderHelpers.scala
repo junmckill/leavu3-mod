@@ -2,7 +2,7 @@ package se.gigurra.leavu3.gfx
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Gdx.gl
-import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.{Color, GL20}
 import com.badlogic.gdx.graphics.GL20._
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType
@@ -10,6 +10,8 @@ import com.badlogic.gdx.math.{Rectangle, Vector2}
 import com.badlogic.gdx.scenes.scene2d.utils.ScissorStack
 import se.gigurra.leavu3.datamodel._
 import se.gigurra.leavu3.lmath.{NormalizeDegrees, UnitConversions}
+
+import scala.language.implicitConversions
 
 trait RenderHelpers extends UnitConversions { _: RenderContext.type =>
 
@@ -32,7 +34,13 @@ trait RenderHelpers extends UnitConversions { _: RenderContext.type =>
       f
     } finally {
       batch.end()
+      reenableBlending()
     }
+  }
+
+  def reenableBlending(): Unit = {
+    Gdx.graphics.getGL20.glEnable(GL20.GL_BLEND)
+    Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
   }
 
   def make11OrthoCamera(scale: Float = 1.0f): Unit = {
@@ -54,8 +62,7 @@ trait RenderHelpers extends UnitConversions { _: RenderContext.type =>
     shapeRenderer.setProjectionMatrix(camera.combined)
   }
 
-  def shape(typ: ShapeRenderer.ShapeType = LINE,
-            color: Color = null)(drawCode: => Unit): Unit = {
+  def shape(typ: ShapeRenderer.ShapeType = LINE, color: Color = null)(drawCode: => Unit): Unit = {
     try {
       shapeRenderer.begin(typ)
       if (color != null)
@@ -186,6 +193,7 @@ trait RenderHelpers extends UnitConversions { _: RenderContext.type =>
   }
 
   def projection[_: Projection]: Projection[_] = implicitly[Projection[_]]
+
 
 }
 

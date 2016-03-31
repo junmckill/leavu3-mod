@@ -8,6 +8,8 @@ case class Sensors(source: SourceData = Map.empty) extends SafeParsed[Sensors.ty
   val targets = parse(schema.targets)
 
   def pdt: Option[Target] = targets.pdt
+
+  def withRwsMemory(rwsContacts: Seq[Contact]): Sensors = marshal(this, schema.targets -> targets.withRwsMemory(rwsContacts))
 }
 
 object Sensors extends Schema[Sensors] {

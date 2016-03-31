@@ -33,6 +33,7 @@ case class GameData(source: SourceData = Map.empty) extends SafeParsed[GameData.
   def aircraftMode: AircraftMode = indicators.nav.mode
 
   def withRoute(newRoute: Route) = marshal(this, schema.route -> newRoute)
+  def withRwsMemory(rwsContacts: Seq[Contact]): GameData = marshal(this, schema.sensors -> sensors.withRwsMemory(rwsContacts))
 
   val timeStamp: Double = CurTime.seconds
   def age: Double = CurTime.seconds - timeStamp
