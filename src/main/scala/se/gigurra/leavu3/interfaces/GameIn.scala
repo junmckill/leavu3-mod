@@ -109,7 +109,7 @@ object GameIn extends Logging {
     }
 
     def rwsMemoryWorkaround(): GameData = {
-      val rwsContactsKnown = rwsMemory.update(newData.sensors.targets.detected)
+      val rwsContactsKnown = rwsMemory.update(newData.sensors.targets.detected.filterNot(_.isDesignated).filter(_.isPositionKnown))
       newData.withRwsMemory(rwsContactsKnown.map(_.t))
     }
 
