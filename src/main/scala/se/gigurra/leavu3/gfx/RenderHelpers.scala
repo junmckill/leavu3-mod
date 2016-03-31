@@ -6,7 +6,8 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20._
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType
-import com.badlogic.gdx.math.Vector2
+import com.badlogic.gdx.math.{Rectangle, Vector2}
+import com.badlogic.gdx.scenes.scene2d.utils.ScissorStack
 import se.gigurra.leavu3.datamodel._
 import se.gigurra.leavu3.lmath.UnitConversions
 
@@ -130,6 +131,18 @@ trait RenderHelpers extends UnitConversions { _: RenderContext.type =>
       } {
         shapeRenderer.line(p1, p2)
       }
+    }
+  }
+
+  def scissor(at: Vec2 = Vec2(0,0), size: Vec2 = Vec2(2,2))(f: => Unit): Unit = {
+    val rIn = new Rectangle((at.x - size.x / 2.0).toFloat, (at.y - size.y / 2.0).toFloat, size.x.toFloat, size.y.toFloat)
+    val rOut = new Rectangle()
+    ScissorStack.calculateScissors(camera, transform.current, rIn, rOut)
+    ScissorStack.pushScissors(rOut)
+    try {
+      f
+    } finally {
+      ScissorStack.popScissors()
     }
   }
 
@@ -262,9 +275,7 @@ case class PpiProjection() extends Projection[Any] {
   def headingCorrection: Float = {
     -self.heading
   }
-
 }
-
 
 case class BScopeProjection(widthDegrees: Double, use3dDist: Boolean) extends Projection[Any] {
 

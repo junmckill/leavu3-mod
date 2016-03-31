@@ -20,5 +20,6 @@
   "rwrSeparateSrTr"  : false,
   "units"            : "imperial",
   "initialQp"        : 0,
-  "qps"              : ["HSD", "RWR", "SMS", "FCR", "INF"]
+  "qps"              : ["HSD", "RWR", "SMS", "FCR", "INF"],
+  "use3dBscope"      : true
 }

@@ -32,6 +32,7 @@ case class Configuration(source: SourceData = Map.empty) extends Parsed[Configur
   val initialUnits      = parse(schema.units)
   val initialQp         = parse(schema.initialQp)
   val qps               = parse(schema.qps)
+  val use3dBscope       = parse(schema.use3dBscope)
 
   require(title.length > 0, "Configured title must be > 0")
   require(width > 0, "Configured width must be > 0")
@@ -64,6 +65,7 @@ object Configuration extends Schema[Configuration] with Logging {
   val units             = required[String]      ("units",             default = "imperial")
   val initialQp         = required[Int]         ("initialQp",         default = 0)
   val qps               = required[Seq[String]] ("qps",               default = Seq("HSD", "RWR", "SMS", "FCR", "INF"))
+  val use3dBscope       = required[Boolean]     ("use3dBscope",       default = true)
 
   def readFromFile(s: String = "leavu3-cfg.json"): Configuration = {
     logger.info(s"Loading configuration file: $s")
