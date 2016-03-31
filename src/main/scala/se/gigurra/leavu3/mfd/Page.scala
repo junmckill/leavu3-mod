@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.Color
 import se.gigurra.leavu3.datamodel._
 import se.gigurra.leavu3.gfx.RenderContext._
 import se.gigurra.leavu3.gfx.{PpiProjection, Projection, ScreenProjection}
-import se.gigurra.leavu3.interfaces.MouseClick
+import se.gigurra.leavu3.interfaces.{GameIn, MouseClick}
 import se.gigurra.leavu3.util.CircleBuffer
 import se.gigurra.serviceutils.twitter.logging.Logging
 
@@ -29,6 +29,18 @@ abstract class Page(val name: String)(implicit config: Configuration) extends Lo
   //////////////////////////////////////////////////////////////////////////////
   // Common symbols
 
+  protected def scanZoneAzDirection: Double = scanZoneAzDirectionAndWidth._1
+  protected def scanZoneWidth: Double = scanZoneAzDirectionAndWidth._2
+  protected def scanZoneAzDirectionAndWidth: (Double, Double) = {
+    val game = GameIn.snapshot
+    val sensors = game.sensors.status
+    val sttScanZoneOverride = game.pdt.isDefined &&
+      (game.aircraftMode.isInCac || game.aircraftMode.isStt)
+    val width = if (sttScanZoneOverride) 2.5f else sensors.scanZone.size.azimuth
+    val direction = if (sttScanZoneOverride) game.pdt.get.bearing else self.heading + sensors.scanZone.direction.azimuth
+    (direction, width)
+  }
+
   protected def drawWpByIndex[_: Projection](wp: Waypoint,
                                              selected: Boolean = false): Unit = {
 
@@ -39,11 +51,10 @@ abstract class Page(val name: String)(implicit config: Configuration) extends Lo
   protected def drawWp[_: Projection](wp: Waypoint,
                                      text: Option[String],
                                      selected: Boolean = false): Unit ={
+    at(wp.position) {
+      circle(radius = 0.015 * symbolScale, typ = if (selected) FILL else LINE, color = WHITE)
 
-    circle(at = wp.position - self.position, radius = 0.015 * symbolScale, typ = if (selected) FILL else LINE, color = WHITE)
-
-    text foreach { text =>
-      at(wp.position) {
+      text foreach { text =>
         text.drawRightOf(scale = stdTextSize, color = WHITE)
       }
     }

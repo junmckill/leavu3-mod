@@ -18,6 +18,7 @@ case class FcrPage(implicit config: Configuration) extends Page("FCR") {
 
   def draw(game: GameData, dlinkIn: Seq[(String, DlinkData)]): Unit = {
     drawConformal(game, dlinkIn)
+    drawInfo(game, dlinkIn)
   }
 
   def drawConformal(game: GameData, dlinkIn: Seq[(String, DlinkData)]): Unit = {
@@ -27,6 +28,7 @@ case class FcrPage(implicit config: Configuration) extends Page("FCR") {
       viewport(screenDistMeters, self.heading, offs = Vec2(0.0, 0.0)) {
         scissor(at = (0.0, 0.0), size = (screenDistMeters, screenDistMeters)) {
           drawScanZoneUnderlay(game)
+          drawSelectedWaypoint(game)
           drawOwnContacts(game, dlinkIn)
           drawAiWingmen(game)
           drawAiWingmenTargets(game)
@@ -41,8 +43,6 @@ case class FcrPage(implicit config: Configuration) extends Page("FCR") {
 
   def drawScanZoneUnderlay[_: Projection](game: GameData): Unit = {
 
-    val scanZone = game.sensors.status.scanZone
-
     def drawGreyUnderlay(): Unit = {
       val braMiddleScreen = Bra(self.heading, screenDistMeters*0.5, 0.0)
       at(self.position + braMiddleScreen.toOffset : Vec2, heading = self.heading) {
@@ -51,17 +51,25 @@ case class FcrPage(implicit config: Configuration) extends Page("FCR") {
     }
 
     def drawScannedArea(): Unit = {
-      val az = scanZone.direction.azimuth
-      val braScanCenter = Bra(self.heading + az, screenDistMeters * 0.5, 0.0)
-      val hCoverage = scanZone.size.azimuth / screenWidthDegrees
+      if (game.sensors.status.sensorOn) {
+        val (direction, width) = scanZoneAzDirectionAndWidth
 
-      at(self.position + braScanCenter.toOffset : Vec2, heading = self.heading) {
-        rect(hCoverage * screenDistMeters, screenDistMeters, typ = FILL, color = BLACK)
+        val braScanCenter = Bra(direction, screenDistMeters * 0.5, 0.0)
+        val hCoverage = width / screenWidthDegrees
+
+        at(self.position + braScanCenter.toOffset: Vec2, heading = self.heading) {
+          rect(hCoverage * screenDistMeters, screenDistMeters, typ = FILL, color = BLACK)
+        }
       }
     }
 
     drawGreyUnderlay()
     drawScannedArea()
+  }
+
+
+  def drawSelectedWaypoint[_: Projection](game: GameData): Unit = {
+    drawWp(game.route.currentWaypoint, None, selected = true)
   }
 
   def drawAiWingmen[_: Projection](game: GameData): Unit = {
@@ -147,6 +155,38 @@ case class FcrPage(implicit config: Configuration) extends Page("FCR") {
 
   def drawSurroundEdge[_: Projection](): Unit = {
     rect(screenDistMeters, screenDistMeters, color = TEAL)
+  }
+
+  def drawInfo(game: GameData, dlinkIn: Seq[(String, DlinkData)]): Unit = {
+    implicit val p = screenProjection
+    drawBullsEyeNumbers(game)
+    drawBraNumbers(game)
+    drawOwnHeading(game)
+    drawModes(game)
+    drawDlzs(game)
+    drawTargetInfo(game)
+    drawOsbs(game)
+  }
+
+  def drawBullsEyeNumbers[_: Projection](game: GameData): Unit = {
+  }
+
+  def drawBraNumbers[_: Projection](game: GameData): Unit = {
+  }
+
+  def drawOwnHeading[_: Projection](game: GameData): Unit = {
+  }
+
+  def drawModes[_: Projection](game: GameData): Unit = {
+  }
+
+  def drawOsbs[_: Projection](game: GameData): Unit = {
+  }
+
+  def drawDlzs[_: Projection](game: GameData): Unit = {
+  }
+
+  def drawTargetInfo[_: Projection](game: GameData): Unit = {
   }
 
 }

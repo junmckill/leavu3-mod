@@ -107,11 +107,8 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD") {
     implicit val p = ppiProjection
     val sensors = game.sensors.status
     if (sensors.sensorOn) {
-      val sttScanZoneOverride = game.pdt.isDefined &&
-        (game.aircraftMode.isInCac || game.aircraftMode.isStt)
       val dist = sensors.scale.distance
-      val width = if (sttScanZoneOverride) 2.5f else sensors.scanZone.size.azimuth
-      val direction = if (sttScanZoneOverride) game.pdt.get.bearing else self.heading + sensors.scanZone.direction.azimuth
+      val (direction, width) = scanZoneAzDirectionAndWidth
       arc(radius = dist, angle = width, direction = direction, color = LIGHT_GRAY)
     }
   }
