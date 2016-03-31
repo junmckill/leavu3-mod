@@ -2,6 +2,7 @@ package se.gigurra.leavu3.mfd
 
 import com.badlogic.gdx.graphics.Color
 import se.gigurra.leavu3.datamodel._
+import se.gigurra.leavu3.gfx.Projection
 import se.gigurra.leavu3.gfx.RenderContext._
 import se.gigurra.leavu3.util.{CircleBuffer, CurTime}
 import se.gigurra.leavu3.interfaces.{Dlink, MouseClick}
@@ -18,9 +19,6 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD") {
   var shouldDrawDetailedHsi = true
   var shouldDrawOwnHeading = true
   val deprFactor = CircleBuffer(0.0, 0.5).withDefaultValue(0.5)
-
-  var wingmenTgtsLastTminus1 = Seq.empty[Vec3] // To calculate ai wingmen tgt headings
-  var wingmenTgtsLastTminus2 = Seq.empty[Vec3] // To calculate ai wingmen tgt headings
 
   val OSB_DEPR = 1
   val OSB_HDG = 2
@@ -56,11 +54,11 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD") {
       drawSelf(game)
       drawHsi(game)
       drawWayPoints(game)
+      drawDlinkMarks(dlinkIn)
       drawScanZone(game)
       drawAiWingmen(game)
       drawAiWingmenTargets(game)
       drawDlinkMembersAndTargets(dlinkIn)
-      drawDlinkMarks(dlinkIn)
       drawLockedTargets(game)
       drawTdc(game)
     }(ppiProjection)
@@ -110,46 +108,6 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD") {
       val dist = sensors.scale.distance
       val (direction, width) = scanZoneAzDirectionAndWidth
       arc(radius = dist, angle = width, direction = direction, color = LIGHT_GRAY)
-    }
-  }
-
-  def drawAiWingmen(game: GameData): Unit = {
-    for (wingman <- game.aiWingmen) {
-      drawContact(wingman.position, Some(wingman.heading), CYAN, centerText = "AI")(ppiProjection)
-    }
-  }
-
-  def drawAiWingmenTargets(game: GameData): Unit = {
-
-    // Hack in heading of tgts if possible
-    val shouldDrawHeading =
-      game.aiWingmenTgts.size == wingmenTgtsLastTminus1.size &&
-      game.aiWingmenTgts.size == wingmenTgtsLastTminus2.size
-
-    for ((tgtPos, i) <- game.aiWingmenTgts.zipWithIndex) {
-      if (shouldDrawHeading) {
-        val tMinus1 = wingmenTgtsLastTminus1(i)
-        val tMinus2 = wingmenTgtsLastTminus2(i)
-        val delta = tMinus1 - tMinus2
-        val heading = math.atan2(delta.x, delta.y).toDegrees
-        drawContact(tgtPos, Some(heading), RED, rightText = "ai")(ppiProjection)
-      } else {
-        drawContact(tgtPos, None, RED, rightText = "ai")(ppiProjection)
-      }
-    }
-
-    if (wingmenTgtsLastTminus1 != game.aiWingmenTgts) {
-      wingmenTgtsLastTminus2 = wingmenTgtsLastTminus1
-      wingmenTgtsLastTminus1 = game.aiWingmenTgts
-    }
-  }
-
-  def drawDlinkMarks(dlinkIn: Seq[(String, DlinkData)]): Unit = {
-    for {
-      (name, member) <- dlinkIn
-      (id, mark) <- member.marks
-    } {
-      drawDlinkMark(name, member, id, mark)(ppiProjection)
     }
   }
 

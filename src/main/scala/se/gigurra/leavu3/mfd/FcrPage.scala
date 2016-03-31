@@ -1,6 +1,6 @@
 package se.gigurra.leavu3.mfd
 
-import se.gigurra.leavu3.datamodel.{Bra, Configuration, Contact, DlinkData, GameData, Vec2, self}
+import se.gigurra.leavu3.datamodel.{Bra, Configuration, Contact, DlinkData, GameData, Vec2, Vec3, self}
 import se.gigurra.leavu3.gfx.{BScopeProjection, Projection}
 import se.gigurra.leavu3.interfaces.GameIn
 import se.gigurra.leavu3.gfx.RenderContext._
@@ -29,10 +29,11 @@ case class FcrPage(implicit config: Configuration) extends Page("FCR") {
         scissor(at = (0.0, 0.0), size = (screenDistMeters, screenDistMeters)) {
           drawScanZoneUnderlay(game)
           drawSelectedWaypoint(game)
-          drawOwnContacts(game, dlinkIn)
+          drawDlinkMarks(dlinkIn)
           drawAiWingmen(game)
           drawAiWingmenTargets(game)
           drawDlinkWingmenAndTargets(game, dlinkIn)
+          drawOwnContacts(game, dlinkIn)
           drawScanZoneOverlay(game)
           drawTdc(game)
         }
@@ -70,14 +71,6 @@ case class FcrPage(implicit config: Configuration) extends Page("FCR") {
 
   def drawSelectedWaypoint[_: Projection](game: GameData): Unit = {
     drawWp(game.route.currentWaypoint, None, selected = true)
-  }
-
-  def drawAiWingmen[_: Projection](game: GameData): Unit = {
-
-  }
-
-  def drawAiWingmenTargets[_: Projection](game: GameData): Unit = {
-
   }
 
   def drawDlinkWingmenAndTargets[_: Projection](game: GameData, dlinkIn: Seq[(String, DlinkData)]): Unit = {
