@@ -244,7 +244,7 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD") {
     val selfBra = (self.position - bullsEye.position).asBra
     val scale = config.symbolScale * 0.02 / font.getSpaceWidth
 
-    batched { at(-0.9, 0.9) {
+    batched { at((-0.9, 0.9)) {
 
       transform(_
         .scalexy(scale)) {
@@ -285,7 +285,7 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD") {
 
     val scale = config.symbolScale * 0.02 / font.getSpaceWidth
 
-    batched { at(0.45, 0.9) {
+    batched { at((0.45, 0.9)) {
 
       transform(_
         .scalexy(scale)) {
@@ -351,7 +351,7 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD") {
     val scale = config.symbolScale * 0.02 / font.getSpaceWidth
 
     batched {
-      at(-0.9, 0.65) {
+      at((-0.9, 0.65)) {
 
         transform(_
           .scalexy(scale)) {

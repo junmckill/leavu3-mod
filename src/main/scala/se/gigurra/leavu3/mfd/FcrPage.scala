@@ -1,10 +1,9 @@
 package se.gigurra.leavu3.mfd
 
-import se.gigurra.leavu3.datamodel.{Configuration, Contact, DlinkData, GameData, Vec2, Vec3, self}
+import se.gigurra.leavu3.datamodel.{Bra, Configuration, Contact, DlinkData, GameData, Vec2, self}
 import se.gigurra.leavu3.gfx.{BScopeProjection, Projection}
 import se.gigurra.leavu3.interfaces.GameIn
 import se.gigurra.leavu3.gfx.RenderContext._
-import se.gigurra.leavu3.util.{ContactMemory, Memory}
 
 import scala.collection.mutable
 
@@ -27,11 +26,58 @@ case class FcrPage(implicit config: Configuration) extends Page("FCR") {
 
       viewport(screenDistMeters, self.heading, offs = Vec2(0.0, 0.0)) {
         scissor(at = (0.0, 0.0), size = (screenDistMeters, screenDistMeters)) {
+          drawScanZoneUnderlay(game)
           drawOwnContacts(game, dlinkIn)
+          drawAiWingmen(game)
+          drawAiWingmenTargets(game)
+          drawDlinkWingmenAndTargets(game, dlinkIn)
+          drawScanZoneOverlay(game)
+          drawTdc(game)
         }
         drawSurroundEdge()
       }
     }
+  }
+
+  def drawScanZoneUnderlay[_: Projection](game: GameData): Unit = {
+
+    val scanZone = game.sensors.status.scanZone
+
+    def drawGreyUnderlay(): Unit = {
+      val braMiddleScreen = Bra(self.heading, screenDistMeters*0.5, 0.0)
+      at(self.position + braMiddleScreen.toOffset : Vec2, heading = self.heading) {
+        rect(screenDistMeters, screenDistMeters, typ = FILL, color = DARK_GRAY.scaleAlpha(0.25f))
+      }
+    }
+
+    def drawScannedArea(): Unit = {
+      val az = scanZone.direction.azimuth
+      val braScanCenter = Bra(self.heading + az, screenDistMeters * 0.5, 0.0)
+      val hCoverage = scanZone.size.azimuth / screenWidthDegrees
+
+      at(self.position + braScanCenter.toOffset : Vec2, heading = self.heading) {
+        rect(hCoverage * screenDistMeters, screenDistMeters, typ = FILL, color = BLACK)
+      }
+    }
+
+    drawGreyUnderlay()
+    drawScannedArea()
+  }
+
+  def drawAiWingmen[_: Projection](game: GameData): Unit = {
+
+  }
+
+  def drawAiWingmenTargets[_: Projection](game: GameData): Unit = {
+
+  }
+
+  def drawDlinkWingmenAndTargets[_: Projection](game: GameData, dlinkIn: Seq[(String, DlinkData)]): Unit = {
+
+  }
+
+  def drawScanZoneOverlay[_: Projection](game: GameData): Unit = {
+
   }
 
   def drawOwnContacts[_: Projection](game: GameData, dlinkIn: Seq[(String, DlinkData)]): Unit = {
@@ -102,7 +148,5 @@ case class FcrPage(implicit config: Configuration) extends Page("FCR") {
   def drawSurroundEdge[_: Projection](): Unit = {
     rect(screenDistMeters, screenDistMeters, color = TEAL)
   }
-
-
 
 }

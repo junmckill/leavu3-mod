@@ -169,19 +169,11 @@ trait RenderHelpers extends UnitConversions { _: RenderContext.type =>
   }
 
   def at[_: Projection](position: Vec2)(f: => Unit): Unit = {
-    at(Vec3(position.x, position.y, 0.0))(f)
+    projection.at(position, heading = 0.0)(f)
   }
 
   def at[_: Projection](position: Vec2, heading: Double)(f: => Unit): Unit = {
-    at(Vec3(position.x, position.y, 0.0), heading)(f)
-  }
-
-  def at[_: Projection](x: Double, y: Double)(f: => Unit): Unit = {
-    at(x, y, heading = 0.0)(f)
-  }
-
-  def at[_: Projection](x: Double, y: Double, heading: Double)(f: => Unit): Unit = {
-    at(Vec3(x,y), heading)(f)
+    projection.at(position, heading)(f)
   }
 
   def rotatedTo[_: Projection](heading: Double)(f: => Unit): Unit = {
@@ -199,7 +191,8 @@ trait RenderHelpers extends UnitConversions { _: RenderContext.type =>
 
 trait Projection[+T] {
   def viewport(viewportSize: Double, heading: Float = 0.0f, offs: Vector2 = Vector2.Zero)(f: => Unit)
-  def at(position: Vec3, heading: Double = 0.0)(f: => Unit): Unit
+  def at(position: Vec3, heading: Double)(f: => Unit): Unit
+  def at(position: Vec2, heading: Double)(f: => Unit): Unit
   def rotatedTo(heading: Double)(f: => Unit): Unit
   def screen2World: Float
   def headingCorrection: Float
@@ -226,6 +219,10 @@ case class ScreenProjection() extends Projection[Any] {
 
   def headingCorrection: Float = {
     0.0f
+  }
+
+  override def at(position: Vec2, heading: Double)(f: => Unit): Unit = {
+    at(Vec3(position.x, position.y), heading)(f)
   }
 
   override def at(position: Vec3, heading: Double)(f: => Unit): Unit = {
@@ -259,6 +256,10 @@ case class PpiProjection() extends Projection[Any] {
       .rotate(heading)) {
       f
     }
+  }
+
+  override def at(position: Vec2, heading: Double)(f: => Unit): Unit = {
+    at(Vec3(position.x, position.y), heading)(f)
   }
 
   def at(position: Vec3, heading: Double = 0.0)(f: => Unit): Unit = {
@@ -301,10 +302,14 @@ case class BScopeProjection(widthDegrees: Double, use3dDist: Boolean) extends Pr
     this.viewportSize = prev
   }
 
+  override def at(position: Vec2, heading: Double)(f: => Unit): Unit = {
+    at(Vec3(position.x, position.y, self.position.z), heading)(f)
+  }
+
   def at(position: Vec3, heading: Double = 0.0)(f: => Unit): Unit = {
     val bra = if (use3dDist) (position - self.position: Vec3).asBra else (position - self.position: Vec2).asBra
     val relAz = NormalizeDegrees.pm180(bra.bearing - self.heading)
-    val range = bra.range
+    val range = bra.range3d
 
     val x = azToX(relAz)
     val y = range - 0.5 * viewportSize
@@ -331,7 +336,7 @@ case class BScopeProjection(widthDegrees: Double, use3dDist: Boolean) extends Pr
   }
 
   def azToX(azDegrees: Double): Double = {
-    0.5 * viewportSize * azDegrees / widthDegrees
+    viewportSize * azDegrees / widthDegrees
   }
 
 }

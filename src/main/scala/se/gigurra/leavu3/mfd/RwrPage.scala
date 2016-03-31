@@ -129,7 +129,7 @@ case class RwrPage(implicit config: Configuration) extends Page("RWR") {
 
     for (threat <- allEmitters.filter(threatFilter).sortBy(_.priority)) {
       val bearing = threat.azimuth + self.heading
-      val bra = Bra(bearingRaw = bearing, range = threat.range, deltaAltitude = 0.0)
+      val bra = Bra(bearingRaw = bearing, range2d = threat.range, deltaAltitude = 0.0)
 
       val offset = bra.toOffset
 
@@ -141,7 +141,7 @@ case class RwrPage(implicit config: Configuration) extends Page("RWR") {
         }
       }
 
-      val lineStart = offset.normalized * (bra.range + airThreat.h * symbolScale)
+      val lineStart = offset.normalized * (bra.range2d + airThreat.h * symbolScale)
       val edgeOffset = offset.normalized * distScale
       lines(Seq(lineStart -> edgeOffset), threat.color)
 
@@ -171,7 +171,7 @@ case class RwrPage(implicit config: Configuration) extends Page("RWR") {
 
     for (azimuth <- Seq(-90.0f, 90.0f)) {
       val bearing = azimuth + self.heading
-      val bra = Bra(bearingRaw = bearing, range = distScale, deltaAltitude = 0.0)
+      val bra = Bra(bearingRaw = bearing, range2d = distScale, deltaAltitude = 0.0)
       val offset = bra.toOffset
 
       val w = 0.02
@@ -188,7 +188,7 @@ case class RwrPage(implicit config: Configuration) extends Page("RWR") {
 
     val scale = config.symbolScale * 0.02 / font.getSpaceWidth
 
-    batched { at(-0.9, 0.9) {
+    batched { at((-0.9, 0.9)) {
 
       transform(_
         .scalexy(scale)) {

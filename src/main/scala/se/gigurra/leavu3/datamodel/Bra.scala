@@ -6,13 +6,16 @@ import se.gigurra.leavu3.lmath.{NormalizeDegrees, UnitConversions}
   * Created by johan_home on 2016-03-25.
   */
 
-case class Bra(bearingRaw: Double, range: Double, deltaAltitude: Double) extends UnitConversions {
+case class Bra(bearingRaw: Double, range2d: Double, deltaAltitude: Double) extends UnitConversions {
 
   def toOffset: Vec3 = {
-    val scale = math.cos(deltaAltitude / range)
-    val y = range * math.cos(bearing.toRadians) * scale
-    val x = range * math.sin(bearing.toRadians) * scale
+    val y = range2d * math.cos(bearing.toRadians)
+    val x = range2d * math.sin(bearing.toRadians)
     Vec3(x, y, deltaAltitude)
+  }
+
+  def range3d: Double = {
+    math.sqrt(range2d * range2d + deltaAltitude * deltaAltitude)
   }
 
   def bearing: Double = NormalizeDegrees._0360(bearingRaw)
@@ -24,7 +27,7 @@ case class Bra(bearingRaw: Double, range: Double, deltaAltitude: Double) extends
         case 0 => "000"
         case 1 => "00" + in
         case 2 => "0" + in
-        case _ =>  in
+        case _ => in
       }
     }
 
@@ -32,7 +35,7 @@ case class Bra(bearingRaw: Double, range: Double, deltaAltitude: Double) extends
   }
 
   def distString(m_to_distUnit: Double): String = {
-    (range * m_to_distUnit).round.toString
+    (range2d * m_to_distUnit).round.toString
   }
 
   def brString(m_to_distUnit: Double): String = {

@@ -19,8 +19,8 @@ case class SensorsStatus(source: SourceData = Map.empty) extends SafeParsed[Sens
 
   def tdcBra(ownHeading: Double): Option[Bra] = {
     if (sensorOn) {
-      val dist = (tdc.y + 1.0) * scale.distance * 0.5
-      val halfWidth = scale.azimuth
+      val dist = math.max(1, (tdc.y + 1.0) * scale.distance * 0.5) // Place the tdc at least 1 meter out... so we get a decent position on the bscope
+      val halfWidth = scale.azimuth / 2.0
       val bearing = ownHeading + halfWidth * tdc.x
       Some(Bra(bearing, dist, 0.0))
     } else {

@@ -17,7 +17,7 @@ case class SmsPage(implicit config: Configuration) extends Page("SMS") {
   val height = top - bottom
 
   def draw(game: GameData, dlinkIn: Seq[(String, DlinkData)]): Unit = {
-    at(0.0, yTitle) {
+    at((0.0, yTitle)) {
       "STORES".drawCentered(WHITE, 1.5f)
     }
     drawBoxPayload(game.payload)
@@ -53,7 +53,7 @@ case class SmsPage(implicit config: Configuration) extends Page("SMS") {
       val yCtr = top - i.toDouble * lineHeight - lineHeight / 2.0
       val color = if (isSelected) WHITE else if (count > 0) GREEN else GRAY
 
-      at(xCtr, yCtr) {
+      at((xCtr, yCtr)) {
         rect(width = boxWidth, height = boxHeight, typ = LINE, color = color)
         val text = s" ${count.toString.pad(3)}x $name".padRight(25)
         text.drawCentered(color)
@@ -88,7 +88,7 @@ case class SmsPage(implicit config: Configuration) extends Page("SMS") {
     val scale = config.symbolScale * 0.03 / font.getSpaceWidth
 
     batched {
-      at(0.5, top - font.lineHeight * scale) {
+      at((0.5, top - font.lineHeight * scale)) {
         transform(_.scalexy(scale)) {
 
           val leftPad = 8
