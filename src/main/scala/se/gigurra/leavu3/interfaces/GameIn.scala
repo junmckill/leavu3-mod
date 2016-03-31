@@ -77,10 +77,6 @@ object GameIn extends Logging {
   }
 
   private def postProcess(newData: GameData): GameData = {
-    // TODO: Fuse with old data where required
-    // Known states that needs fusion:
-    // - rws detections (only visible a few frames) - Needs manual storage
-    // - If in NAV mode: Store waypoints that have not yet been seen (workaround for missing waypoints bug)
     newData.waypointWorkaround().rdrMemoryWorkaround()
   }
 
