@@ -140,12 +140,20 @@ trait RenderHelpers extends UnitConversions { _: RenderContext.type =>
     projection.viewport(viewportSize, heading, offs)(f)
   }
 
-  def at[_: Projection](position: Vec2, heading: Double)(f: => Unit): Unit = {
+  def at[_: Projection](position: Vec3, heading: Double)(f: => Unit): Unit = {
     projection.at(position, heading)(f)
   }
 
-  def at[_: Projection](position: Vec2)(f: => Unit): Unit = {
+  def at[_: Projection](position: Vec3)(f: => Unit): Unit = {
     at(position, heading = 0.0)(f)
+  }
+
+  def at[_: Projection](position: Vec2)(f: => Unit): Unit = {
+    at(Vec3(position.x, position.y, 0.0))(f)
+  }
+
+  def at[_: Projection](position: Vec2, heading: Double)(f: => Unit): Unit = {
+    at(Vec3(position.x, position.y, 0.0), heading)(f)
   }
 
   def at[_: Projection](x: Double, y: Double)(f: => Unit): Unit = {
@@ -153,7 +161,7 @@ trait RenderHelpers extends UnitConversions { _: RenderContext.type =>
   }
 
   def at[_: Projection](x: Double, y: Double, heading: Double)(f: => Unit): Unit = {
-    at(Vec2(x,y), heading)(f)
+    at(Vec3(x,y), heading)(f)
   }
 
   def rotatedTo[_: Projection](heading: Double)(f: => Unit): Unit = {
@@ -170,7 +178,7 @@ trait RenderHelpers extends UnitConversions { _: RenderContext.type =>
 
 trait Projection[+T] {
   def viewport(viewportSize: Double, heading: Float = 0.0f, offs: Vector2 = Vector2.Zero)(f: => Unit)
-  def at(position: Vec2, heading: Double = 0.0)(f: => Unit): Unit
+  def at(position: Vec3, heading: Double = 0.0)(f: => Unit): Unit
   def rotatedTo(heading: Double)(f: => Unit): Unit
   def screen2World: Float
   def headingCorrection: Float
@@ -199,7 +207,7 @@ case class ScreenProjection() extends Projection[Any] {
     0.0f
   }
 
-  override def at(position: Vec2, heading: Double)(f: => Unit): Unit = {
+  override def at(position: Vec3, heading: Double)(f: => Unit): Unit = {
 
     val w = Gdx.graphics.getWidth.toFloat
     val h = Gdx.graphics.getHeight.toFloat
@@ -232,9 +240,9 @@ case class PpiProjection() extends Projection[Any] {
     }
   }
 
-  def at(position: Vec2, heading: Double = 0.0)(f: => Unit): Unit = {
+  def at(position: Vec3, heading: Double = 0.0)(f: => Unit): Unit = {
     transform(_
-      .translate(position - self.position)
+      .translate(position - self.position : Vec2)
       .rotate(-heading)) {
       f
     }
@@ -253,6 +261,58 @@ case class PpiProjection() extends Projection[Any] {
 
   def headingCorrection: Float = {
     -self.heading
+  }
+
+}
+
+
+case class BScopeProjection(widthDegrees: Double, use3dDist: Boolean) extends Projection[Any] {
+
+  val transform = RenderContext.transform
+  var viewportSize = 2.0
+
+  def viewport(viewportSize: Double, heading: Float = 0.0f, offs: Vector2 = Vector2.Zero)(f: => Unit) {
+    val prev = viewportSize
+    this.viewportSize = viewportSize
+    transform(_
+      .scalexy(2.0f / viewportSize.toFloat)
+      .translate(offs.x, offs.y, 0.0f)) {
+      f
+    }
+    this.viewportSize = prev
+  }
+
+  def at(position: Vec3, heading: Double = 0.0)(f: => Unit): Unit = {
+    val bra = if (use3dDist) (position - self.position: Vec3).asBra else (position - self.position: Vec2).asBra
+    val relAz = bra.bearing - self.heading
+    val range = bra.range
+
+    val x = azToX(relAz)
+    val y = 2.0 * range - 0.5 * viewportSize
+
+    transform(_
+      .translate(x.toFloat, y.toFloat)
+      .rotate(-heading)) {
+      f
+    }
+  }
+
+  def rotatedTo(heading: Double)(f: => Unit): Unit = {
+    transform(_.rotate(-heading)) {
+      f
+    }
+  }
+
+  def screen2World: Float = {
+    1.0f / math.sqrt(transform.current.getScaleXSquared).toFloat
+  }
+
+  def headingCorrection: Float = {
+    0.0f
+  }
+
+  def azToX(azDegrees: Double): Double = {
+    viewportSize * azDegrees / widthDegrees
   }
 
 }
