@@ -66,9 +66,14 @@ object GameIn extends Logging {
 
   private val knownNavWaypoints = new mutable.HashMap[Int, Waypoint]
   private val rdrMemory = ContactMemory()
+  private val rdrLastTwsPositionUpdateMemory = new PositionChangeMemory()
 
   def rdrMemory(contact: Contact): Option[Memorized[Contact]] = {
     rdrMemory.get(contact)
+  }
+
+  def rdrLastTwsPositionUpdate(contact: Contact): Option[Memorized[Contact]] = {
+    rdrLastTwsPositionUpdateMemory.get(contact)
   }
 
   private def postProcess(newData: GameData): GameData = {
@@ -110,6 +115,7 @@ object GameIn extends Logging {
 
     def rdrMemoryWorkaround(): GameData = {
       val rwsContactsKnown = rdrMemory.update(newData.sensors.targets.all)
+      rdrLastTwsPositionUpdateMemory.update(newData.sensors.targets.tws.map(_.contact))
       newData.withRwsMemory(rwsContactsKnown.map(_.t))
     }
 

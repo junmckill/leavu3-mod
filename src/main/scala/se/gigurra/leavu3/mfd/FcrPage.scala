@@ -4,6 +4,7 @@ import se.gigurra.leavu3.datamodel.{Bra, Configuration, Contact, DlinkData, Game
 import se.gigurra.leavu3.gfx.{BScopeProjection, Projection}
 import se.gigurra.leavu3.interfaces.GameIn
 import se.gigurra.leavu3.gfx.RenderContext._
+import se.gigurra.leavu3.util.CurTime
 
 import scala.collection.mutable
 
@@ -125,9 +126,11 @@ case class FcrPage(implicit config: Configuration) extends Page("FCR") {
 
         val baseColor = contactColor(contact, fromDatalink = false)
         val color = baseColor.scaleAlpha(contact.news)
+        val lag = if (contact.isDesignated || contact.isRws) 0.0 else GameIn.rdrLastTwsPositionUpdate(contact).fold(0.0)(CurTime.seconds - _.timestamp)
+        val position = contact.position + contact.velocity * lag
 
         drawContact(
-          position = contact.position,
+          position = position,
           heading = if (contact.isRws) None else Some(contact.heading),
           color = color,
           centerText = if (contact.isDesignated) (contact.index + 1).toString else "",

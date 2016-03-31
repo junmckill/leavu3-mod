@@ -24,13 +24,13 @@ abstract class Memory[T](timeoutSeconds: Double) {
     data.get(idOf(t))
   }
 
-  private def all: Seq[Memorized[T]] = {
-    data.values.toArray.toSeq
-  }
-
-  private def update(t: T): Unit = {
+  protected def update(t: T): Unit = {
     val id = idOf(t)
     data += id -> Memorized(t, timeoutSeconds, CurTime.seconds)
+  }
+
+  private def all: Seq[Memorized[T]] = {
+    data.values.toArray.toSeq
   }
 
   private def clearExpired(): Unit = {
@@ -50,4 +50,13 @@ object Memorized {
 
 case class ContactMemory(timeoutSeconds: Double = 10.0) extends Memory[Contact](timeoutSeconds) {
   override protected def idOf(t: Contact): String = t.id.toString
+}
+
+class PositionChangeMemory(timeoutSeconds: Double = 10.0) extends ContactMemory(timeoutSeconds) {
+  protected override def update(t: Contact): Unit = {
+    get(t) match {
+      case Some(prevContact) if prevContact.position == t.position =>
+      case _ => super.update(t)
+    }
+  }
 }
