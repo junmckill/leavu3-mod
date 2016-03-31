@@ -4,7 +4,7 @@ import com.twitter.finagle.FailedFastException
 import com.twitter.util.Future
 import se.gigurra.leavu3.datamodel.{Configuration, Contact, GameData, Waypoint}
 import se.gigurra.leavu3.gfx.Drawable
-import se.gigurra.leavu3.util.{ContactMemory, DefaultTimer, IdenticalRequestPending, Resource2String}
+import se.gigurra.leavu3.util._
 import se.gigurra.serviceutils.json.JSON
 import se.gigurra.serviceutils.twitter.logging.Logging
 import se.gigurra.serviceutils.twitter.service.ServiceException
@@ -65,10 +65,10 @@ object GameIn extends Logging {
   }
 
   private val knownNavWaypoints = new mutable.HashMap[Int, Waypoint]
-  private val rwsMemory = ContactMemory()
+  private val rdrMemory = ContactMemory()
 
-  def rwsContactNews(contact: Contact): Option[Double] = {
-    rwsMemory.get(contact).map(_.news)
+  def rdrMemory(contact: Contact): Option[Memorized[Contact]] = {
+    rdrMemory.get(contact)
   }
 
   private def postProcess(newData: GameData): GameData = {
@@ -76,7 +76,7 @@ object GameIn extends Logging {
     // Known states that needs fusion:
     // - rws detections (only visible a few frames) - Needs manual storage
     // - If in NAV mode: Store waypoints that have not yet been seen (workaround for missing waypoints bug)
-    newData.waypointWorkaround().rwsMemoryWorkaround()
+    newData.waypointWorkaround().rdrMemoryWorkaround()
   }
 
   implicit class GameDataWorkarounds(newData: GameData) {
@@ -108,8 +108,8 @@ object GameIn extends Logging {
       }
     }
 
-    def rwsMemoryWorkaround(): GameData = {
-      val rwsContactsKnown = rwsMemory.update(newData.sensors.targets.detected.filterNot(_.isDesignated).filter(_.isPositionKnown))
+    def rdrMemoryWorkaround(): GameData = {
+      val rwsContactsKnown = rdrMemory.update(newData.sensors.targets.all)
       newData.withRwsMemory(rwsContactsKnown.map(_.t))
     }
 

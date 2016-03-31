@@ -108,7 +108,7 @@ case class FcrPage(implicit config: Configuration) extends Page("FCR") {
     implicit class RichContact(c: Contact) {
       def index: Int = order(c.id)
       def isRws: Boolean = rws(c.id)
-      def news: Double = GameIn.rwsContactNews(c).getOrElse(1.0)
+      def news: Double = GameIn.rdrMemory(c).fold(1.0)(_.news)
     }
 
     val positionsEchoed = contacts.values.toSeq
@@ -121,21 +121,21 @@ case class FcrPage(implicit config: Configuration) extends Page("FCR") {
       .filter(_.isPositionKnown)
       .sortBy(_.index)
 
+    val bearingsEchoed = contacts.values.toSeq
+      .filterNot(_.isDesignated)
+      .filterNot(_.isPositionKnown)
+      .sortBy(_.index)
+
     val bearingsDesignated = contacts.values.toSeq
       .filter(_.isDesignated)
       .filterNot(_.isPositionKnown)
       .sortBy(_.index)
 
-    for (contact <- bearingsDesignated) {
-   //   val offs = contact.position - self.position : Vec2
-   //   lines(Seq(Vec2() -> offs) * 10000.0, YELLOW)
-    }
-
     def drawKnownPosContacts(contacts: Seq[Contact]): Unit = {
       for (contact <- contacts.reverse) { // draw lowest index (=highest prio) last
 
         val baseColor = contactColor(contact, fromDatalink = false)
-        val color = if (contact.isRws) baseColor.scaleAlpha(contact.news) else baseColor
+        val color = baseColor.scaleAlpha(contact.news)
 
         drawContact(
           position = contact.position,
@@ -148,9 +148,31 @@ case class FcrPage(implicit config: Configuration) extends Page("FCR") {
       }
     }
 
+    def drawJammers(contacts: Seq[Contact]): Unit = {
+      for (contact <- contacts.reverse) { // draw lowest index (=highest prio) last
+
+        val baseColor = YELLOW
+        val color = baseColor.scaleAlpha(contact.news)
+
+        drawJammer(
+          position_actual = contact.position,
+          heading = if (contact.isRws) None else Some(contact.heading),
+          color = color,
+          centerText = if (contact.isDesignated) (contact.index + 1).toString else "",
+          designated = contact.isDesignated,
+          drawDistFallback = 30.nmi
+        )
+      }
+    }
+
+    // Separated to ensure draw order
+    drawJammers(bearingsEchoed)
+    drawJammers(bearingsDesignated)
+
     // Separated to ensure draw order
     drawKnownPosContacts(positionsEchoed)
     drawKnownPosContacts(positionsDesignated)
+
   }
 
   def drawSurroundEdge[_: Projection](): Unit = {

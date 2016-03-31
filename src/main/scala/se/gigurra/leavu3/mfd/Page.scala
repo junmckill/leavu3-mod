@@ -7,6 +7,7 @@ import se.gigurra.leavu3.gfx.{PpiProjection, Projection, ScreenProjection}
 import se.gigurra.leavu3.interfaces.{GameIn, MouseClick}
 import se.gigurra.leavu3.util.CircleBuffer
 import se.gigurra.serviceutils.twitter.logging.Logging
+import scala.language.postfixOps
 
 abstract class Page(val name: String)(implicit config: Configuration) extends Logging {
 
@@ -29,8 +30,6 @@ abstract class Page(val name: String)(implicit config: Configuration) extends Lo
   //////////////////////////////////////////////////////////////////////////////
   // Common symbols
 
-  protected def scanZoneAzDirection: Double = scanZoneAzDirectionAndWidth._1
-  protected def scanZoneWidth: Double = scanZoneAzDirectionAndWidth._2
   protected def scanZoneAzDirectionAndWidth: (Double, Double) = {
     val game = GameIn.snapshot
     val sensors = game.sensors.status
@@ -160,6 +159,45 @@ abstract class Page(val name: String)(implicit config: Configuration) extends Lo
       rightText.drawRightOf(scale = stdTextSize * 0.75f, color = color)
     }
   }
+
+  protected def drawJammer[_: Projection](position_actual: Vec3,
+                                          heading: Option[Double],
+                                          color: Color,
+                                          centerText: String = "",
+                                          rightText: String = "",
+                                          designated: Boolean = false,
+                                          drawDistFallback: Double): Unit = {
+
+
+    val drawDist = if (designated) {
+      GameIn.snapshot.tdcPosition.fold(drawDistFallback)(tdcp => (tdcp - self.position).asBra.range2d)
+    } else {
+      drawDistFallback
+    }
+
+    val radius = 0.015 * symbolScale
+    val dir = (position_actual - self.position).normalized
+    val position = self.position + dir * drawDist
+
+    def doDraw(): Unit = rect(radius * 2.0, radius * 2.0, typ = if (designated) FILL else LINE, color = color)
+
+    at(position, self.heading) {
+      doDraw()
+      rotatedTo(45.0f) {
+        doDraw()
+      }
+    }
+
+    at(position) {
+      val bra = (position - self.position).asBra
+      val elevation = math.asin(bra.deltaAltitude/bra.range2d).toDegrees.round
+      val altText = (if (elevation > 0) "+" else "") + elevation.toString
+      altText.drawLeftOf(scale = stdTextSize * 0.75f, color = color)
+      centerText.drawCentered(scale = stdTextSize * 0.50f, color = if (designated) BLACK else color)
+      rightText.drawRightOf(scale = stdTextSize * 0.75f, color = color)
+    }
+  }
+
 
   protected def drawDlinkMark[_: Projection](name: String, member: Member, id: String, mark: Mark): Unit = {
     val radius = 0.015 * symbolScale
