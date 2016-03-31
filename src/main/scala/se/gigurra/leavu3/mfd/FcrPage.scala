@@ -1,6 +1,6 @@
 package se.gigurra.leavu3.mfd
 
-import se.gigurra.leavu3.datamodel.{Bra, Configuration, Contact, DlinkData, GameData, Vec2, Vec3, self}
+import se.gigurra.leavu3.datamodel.{Bra, Configuration, Contact, DlinkData, GameData, Vec2, self}
 import se.gigurra.leavu3.gfx.{BScopeProjection, Projection}
 import se.gigurra.leavu3.interfaces.GameIn
 import se.gigurra.leavu3.gfx.RenderContext._
@@ -32,7 +32,7 @@ case class FcrPage(implicit config: Configuration) extends Page("FCR") {
           drawDlinkMarks(dlinkIn)
           drawAiWingmen(game)
           drawAiWingmenTargets(game)
-          drawDlinkWingmenAndTargets(game, dlinkIn)
+          drawDlinkMembersAndTargets(dlinkIn)
           drawOwnContacts(game, dlinkIn)
           drawScanZoneOverlay(game)
           drawTdc(game)
@@ -71,10 +71,6 @@ case class FcrPage(implicit config: Configuration) extends Page("FCR") {
 
   def drawSelectedWaypoint[_: Projection](game: GameData): Unit = {
     drawWp(game.route.currentWaypoint, None, selected = true)
-  }
-
-  def drawDlinkWingmenAndTargets[_: Projection](game: GameData, dlinkIn: Seq[(String, DlinkData)]): Unit = {
-
   }
 
   def drawScanZoneOverlay[_: Projection](game: GameData): Unit = {
@@ -174,6 +170,8 @@ case class FcrPage(implicit config: Configuration) extends Page("FCR") {
 
   def drawInfo(game: GameData, dlinkIn: Seq[(String, DlinkData)]): Unit = {
     implicit val p = screenProjection
+    drawBearings(game)
+    drawElevations(game)
     drawBullsEyeNumbers(game)
     drawBraNumbers(game)
     drawOwnHeading(game)
@@ -181,6 +179,12 @@ case class FcrPage(implicit config: Configuration) extends Page("FCR") {
     drawDlzs(game)
     drawTargetInfo(game)
     drawOsbs(game)
+  }
+
+  def drawBearings[_: Projection](game: GameData): Unit = {
+  }
+
+  def drawElevations[_: Projection](game: GameData): Unit = {
   }
 
   def drawBullsEyeNumbers[_: Projection](game: GameData): Unit = {

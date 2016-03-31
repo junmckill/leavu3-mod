@@ -111,40 +111,6 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD") {
     }
   }
 
-  def drawDlinkMembersAndTargets(dlinkIn: Seq[(String, DlinkData)]): Unit = {
-    implicit val p = ppiProjection
-
-    val dlinksOfInterest = dlinkIn.filter(m => m._2.data.planeId != self.planeId || m._1 != self.dlinkCallsign)
-
-    for ((name, member) <- dlinksOfInterest) {
-
-      val lag = CurTime.seconds - member.timestamp
-      val memberPosition = member.position + member.velocity * lag
-
-      drawContact(memberPosition, Some(member.heading), CYAN, centerText = name.take(2))
-
-      for (target <- member.targets.reverse) { // draw lowest index (=highest prio) last
-
-        val targetPosition = target.position + target.velocity * lag
-
-        if (target.isPositionKnown) {
-          drawContact(
-            position = targetPosition,
-            heading = Some(target.heading),
-            color = contactColor(target, fromDatalink = true),
-            rightText = name.take(2),
-            fill = true
-          )
-        } else at(memberPosition) { // HOJ
-          val b = targetPosition - member.position: Vec2
-          lines(Seq(Vec2() -> b) * 10000.0, RED)
-        }
-      }
-
-    }
-
-  }
-
   def drawLockedTargets(game: GameData): Unit = {
     implicit val p = ppiProjection
 

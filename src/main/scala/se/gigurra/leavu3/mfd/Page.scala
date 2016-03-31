@@ -5,8 +5,9 @@ import se.gigurra.leavu3.datamodel._
 import se.gigurra.leavu3.gfx.RenderContext._
 import se.gigurra.leavu3.gfx.{PpiProjection, Projection, ScreenProjection}
 import se.gigurra.leavu3.interfaces.{GameIn, MouseClick}
-import se.gigurra.leavu3.util.CircleBuffer
+import se.gigurra.leavu3.util.{CircleBuffer, CurTime}
 import se.gigurra.serviceutils.twitter.logging.Logging
+
 import scala.language.postfixOps
 
 abstract class Page(val name: String)(implicit config: Configuration) extends Logging {
@@ -249,5 +250,38 @@ abstract class Page(val name: String)(implicit config: Configuration) extends Lo
     } {
       drawDlinkMark(name, member, id, mark)
     }
+  }
+
+  protected def drawDlinkMembersAndTargets[_: Projection](dlinkIn: Seq[(String, DlinkData)]): Unit = {
+
+    val dlinksOfInterest = dlinkIn.filter(m => m._2.data.planeId != self.planeId || m._1 != self.dlinkCallsign)
+
+    for ((name, member) <- dlinksOfInterest) {
+
+      val lag = CurTime.seconds - member.timestamp
+      val memberPosition = member.position + member.velocity * lag
+
+      drawContact(memberPosition, Some(member.heading), CYAN, centerText = name.take(2))
+
+      for (target <- member.targets.reverse) { // draw lowest index (=highest prio) last
+
+        val targetPosition = target.position + target.velocity * lag
+
+        if (target.isPositionKnown) {
+          drawContact(
+            position = targetPosition,
+            heading = Some(target.heading),
+            color = contactColor(target, fromDatalink = true),
+            rightText = name.take(2),
+            fill = true
+          )
+        } else at(memberPosition) { // HOJ
+        val b = targetPosition - member.position: Vec2
+          lines(Seq(Vec2() -> b) * 10000.0, RED)
+        }
+      }
+
+    }
+
   }
 }
