@@ -166,13 +166,13 @@ abstract class Page(val name: String)(implicit config: Configuration) extends Lo
                                           centerText: String = "",
                                           rightText: String = "",
                                           designated: Boolean = false,
-                                          drawDistFallback: Double): Unit = {
+                                          drawDistUndesignated: Double): Unit = {
 
 
     val drawDist = if (designated) {
-      GameIn.snapshot.tdcPosition.fold(drawDistFallback)(tdcp => (tdcp - self.position).asBra.range2d)
+      GameIn.snapshot.tdcPosition.fold(drawDistUndesignated)(tdcp => (tdcp - self.position).asBra.range2d)
     } else {
-      drawDistFallback
+      drawDistUndesignated
     }
 
     val radius = 0.015 * symbolScale

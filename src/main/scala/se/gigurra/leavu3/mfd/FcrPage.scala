@@ -160,7 +160,7 @@ case class FcrPage(implicit config: Configuration) extends Page("FCR") {
           color = color,
           centerText = if (contact.isDesignated) (contact.index + 1).toString else "",
           designated = contact.isDesignated,
-          drawDistFallback = 30.nmi
+          drawDistUndesignated = math.min(math.max(30.nmi, screenDistMeters * 0.75), screenDistMeters * 0.95)
         )
       }
     }
