@@ -88,7 +88,8 @@ case class FcrPage(implicit config: Configuration) extends Page("FCR") {
           heading = if (contact.isRws) None else Some(contact.heading),
           color = color,
           centerText = if (contact.isDesignated) (contact.index + 1).toString else "",
-          fill = contact.isDesignated
+          fill = contact.isDesignated,
+          drawAlt = !contact.isRws
         )
       }
     }

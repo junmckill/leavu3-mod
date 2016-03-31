@@ -132,7 +132,8 @@ abstract class Page(val name: String)(implicit config: Configuration) extends Lo
                                            color: Color,
                                            centerText: String = "",
                                            rightText: String = "",
-                                           fill: Boolean = false): Unit = {
+                                           fill: Boolean = false,
+                                           drawAlt: Boolean = true): Unit = {
     val radius = 0.015 * symbolScale
 
     at(position, heading.getOrElse(0.0)) {
