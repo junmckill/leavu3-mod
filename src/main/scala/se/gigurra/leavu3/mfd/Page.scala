@@ -130,8 +130,8 @@ abstract class Page(val name: String)(implicit config: Configuration) extends Lo
   protected def drawContact[_: Projection](position: Vec3,
                                            heading: Option[Double],
                                            color: Color,
-                                           idText: String = "",
-                                           textToTheSide: Boolean = true,
+                                           centerText: String = "",
+                                           rightText: String = "",
                                            fill: Boolean = false): Unit = {
     val radius = 0.015 * symbolScale
 
@@ -144,11 +144,8 @@ abstract class Page(val name: String)(implicit config: Configuration) extends Lo
     at(position) {
       val altText = (position.z * displayUnits.m_to_altUnit).round.toString
       altText.drawLeftOf(scale = stdTextSize, color = color)
-      if (textToTheSide) {
-        idText.drawRightOf(scale = stdTextSize * 0.75f, color = color)
-      } else {
-        idText.drawCentered(scale = stdTextSize * 0.50f, color = if (fill) BLACK else color)
-      }
+      centerText.drawCentered(scale = stdTextSize * 0.50f, color = if (fill) BLACK else color)
+      rightText.drawRightOf(scale = stdTextSize * 0.75f, color = color)
     }
   }
 

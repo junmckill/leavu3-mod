@@ -9,7 +9,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType
 import com.badlogic.gdx.math.{Rectangle, Vector2}
 import com.badlogic.gdx.scenes.scene2d.utils.ScissorStack
 import se.gigurra.leavu3.datamodel._
-import se.gigurra.leavu3.lmath.UnitConversions
+import se.gigurra.leavu3.lmath.{NormalizeDegrees, UnitConversions}
 
 trait RenderHelpers extends UnitConversions { _: RenderContext.type =>
 
@@ -295,15 +295,15 @@ case class BScopeProjection(widthDegrees: Double, use3dDist: Boolean) extends Pr
 
   def at(position: Vec3, heading: Double = 0.0)(f: => Unit): Unit = {
     val bra = if (use3dDist) (position - self.position: Vec3).asBra else (position - self.position: Vec2).asBra
-    val relAz = bra.bearing - self.heading
+    val relAz = NormalizeDegrees.pm180(bra.bearing - self.heading)
     val range = bra.range
 
     val x = azToX(relAz)
-    val y = 2.0 * range - 0.5 * viewportSize
+    val y = range - 0.5 * viewportSize
 
     transform(_
       .translate(x.toFloat, y.toFloat)
-      .rotate(-heading)) {
+      .rotate(self.heading-heading)) {
       f
     }
   }
@@ -319,11 +319,11 @@ case class BScopeProjection(widthDegrees: Double, use3dDist: Boolean) extends Pr
   }
 
   def headingCorrection: Float = {
-    0.0f
+    -self.heading
   }
 
   def azToX(azDegrees: Double): Double = {
-    viewportSize * azDegrees / widthDegrees
+    0.5 * viewportSize * azDegrees / widthDegrees
   }
 
 }

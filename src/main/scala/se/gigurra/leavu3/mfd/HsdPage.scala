@@ -118,7 +118,7 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD") {
 
   def drawAiWingmen(game: GameData): Unit = {
     for (wingman <- game.aiWingmen) {
-      drawContact(wingman.position, Some(wingman.heading), CYAN, "AI")(ppiProjection)
+      drawContact(wingman.position, Some(wingman.heading), CYAN, centerText = "AI")(ppiProjection)
     }
   }
 
@@ -135,9 +135,9 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD") {
         val tMinus2 = wingmenTgtsLastTminus2(i)
         val delta = tMinus1 - tMinus2
         val heading = math.atan2(delta.x, delta.y).toDegrees
-        drawContact(tgtPos, Some(heading), RED)(ppiProjection)
+        drawContact(tgtPos, Some(heading), RED, rightText = "ai")(ppiProjection)
       } else {
-        drawContact(tgtPos, None, RED)(ppiProjection)
+        drawContact(tgtPos, None, RED, rightText = "ai")(ppiProjection)
       }
     }
 
@@ -166,7 +166,7 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD") {
       val lag = CurTime.seconds - member.timestamp
       val memberPosition = member.position + member.velocity * lag
 
-      drawContact(memberPosition, Some(member.heading), CYAN, name.take(2))
+      drawContact(memberPosition, Some(member.heading), CYAN, centerText = name.take(2))
 
       for (target <- member.targets.reverse) { // draw lowest index (=highest prio) last
 
@@ -177,7 +177,7 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD") {
             position = targetPosition,
             heading = Some(target.heading),
             color = contactColor(target, fromDatalink = true),
-            idText = name.take(2),
+            rightText = name.take(2),
             fill = true
           )
         } else at(memberPosition) { // HOJ
@@ -229,8 +229,7 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD") {
         position = contact.position,
         heading = Some(contact.heading),
         color = contactColor(contact, fromDatalink = false),
-        idText = (contact.index + 1).toString,
-        textToTheSide = false,
+        centerText = (contact.index + 1).toString,
         fill = true
       )
     }
