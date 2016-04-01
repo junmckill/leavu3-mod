@@ -2,7 +2,7 @@ package se.gigurra.leavu3.mfd
 
 import se.gigurra.leavu3.datamodel.{Bra, Configuration, Contact, DlinkData, GameData, Vec2, self}
 import se.gigurra.leavu3.gfx.{BScopeProjection, Projection}
-import se.gigurra.leavu3.interfaces.GameIn
+import se.gigurra.leavu3.interfaces.{GameIn, MouseClick}
 import se.gigurra.leavu3.gfx.RenderContext._
 import se.gigurra.leavu3.util.CurTime
 
@@ -16,8 +16,26 @@ case class FcrPage(implicit config: Configuration) extends Page("FCR") {
   def screenDistMeters: Double = GameIn.snapshot.sensors.status.scale.distance
   def screenWidthDegrees: Double = GameIn.snapshot.sensors.status.scale.azimuth
   val inset = 0.2
+  val OSB_AI = 18
+  val OSB_DL = 17
+  val OSB_BE = 16
+  var shouldDrawAi = true
+  var shouldDrawDl = true
+  var shouldDrawBe = true
 
-  def draw(game: GameData, dlinkIn: Seq[(String, DlinkData)]): Unit = {
+  override def mouseClicked(click: MouseClick): Unit =  {
+  }
+
+  override def pressOsb(i: Int): Unit = {
+    i match {
+      case OSB_AI => shouldDrawAi = !shouldDrawAi
+      case OSB_DL => shouldDrawDl = !shouldDrawDl
+      case OSB_BE => shouldDrawBe = !shouldDrawBe
+      case _ => // Nothing yet
+    }
+  }
+
+  override def draw(game: GameData, dlinkIn: Seq[(String, DlinkData)]): Unit = {
     drawConformal(game, dlinkIn)
     drawInfo(game, dlinkIn)
   }
@@ -30,11 +48,17 @@ case class FcrPage(implicit config: Configuration) extends Page("FCR") {
         scissor(at = (0.0, 0.0), size = (screenDistMeters, screenDistMeters)) {
           drawScanZoneUnderlay(game)
           drawGrid(game)
-          drawSelectedWaypoint(game)
-          drawDlinkMarks(dlinkIn)
-          drawAiWingmen(game)
-          drawAiWingmenTargets(game)
-          drawDlinkMembersAndTargets(dlinkIn)
+          if (shouldDrawBe) {
+            drawSelectedWaypoint(game)
+          }
+          if (shouldDrawDl) {
+            drawDlinkMarks(dlinkIn)
+            if (shouldDrawAi) {
+              drawAiWingmen(game)
+              drawAiWingmenTargets(game)
+            }
+            drawDlinkMembersAndTargets(dlinkIn)
+          }
           drawOwnContacts(game, dlinkIn)
           drawTdc(game)
           drawScanZoneOverlay(game)
@@ -291,6 +315,10 @@ case class FcrPage(implicit config: Configuration) extends Page("FCR") {
   }
 
   def drawOsbs[_: Projection](game: GameData): Unit = {
+    import Mfd.Osb._
+    drawBoxed(OSB_AI, "AI", boxed = shouldDrawAi)
+    drawBoxed(OSB_DL, "DL", boxed = shouldDrawDl)
+    drawBoxed(OSB_BE, "BE", boxed = shouldDrawBe)
   }
 
   def drawDlzs[_: Projection](game: GameData): Unit = {

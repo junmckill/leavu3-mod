@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import se.gigurra.leavu3.datamodel.{GameData, _}
 import se.gigurra.leavu3.gfx.RenderContext._
-import se.gigurra.leavu3.gfx.{Blink, PpiProjection, Projection, ScreenProjection}
+import se.gigurra.leavu3.gfx.{Blink, Projection}
 import se.gigurra.leavu3.datamodel.Configuration
 import se.gigurra.leavu3.util.CircleBuffer
 
@@ -47,7 +47,6 @@ case class RwrPage(implicit config: Configuration) extends Page("RWR") {
 
   override def pressOsb(i: Int): Unit = {
     i match {
-      //TODO: Impl Roll stab case OSB_HOR => shouldHorizonStabilize = !shouldHorizonStabilize
       case OSB_A2A => a2aFilter.stepUp()
       case OSB_A2G => a2gFilter.stepUp()
       case OSB_HSI => shouldDrawDetailedHsi = !shouldDrawDetailedHsi
