@@ -378,6 +378,7 @@ case class FcrPage(implicit config: Configuration) extends Page("FCR") {
   }
 
   def drawBraNumbrs[_: Projection](game: GameData): Unit = {
+    drawBraNumbers(game, 0.0175, (0.50, 0.95))
   }
 
   def drawModes[_: Projection](game: GameData): Unit = {

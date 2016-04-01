@@ -255,6 +255,50 @@ abstract class Page(val name: String)(implicit config: Configuration) extends Lo
 
   }
 
+  protected def drawBraNumbers(game: GameData, textScale: Double, pos: Vec2) = {
+    implicit val p = screenProjection
+
+    def mkBraString(prefix: String, bra: Bra): String = s"$prefix : ${bra.brString(displayUnits.m_to_distUnit)}"
+
+    val scale = config.symbolScale * textScale / font.getSpaceWidth
+
+    batched { at(pos) {
+
+      transform(_
+        .scalexy(scale)) {
+
+        val beStr = s" BR from : self"
+
+        var n = 0
+        def drawTextLine(str: String, color: Color): Unit = {
+          transform(_.translate(y = -n.toFloat * font.getLineHeight))(str.drawRaw(xAlign = 0.5f, color = color))
+          n += 1
+        }
+
+        drawTextLine(beStr, LIGHT_GRAY)
+
+        val wp = game.route.currentWaypoint
+        val wpBra = (wp.position - self.position).asBra
+        val wpStr = mkBraString(s"wp ${wp.index-1}".pad(8), wpBra)
+        drawTextLine(wpStr, DARK_GRAY)
+
+        game.tdcPosition foreach { tdc =>
+          val tdcBra = (tdc - self.position).asBra
+          val tdcStr = mkBraString("tdc".pad(8), tdcBra)
+          drawTextLine(tdcStr, WHITE)
+        }
+
+        game.pdt.filter(_.isPositionKnown) foreach { pdt =>
+          val pdtBra = (pdt.position - self.position).asBra
+          val pdtStr = mkBraString("pdt".pad(8), pdtBra)
+          drawTextLine(pdtStr, contactColor(pdt, fromDatalink = false))
+        }
+
+      }
+    }}
+
+  }
+
   protected def drawContact[_: Projection](position: Vec3,
                                            heading: Option[Double],
                                            color: Color,
