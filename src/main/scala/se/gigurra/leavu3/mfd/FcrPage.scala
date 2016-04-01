@@ -26,9 +26,6 @@ case class FcrPage(implicit config: Configuration) extends Page("FCR") {
   var shouldDrawBe = true
   var shouldDrawAbsBearings = false
 
-  override def mouseClicked(click: MouseClick): Unit =  {
-  }
-
   override def pressOsb(i: Int): Unit = {
     i match {
       case OSB_AI => shouldDrawAi = !shouldDrawAi

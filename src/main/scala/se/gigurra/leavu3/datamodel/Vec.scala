@@ -24,8 +24,8 @@ case class Vec3(x: Double = 0.0, y: Double = 0.0, z: Double = 0.0) {
   def withLength(norm: Double): Vec3 = normalized * norm
   def asBra: Bra = {
     val bearing = math.atan2(x, y).toDegrees
-    val range = norm
-    Bra(bearing, range, z)
+    val range2d = (this : Vec2).norm
+    Bra(bearing, range2d, z)
   }
 }
 
