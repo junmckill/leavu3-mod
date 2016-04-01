@@ -275,9 +275,8 @@ abstract class Page(val name: String)(implicit config: Configuration) extends Lo
             rightText = name.take(2),
             fill = true
           )
-        } else at(memberPosition) { // HOJ
-        val b = targetPosition - member.position: Vec2
-          lines(Seq(Vec2() -> b) * 10000.0, RED)
+        } else { // HOJ
+          lineBetween(memberPosition, targetPosition, YELLOW, scaleOut = 10000.0)
         }
       }
 

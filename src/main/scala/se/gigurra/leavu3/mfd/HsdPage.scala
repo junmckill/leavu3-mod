@@ -141,8 +141,7 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD") {
       .sortBy(_.index)
 
     for (contact <- bearingsDesignated) {
-      val offs = contact.position - self.position : Vec2
-      lines(Seq(Vec2() -> offs) * 10000.0, YELLOW)
+      lineBetween(self.position, contact.position, YELLOW, scaleOut = 10000.0)
     }
 
     for (contact <- positionsDesignated.reverse) { // draw lowest index (=highest prio) last

@@ -121,6 +121,15 @@ trait RenderHelpers extends UnitConversions { _: RenderContext.type =>
     }
   }
 
+  def lineBetween[_: Projection](aWorld: Vec3, bWorld: Vec3, color: Color, scaleOut: Double = 1.0, scaleIn: Double = 1.0): Unit = {
+    val p0 = prePosition(aWorld): Vec2
+    val p1 = prePosition(bWorld): Vec2
+    val delta = p1 - p0
+    val a = p1 - delta * scaleIn
+    val b = p0 + delta * scaleOut
+    lines(Seq(a -> b), color)
+  }
+
   def lines(dashes: Seq[(Vector2, Vector2)], color: Color = null): Unit = {
     shape(LINE, color) {
       for ((p1, p2) <- dashes) {
@@ -159,6 +168,14 @@ trait RenderHelpers extends UnitConversions { _: RenderContext.type =>
     projection.viewport(viewportSize, heading, offs)(f)
   }
 
+  def prePosition[_: Projection](from: Vec2): Vec2 = {
+    projection.prePosition(from)
+  }
+
+  def prePosition[_: Projection](from: Vec3): Vec3 = {
+    projection.prePosition(from)
+  }
+
   def at[_: Projection](position: Vec3, heading: Double)(f: => Unit): Unit = {
     projection.at(position, heading)(f)
   }
@@ -192,6 +209,8 @@ trait Projection[+T] {
   def viewport(viewportSize: Double, heading: Float = 0.0f, offs: Vector2 = Vector2.Zero)(f: => Unit)
   def at(position: Vec3, heading: Double)(f: => Unit): Unit
   def at(position: Vec2, heading: Double)(f: => Unit): Unit
+  def prePosition(from: Vec2): Vec2
+  def prePosition(from: Vec3): Vec3
   def rotatedTo(heading: Double)(f: => Unit): Unit
   def screen2World: Float
   def headingCorrection: Float
@@ -218,6 +237,14 @@ case class ScreenProjection() extends Projection[Any] {
 
   def headingCorrection: Float = {
     0.0f
+  }
+
+  def prePosition(from: Vec2): Vec2 = {
+    from
+  }
+
+  def prePosition(from: Vec3): Vec3 = {
+    from
   }
 
   override def at(position: Vec2, heading: Double)(f: => Unit): Unit = {
@@ -269,6 +296,14 @@ case class PpiProjection() extends Projection[Any] {
     }
   }
 
+  def prePosition(from: Vec2): Vec2 = {
+    from - self.position
+  }
+
+  def prePosition(from: Vec3): Vec3 = {
+    from - self.position
+  }
+
   def rotatedTo(heading: Double)(f: => Unit): Unit = {
     transform(_
       .rotate(-heading)) {
@@ -301,7 +336,22 @@ case class BScopeProjection(widthDegrees: Double, use3dDist: Boolean) extends Pr
     this.viewportSize = prev
   }
 
-  override def at(position: Vec2, heading: Double)(f: => Unit): Unit = {
+  def prePosition(position: Vec2): Vec2 = {
+    prePosition(Vec3(position.x, position.y, self.position.z))
+  }
+
+  def prePosition(position: Vec3): Vec3 = {
+    val bra = if (use3dDist) (position - self.position: Vec3).asBra else (position - self.position: Vec2).asBra
+    val relAz = NormalizeDegrees.pm180(bra.bearing - self.heading)
+    val range = bra.range3d
+
+    val x = azToX(relAz)
+    val y = range - 0.5 * viewportSize
+
+    Vec3(x,y,0.0)
+  }
+
+  def at(position: Vec2, heading: Double)(f: => Unit): Unit = {
     at(Vec3(position.x, position.y, self.position.z), heading)(f)
   }
 

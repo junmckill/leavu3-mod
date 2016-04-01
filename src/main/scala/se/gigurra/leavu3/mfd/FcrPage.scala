@@ -146,6 +146,10 @@ case class FcrPage(implicit config: Configuration) extends Page("FCR") {
         val baseColor = YELLOW
         val color = baseColor.scaleAlpha(contact.news)
 
+        if (contact.isDesignated) {
+          lineBetween(0.5 * (self.position + contact.position), contact.position, YELLOW, scaleIn = 10000.0, scaleOut = 10000.0)
+        }
+
         drawJammer(
           position_actual = contact.position,
           heading = if (contact.isRws) None else Some(contact.heading),
@@ -154,6 +158,7 @@ case class FcrPage(implicit config: Configuration) extends Page("FCR") {
           designated = contact.isDesignated,
           drawDistUndesignated = math.min(math.max(30.nmi, screenDistMeters * 0.75), screenDistMeters * 0.95)
         )
+
       }
     }
 
