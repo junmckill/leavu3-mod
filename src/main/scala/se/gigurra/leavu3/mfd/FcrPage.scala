@@ -314,7 +314,7 @@ case class FcrPage(implicit config: Configuration) extends Page("FCR") {
     val dx = (right - left) / 4
     val dAngle = max / 2.0
 
-    for (y <- Seq(yDown, yUp)) {
+    for (y <- Seq(yDown/*, yUp*/)) {
       for (i <- -2 to 2) {
         val di = (i - -2).toDouble
         val x = left + di * dx
@@ -335,10 +335,44 @@ case class FcrPage(implicit config: Configuration) extends Page("FCR") {
         }
       }
     }
+  }
 
+  def drawOsbs[_: Projection](game: GameData): Unit = {
+    import Mfd.Osb._
+    drawBoxed(OSB_AI, "AI", boxed = shouldDrawAi)
+    drawBoxed(OSB_DL, "DL", boxed = shouldDrawDl)
+    drawBoxed(OSB_BE, "BE", boxed = shouldDrawBe)
+    drawBoxed(OSB_ABS, "ABS", boxed = shouldDrawAbsBearings)
+  }
+
+
+  def drawOffText[_: Projection](game: GameData): Unit = {
+    if (game.sensors.status.sensorOff) {
+      "SENSOR OFF".drawCentered(WHITE)
+    }
   }
 
   def drawElevations[_: Projection](game: GameData): Unit = {
+
+    val bottom = -1.0 + inset
+    val top = 1.0 - inset
+    val max = 90.0
+    val x = -1.0 + inset * 0.75
+    val dy = (top - bottom) / 4
+    val dAngle = max / 2.0
+
+    for (i <- -2 to 2) {
+      val di = (i - -2).toDouble
+      val y = bottom + di * dy
+
+      transform(_.translate(x.toFloat, y.toFloat)) {
+        if (math.abs(i) == 1) {
+          val angle = deltaAngleString(NormalizeDegrees.pm180(dAngle * di - max))
+          angle.drawCentered(GRAY, 0.60f)
+        }
+      }
+    }
+
   }
 
   def drawBullsEyeNumbers[_: Projection](game: GameData): Unit = {
@@ -353,21 +387,7 @@ case class FcrPage(implicit config: Configuration) extends Page("FCR") {
   def drawModes[_: Projection](game: GameData): Unit = {
   }
 
-  def drawOsbs[_: Projection](game: GameData): Unit = {
-    import Mfd.Osb._
-    drawBoxed(OSB_AI, "AI", boxed = shouldDrawAi)
-    drawBoxed(OSB_DL, "DL", boxed = shouldDrawDl)
-    drawBoxed(OSB_BE, "BE", boxed = shouldDrawBe)
-    drawBoxed(OSB_ABS, "ABS", boxed = shouldDrawAbsBearings)
-  }
-
   def drawDlzs[_: Projection](game: GameData): Unit = {
-  }
-
-  def drawOffText[_: Projection](game: GameData): Unit = {
-    if (game.sensors.status.sensorOff) {
-      "SENSOR OFF".drawCentered(WHITE)
-    }
   }
 
   def drawTargetInfo[_: Projection](game: GameData): Unit = {
