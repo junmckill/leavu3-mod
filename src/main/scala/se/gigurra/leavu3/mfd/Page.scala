@@ -16,12 +16,22 @@ abstract class Page(val name: String)(implicit config: Configuration) extends Lo
   val stdTextSize = 0.75f
   val ppiProjection = new PpiProjection
   val screenProjection = new ScreenProjection
-  val displayUnits = DisplayUnits.displayUnits.setBy(_.name == config.initialUnits)
+  private val displayUnits = DisplayUnits.displayUnits.setBy(_.name == config.initialUnits)
   val shortName = this.getClass.getSimpleName.toLowerCase.subSequence(0, 3)
 
   logger.info(s"Created $shortName mfd page")
 
   def distScale: CircleBuffer[Double] = displayUnits.distScale
+
+  def m_to_distUnit: Double = displayUnits.m_to_distUnit
+
+  def m_to_altUnit: Double = displayUnits.m_to_altUnit
+
+  def displayUnitName: String = displayUnits.name
+
+  def stepDisplayUnits(): Unit = {
+    displayUnits.stepUp()
+  }
 
   def mouseClicked(click: MouseClick): Unit =  {}
 
@@ -31,7 +41,12 @@ abstract class Page(val name: String)(implicit config: Configuration) extends Lo
 
 
   //////////////////////////////////////////////////////////////////////////////
-  // Common symbols
+  // Common studd
+
+  protected def matchIngameScale(game: GameData) = {
+    val x = distScale.items.minBy(x => math.abs(x - game.sensors.status.scale.distance))
+    distScale.set(x)
+  }
 
   protected def scanZoneAzDirectionAndWidth: (Double, Double) = {
     val game = GameIn.snapshot

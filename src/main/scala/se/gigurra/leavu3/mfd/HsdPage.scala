@@ -14,7 +14,6 @@ import scala.language.postfixOps
   */
 case class HsdPage(implicit config: Configuration) extends Page("HSD") {
 
-  var shouldMatchIngameScale = true
   var shouldDrawDetailedHsi = true
   var shouldDrawOwnHeading = true
   val deprFactor = CircleBuffer(0.0, 0.5).withDefaultValue(0.5)
@@ -32,7 +31,7 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD") {
       case OSB_HSI => shouldDrawDetailedHsi = !shouldDrawDetailedHsi
       case OSB_HDG => shouldDrawOwnHeading = !shouldDrawOwnHeading
       case OSB_DEL => Dlink.Out.deleteMark(Dlink.config.callsign)
-      case OSB_UNITS => displayUnits.stepUp()
+      case OSB_UNITS => stepDisplayUnits()
       case _ => // Nothing yet
     }
   }
@@ -66,13 +65,6 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD") {
     drawOwnHeading(game)
     drawModes(game)
     drawOsbs(game)
-  }
-
-  def matchIngameScale(game: GameData) = {
-    if (shouldMatchIngameScale) {
-      val x = distScale.items.minBy(x => math.abs(x - game.sensors.status.scale.distance))
-      distScale.set(x)
-    }
   }
 
   def drawHsi(game: GameData): Unit = {
@@ -170,8 +162,8 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD") {
     drawBoxed(OSB_HSI, "HSI", boxed = shouldDrawDetailedHsi)
     if (Dlink.Out.hasMark(Dlink.config.callsign))
       drawBoxed(OSB_DEL, "DEL", boxed = false)
-    drawBoxed(OSB_SCALE, (distScale.get * displayUnits.m_to_distUnit).round.toString, boxed = false)
-    Mfd.Osb.draw(OSB_UNITS, displayUnits.name.toUpperCase.take(3))
+    drawBoxed(OSB_SCALE, (distScale.get * m_to_distUnit).round.toString, boxed = false)
+    Mfd.Osb.draw(OSB_UNITS, displayUnitName.toUpperCase.take(3))
   }
 
   def drawOwnHeading(game: GameData): Unit = {

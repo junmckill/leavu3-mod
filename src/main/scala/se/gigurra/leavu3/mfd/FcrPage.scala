@@ -39,6 +39,7 @@ case class FcrPage(implicit config: Configuration) extends Page("FCR") {
   }
 
   override def draw(game: GameData, dlinkIn: Seq[(String, DlinkData)]): Unit = {
+    matchIngameScale(game)
     drawConformal(game, dlinkIn)
     drawInfo(game, dlinkIn)
   }
@@ -299,6 +300,7 @@ case class FcrPage(implicit config: Configuration) extends Page("FCR") {
     drawElevations(game)
     drawBullsEyeNumbrs(game)
     drawBraNumbrs(game)
+    drawScale(game)
     drawModes(game)
     drawDlzs(game)
     drawTargetInfo(game)
@@ -381,7 +383,35 @@ case class FcrPage(implicit config: Configuration) extends Page("FCR") {
     drawBraNumbers(game, 0.0175, (0.50, 0.95))
   }
 
-  def drawModes[_: Projection](game: GameData): Unit = {
+  def drawScale(game: GameData): Unit = {
+
+    implicit val p = screenProjection
+    val scale = config.symbolScale * 0.025 / font.getSpaceWidth
+
+    batched {
+
+      transform(_
+        .translate(-1.0f + inset.toFloat * 0.4f, 1.0f - 1.2f * inset.toFloat)
+        .scalexy(scale)) {
+
+        var n = 0
+        def drawTextLine(value: Any, color: Color): Unit = {
+          transform(_
+            .translate(y = -n.toFloat * font.getLineHeight)
+            .scalexy(1.0f)
+          ) {
+            value.toString.drawRaw(xAlign = 0.5f, color = color)
+          }
+          n += 1
+        }
+
+        drawTextLine(s"${(distScale.current * m_to_distUnit).round.toString.pad(3)}", WHITE)
+
+      }
+    }
+  }
+
+  def drawModes(game: GameData): Unit = {
 
     implicit val p = screenProjection
     val sensors = game.sensors.status
@@ -414,6 +444,13 @@ case class FcrPage(implicit config: Configuration) extends Page("FCR") {
   }
 
   def drawTargetInfo[_: Projection](game: GameData): Unit = {
+    implicit val p = screenProjection
+    game.pdt.filter(_.isPositionKnown).foreach { pdt =>
+      at((0.0, 0.09)) {
+       // val tgtSpeed = pdt.velocity.norm * m
+       // val closureText =
+      }
+    }
   }
 
 }
