@@ -42,6 +42,17 @@ abstract class Page(val name: String)(implicit config: Configuration) extends Lo
     (direction, width)
   }
 
+  protected def scanZoneElDirectionAndHeight: (Double, Double) = {
+
+    val game = GameIn.snapshot
+    val sensors = game.sensors.status
+    val sttScanZoneOverride = game.pdt.isDefined &&
+      (game.aircraftMode.isInCac || game.aircraftMode.isStt)
+    val height = if (sttScanZoneOverride) 2.5f else sensors.scanZone.size.elevation
+    val direction = if (sttScanZoneOverride) game.pdt.get.elevation else sensors.scanZone.direction.elevation
+    (direction, height)
+  }
+
   protected def drawWpByIndex[_: Projection](wp: Waypoint,
                                              selected: Boolean = false): Unit = {
 
@@ -129,13 +140,25 @@ abstract class Page(val name: String)(implicit config: Configuration) extends Lo
 
       at(tdc) {
         val coverage = game.sensors.status.scanZone.altitudeCoverage
-        val elevationText = game.sensors.status.scanZone.direction.elevation.round.toString
+        val elevationText = deltaAngleString(game.sensors.status.scanZone.direction.elevation)
         val coverageText =
           s"""${(coverage.max * displayUnits.m_to_altUnit).round}
              |${(coverage.min * displayUnits.m_to_altUnit).round}""".stripMargin
         coverageText.drawRightOf(scale = 0.5f, color = WHITE)
         elevationText.drawLeftOf(scale = 0.5f, color = WHITE)
       }
+    }
+  }
+
+  protected def deltaAngleString(value: Double): String = {
+    haveLeadingSign(s"${value.round}º")
+  }
+
+  protected def haveLeadingSign(str: String): String = {
+    if (str.startsWith("+") || str.startsWith("-")) {
+      str
+    } else {
+      s"+$str"
     }
   }
 
@@ -192,8 +215,7 @@ abstract class Page(val name: String)(implicit config: Configuration) extends Lo
 
     at(position) {
       val bra = (position - self.position).asBra
-      val elevation = math.asin(bra.deltaAltitude/bra.range2d).toDegrees.round
-      val altText = (if (elevation > 0) "+" else "") + elevation.toString
+      val altText = deltaAngleString(bra.elevation)
       altText.drawLeftOf(scale = stdTextSize * 0.75f, color = color)
       centerText.drawCentered(scale = stdTextSize * 0.50f, color = if (designated) BLACK else color)
       rightText.drawRightOf(scale = stdTextSize * 0.75f, color = color)

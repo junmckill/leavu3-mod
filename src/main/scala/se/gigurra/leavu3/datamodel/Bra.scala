@@ -18,6 +18,10 @@ case class Bra(bearingRaw: Double, range2d: Double, deltaAltitude: Double) exten
     math.sqrt(range2d * range2d + deltaAltitude * deltaAltitude)
   }
 
+  def elevation: Double = {
+    math.atan(deltaAltitude / range2d).toDegrees
+  }
+
   def bearing: Double = NormalizeDegrees._0360(bearingRaw)
 
   def bearingString: String = {

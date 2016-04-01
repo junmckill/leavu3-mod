@@ -29,14 +29,15 @@ case class FcrPage(implicit config: Configuration) extends Page("FCR") {
       viewport(screenDistMeters, self.heading, offs = Vec2(0.0, 0.0)) {
         scissor(at = (0.0, 0.0), size = (screenDistMeters, screenDistMeters)) {
           drawScanZoneUnderlay(game)
+          drawGrid(game)
           drawSelectedWaypoint(game)
           drawDlinkMarks(dlinkIn)
           drawAiWingmen(game)
           drawAiWingmenTargets(game)
           drawDlinkMembersAndTargets(dlinkIn)
           drawOwnContacts(game, dlinkIn)
-          drawScanZoneOverlay(game)
           drawTdc(game)
+          drawScanZoneOverlay(game)
         }
         drawSurroundEdge()
       }
@@ -69,20 +70,18 @@ case class FcrPage(implicit config: Configuration) extends Page("FCR") {
     drawScannedArea()
   }
 
+  def drawGrid[_: Projection](game: GameData): Unit = {
+    // TODO: IMPL!
+  }
 
   def drawSelectedWaypoint[_: Projection](game: GameData): Unit = {
     drawWp(game.route.currentWaypoint, None, selected = true)
-  }
-
-  def drawScanZoneOverlay[_: Projection](game: GameData): Unit = {
-
   }
 
   def drawOwnContacts[_: Projection](game: GameData, dlinkIn: Seq[(String, DlinkData)]): Unit = {
 
     val contacts = new mutable.HashMap[Int, Contact] // id -> data
     val order = new mutable.HashMap[Int, Int] // id -> index
-  ///  val rws = new mutable.HashMap[Int, Boolean] // id -> index
 
     import game.sensors.targets._
 
@@ -170,6 +169,77 @@ case class FcrPage(implicit config: Configuration) extends Page("FCR") {
 
   }
 
+  def drawScanZoneOverlay[_: Projection](game: GameData): Unit = {
+    // DCS doesn't export momentary antenna position, so don't try to draw that
+
+
+    def drawHorizontalStuff(): Unit = {
+      if (game.sensors.status.sensorOn) {
+
+        val symbolOffs = 0.001
+
+        val (azDir, azWidth) = scanZoneAzDirectionAndWidth
+        val azLeftEdge = azDir - azWidth / 2.0 * 0.995
+        val azRightEdge = azDir + azWidth / 2.0 * 0.995
+
+        val braLeftEdge = Bra(azLeftEdge, screenDistMeters * symbolOffs, 0.0)
+        val braRightEdge = Bra(azRightEdge, screenDistMeters * symbolOffs, 0.0)
+
+        val leftPos = self.position + braLeftEdge.toOffset : Vec2
+        val rightPos = self.position + braRightEdge.toOffset : Vec2
+        val centerPos = 0.5 * (leftPos + rightPos)
+
+        val h = 0.05
+
+        for (pos <- Seq(leftPos, centerPos, rightPos)) {
+          at(pos, heading = self.heading) {
+            lines(Seq(Vec2(0.0, -h) -> Vec2(0.0, h)) * symbolScale)
+          }
+        }
+      }
+    }
+
+    def drawVerticalStuff(): Unit = {
+      if (game.sensors.status.sensorOn) {
+
+        def elev2dist(elev: Double): Double = screenDistMeters/2.0 + screenDistMeters * elev / 180.0
+
+        val symbolOffs = 0.025
+
+        val (elDir, elWidth) = scanZoneElDirectionAndHeight
+        val az = self.heading - (1.0 - symbolOffs) * game.sensors.status.scale.azimuth / 2.0
+        val distCenter = elev2dist(elDir)
+        val distUp = elev2dist(elDir + elWidth / 2.0)
+        val distDown = elev2dist(elDir - elWidth / 2.0)
+
+        val braCenter = Bra(az, distCenter, 0.0)
+        val braUp = Bra(az, distUp, 0.0)
+        val braDown = Bra(az, distDown, 0.0)
+
+        val center = self.position + braCenter.toOffset : Vec2
+        val up = self.position + braUp.toOffset : Vec2
+        val down = self.position + braDown.toOffset : Vec2
+
+        val w = 0.0225
+
+        for (pos <- Seq(center, up, down)) {
+          at(pos, heading = self.heading) {
+            lines(Seq(Vec2(-w, 0.0) -> Vec2(w, 0.0)) * symbolScale)
+          }
+        }
+
+        at(center) {
+          val elevString = deltaAngleString(elDir)
+          elevString.drawRightOf(WHITE, 0.5f)
+        }
+
+      }
+    }
+
+    drawHorizontalStuff()
+    drawVerticalStuff()
+  }
+
   def drawSurroundEdge[_: Projection](): Unit = {
     rect(screenDistMeters, screenDistMeters, color = TEAL)
   }
@@ -184,6 +254,7 @@ case class FcrPage(implicit config: Configuration) extends Page("FCR") {
     drawModes(game)
     drawDlzs(game)
     drawTargetInfo(game)
+    drawOffText(game)
     drawOsbs(game)
   }
 
@@ -209,6 +280,9 @@ case class FcrPage(implicit config: Configuration) extends Page("FCR") {
   }
 
   def drawDlzs[_: Projection](game: GameData): Unit = {
+  }
+
+  def drawOffText[_: Projection](game: GameData): Unit = {
   }
 
   def drawTargetInfo[_: Projection](game: GameData): Unit = {
