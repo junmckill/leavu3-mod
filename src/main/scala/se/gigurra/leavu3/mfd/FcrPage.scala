@@ -44,11 +44,12 @@ case class FcrPage(implicit config: Configuration) extends Page("FCR") {
     }
   }
 
+  def braMiddleOfScreen = Bra(self.heading, screenDistMeters*0.5, 0.0)
+
   def drawScanZoneUnderlay[_: Projection](game: GameData): Unit = {
 
     def drawGreyUnderlay(): Unit = {
-      val braMiddleScreen = Bra(self.heading, screenDistMeters*0.5, 0.0)
-      at(self.position + braMiddleScreen.toOffset : Vec2, heading = self.heading) {
+      at(self.position + braMiddleOfScreen.toOffset : Vec2, heading = self.heading) {
         rect(screenDistMeters, screenDistMeters, typ = FILL, color = DARK_GRAY.scaleAlpha(0.25f))
       }
     }
@@ -71,7 +72,20 @@ case class FcrPage(implicit config: Configuration) extends Page("FCR") {
   }
 
   def drawGrid[_: Projection](game: GameData): Unit = {
-    // TODO: IMPL!
+
+    val k = screenDistMeters / 2.0
+
+    at(self.position + braMiddleOfScreen.toOffset: Vec2, heading = self.heading) {
+      for (angle <- Seq(0.0, 90.0)) {
+        transform(_.rotate(angle)) {
+          lines(Seq(
+            Vec2(-1.0, 0.0) -> Vec2(1.0, 0.0),
+            Vec2(-1.0, 0.5) -> Vec2(1.0, 0.5),
+            Vec2(-1.0, -0.5) -> Vec2(1.0, -0.5)
+          ) * k, TEAL.scaleRGB(0.35f))
+        }
+      }
+    }
   }
 
   def drawSelectedWaypoint[_: Projection](game: GameData): Unit = {
