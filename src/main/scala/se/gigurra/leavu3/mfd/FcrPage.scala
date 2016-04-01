@@ -297,6 +297,9 @@ case class FcrPage(implicit config: Configuration) extends Page("FCR") {
   }
 
   def drawOffText[_: Projection](game: GameData): Unit = {
+    if (game.sensors.status.sensorOff) {
+      "SENSOR OFF".drawCentered(WHITE)
+    }
   }
 
   def drawTargetInfo[_: Projection](game: GameData): Unit = {

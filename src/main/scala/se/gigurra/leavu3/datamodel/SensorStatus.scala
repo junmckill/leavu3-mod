@@ -16,6 +16,7 @@ case class SensorsStatus(source: SourceData = Map.empty) extends SafeParsed[Sens
   val prf              = parse(schema.prf)
 
   def sensorOn: Boolean = radarOn || eosOn
+  def sensorOff: Boolean = !sensorOn
 
   def tdcBra(ownHeading: Double): Option[Bra] = {
     if (sensorOn) {

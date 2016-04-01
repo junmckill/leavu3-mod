@@ -202,7 +202,6 @@ trait RenderHelpers extends UnitConversions { _: RenderContext.type =>
 
   def projection[_: Projection]: Projection[_] = implicitly[Projection[_]]
 
-
 }
 
 trait Projection[+T] {
