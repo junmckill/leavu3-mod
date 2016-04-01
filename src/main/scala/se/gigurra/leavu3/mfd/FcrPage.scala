@@ -1,8 +1,9 @@
 package se.gigurra.leavu3.mfd
 
+import com.badlogic.gdx.graphics.Color
 import se.gigurra.leavu3.datamodel.{Bra, Configuration, Contact, DlinkData, GameData, Vec2, self}
 import se.gigurra.leavu3.gfx.{BScopeProjection, Projection}
-import se.gigurra.leavu3.interfaces.{GameIn, MouseClick}
+import se.gigurra.leavu3.interfaces.GameIn
 import se.gigurra.leavu3.gfx.RenderContext._
 import se.gigurra.leavu3.lmath.NormalizeDegrees
 import se.gigurra.leavu3.util.CurTime
@@ -16,6 +17,7 @@ case class FcrPage(implicit config: Configuration) extends Page("FCR") {
 
   def screenDistMeters: Double = GameIn.snapshot.sensors.status.scale.distance
   def screenWidthDegrees: Double = GameIn.snapshot.sensors.status.scale.azimuth
+
   val inset = 0.2
   val OSB_AI = 18
   val OSB_DL = 17
@@ -297,7 +299,6 @@ case class FcrPage(implicit config: Configuration) extends Page("FCR") {
     drawElevations(game)
     drawBullsEyeNumbers(game)
     drawBraNumbers(game)
-    drawOwnHeading(game)
     drawModes(game)
     drawDlzs(game)
     drawTargetInfo(game)
@@ -309,28 +310,25 @@ case class FcrPage(implicit config: Configuration) extends Page("FCR") {
     val left = -1.0 + inset
     val right = 1.0 - inset
     val max = game.sensors.status.scale.azimuth / 2.0
-    val yDown = -1.0 + inset * 0.85
-    val yUp = 1.0 - inset * 0.85
+    val y = -1.0 + inset * 0.85
     val dx = (right - left) / 4
     val dAngle = max / 2.0
 
-    for (y <- Seq(yDown/*, yUp*/)) {
-      for (i <- -2 to 2) {
-        val di = (i - -2).toDouble
-        val x = left + di * dx
+    for (i <- -2 to 2) {
+      val di = (i - -2).toDouble
+      val x = left + di * dx
 
-        transform(_.translate(x.toFloat, y.toFloat)) {
-          if (shouldDrawAbsBearings) {
-            val angle = NormalizeDegrees._0360(dAngle * di - max + self.heading)
-            angle.round.toString.pad(3, '0').drawCentered(GRAY, 0.60f)
+      transform(_.translate(x.toFloat, y.toFloat)) {
+        if (shouldDrawAbsBearings) {
+          val angle = NormalizeDegrees._0360(dAngle * di - max + self.heading)
+          angle.round.toString.pad(3, '0').drawCentered(GRAY, 0.60f)
+        } else {
+          if (i != 0) {
+            val angle = deltaAngleString(NormalizeDegrees.pm180(dAngle * di - max))
+            angle.drawCentered(GRAY, 0.60f)
           } else {
-            if (i != 0) {
-              val angle = deltaAngleString(NormalizeDegrees.pm180(dAngle * di - max))
-              angle.drawCentered(GRAY, 0.60f)
-            } else {
-              val angle = NormalizeDegrees._0360(self.heading)
-              angle.round.toString.pad(3, '0').drawCentered(WHITE, 0.75f)
-            }
+            val angle = NormalizeDegrees._0360(self.heading)
+            angle.round.toString.pad(3, '0').drawCentered(WHITE, 0.75f)
           }
         }
       }
@@ -381,10 +379,33 @@ case class FcrPage(implicit config: Configuration) extends Page("FCR") {
   def drawBraNumbers[_: Projection](game: GameData): Unit = {
   }
 
-  def drawOwnHeading[_: Projection](game: GameData): Unit = {
-  }
-
   def drawModes[_: Projection](game: GameData): Unit = {
+
+    implicit val p = screenProjection
+    val sensors = game.sensors.status
+    val scale = config.symbolScale * 0.02 / font.getSpaceWidth
+
+    batched {
+
+      transform(_
+        .translate(-1.0f + inset.toFloat + 0.05f, 1.0f - inset.toFloat - 0.05f)
+        .scalexy(scale)) {
+
+        var n = 0
+        def drawTextLine(value: Any, color: Color): Unit = {
+          transform(_
+            .translate(y = -n.toFloat * font.getLineHeight)
+            .scalexy(0.85f)
+          ) {
+            value.toString.drawRaw(xAlign = 0.5f, color = color)
+          }
+          n += 1
+        }
+
+        drawTextLine(s"${game.aircraftMode.master} / ${game.aircraftMode.submode}", LIGHT_GRAY)
+        drawTextLine(s"${sensors.prf.selection} / ${sensors.prf.current}", LIGHT_GRAY)
+      }
+    }
   }
 
   def drawDlzs[_: Projection](game: GameData): Unit = {
