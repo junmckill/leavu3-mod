@@ -53,6 +53,7 @@ case class FcrPage(implicit config: Configuration) extends Page("FCR") {
         scissor(at = (0.0, 0.0), size = (screenDistMeters, screenDistMeters)) {
           drawScanZoneUnderlay(game)
           drawGrid(game)
+          drawDlz(game)
           if (shouldDrawBe) {
             drawSelectedWaypoint(game)
           }
@@ -306,7 +307,6 @@ case class FcrPage(implicit config: Configuration) extends Page("FCR") {
     drawBraNumbrs(game)
     drawScale(game)
     drawModes(game)
-    drawDlzs(game)
     drawTargetInfo(game)
     drawOffText(game)
     drawOsbs(game)
@@ -444,7 +444,54 @@ case class FcrPage(implicit config: Configuration) extends Page("FCR") {
     }
   }
 
-  def drawDlzs[_: Projection](game: GameData): Unit = {
+  def drawDlz[_: Projection](game: GameData): Unit = {
+
+    game.pdt
+      .filter(_.isPositionKnown)
+      .filter(_.dlz.rAero > 1000)
+      .foreach { pdt =>
+
+        val tgtDist = (pdt.position - self.position).norm
+
+        val vector = Bra(self.heading + game.sensors.status.scale.azimuth / 2.0, 1.0, 0.0)
+        val braTgt = vector.with2dLength(math.max(1.0, tgtDist))
+        val braRMin = vector.with2dLength(math.max(1.0, pdt.dlz.rMin))
+        val braRtr = vector.with2dLength(pdt.dlz.rTr)
+        val braRPi = vector.with2dLength(pdt.dlz.rPi)
+        val braRAero = vector.with2dLength(pdt.dlz.rAero)
+
+        val w = 0.050 * screenDistMeters * config.symbolScale
+        val h = 0.0035 * screenDistMeters * config.symbolScale
+
+        at(self.position + braRMin.toOffset, heading = self.heading) {
+          rect(w, h, color = TEAL, typ = LINE)
+          transform(_.rotate(self.heading)) {
+            "rmin ".drawLeftOf(TEAL, scale = 0.5f)
+          }
+        }
+
+        at(self.position + braRtr.toOffset, heading = self.heading) {
+          rect(w, h, color = TEAL, typ = FILL)
+          transform(_.rotate(self.heading)) {
+            " rtr ".drawLeftOf(TEAL, scale = 0.5f)
+          }
+        }
+
+        at(self.position + braRPi.toOffset, heading = self.heading) {
+          rect(w, h, color = TEAL, typ = FILL)
+          transform(_.rotate(self.heading)) {
+            " rpi ".drawLeftOf(TEAL, scale = 0.5f)
+          }
+        }
+
+        at(self.position + braRAero.toOffset, heading = self.heading) {
+          rect(w, h / 2.0, color = TEAL, typ = FILL)
+        }
+
+        at(self.position + braTgt.toOffset, heading = self.heading) {
+          rect(w, h / 2.0, color = contactColor(pdt, fromDatalink = false), typ = FILL)
+        }
+      }
   }
 
   def drawTargetInfo[_: Projection](game: GameData): Unit = {

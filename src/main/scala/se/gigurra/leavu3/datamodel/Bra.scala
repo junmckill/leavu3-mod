@@ -32,6 +32,10 @@ case class Bra(bearingRaw: Double, range2d: Double, deltaAltitude: Double) exten
     Bra(bearingRaw, k * range2d, k * deltaAltitude)
   }
 
+  def withBearing(bearing: Double): Bra = {
+    Bra(bearing, range2d, deltaAltitude)
+  }
+
   def bearing: Double = NormalizeDegrees._0360(bearingRaw)
 
   def bearingString: String = {
