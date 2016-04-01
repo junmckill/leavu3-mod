@@ -297,8 +297,8 @@ case class FcrPage(implicit config: Configuration) extends Page("FCR") {
     implicit val p = screenProjection
     drawBearings(game)
     drawElevations(game)
-    drawBullsEyeNumbers(game)
-    drawBraNumbers(game)
+    drawBullsEyeNumbrs(game)
+    drawBraNumbrs(game)
     drawModes(game)
     drawDlzs(game)
     drawTargetInfo(game)
@@ -373,10 +373,11 @@ case class FcrPage(implicit config: Configuration) extends Page("FCR") {
 
   }
 
-  def drawBullsEyeNumbers[_: Projection](game: GameData): Unit = {
+  def drawBullsEyeNumbrs[_: Projection](game: GameData): Unit = {
+    drawBullsEyeNumbers(game, 0.0175, (-0.95, 0.95))
   }
 
-  def drawBraNumbers[_: Projection](game: GameData): Unit = {
+  def drawBraNumbrs[_: Projection](game: GameData): Unit = {
   }
 
   def drawModes[_: Projection](game: GameData): Unit = {

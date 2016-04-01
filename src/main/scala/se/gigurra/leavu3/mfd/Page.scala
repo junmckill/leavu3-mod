@@ -167,6 +167,94 @@ abstract class Page(val name: String)(implicit config: Configuration) extends Lo
     }
   }
 
+  def drawBullsEyeNumbers[_: Projection](game: GameData): Unit = {
+
+    implicit val p = screenProjection
+
+    def mkBraString(prefix: String, bra: Bra): String = s"$prefix : ${bra.brString(displayUnits.m_to_distUnit)}"
+
+    val bullsEye = game.route.currentWaypoint
+    val selfBra = (self.position - bullsEye.position).asBra
+    val scale = config.symbolScale * 0.0175 / font.getSpaceWidth
+
+    batched { at((-0.95, 0.95)) {
+
+      transform(_
+        .scalexy(scale)) {
+
+        val beStr = s"bullseye : wp ${bullsEye.index - 1}"
+        val selfStr = mkBraString("self".pad(8), selfBra)
+
+        var n = 0
+        def drawTextLine(str: String, color: Color): Unit = {
+          transform(_.translate(y = -n.toFloat * font.getLineHeight))(str.drawRaw(xAlign = 0.5f, color = color))
+          n += 1
+        }
+
+        drawTextLine(beStr, LIGHT_GRAY)
+        drawTextLine(selfStr, CYAN)
+
+        game.tdcPosition foreach { tdc =>
+          val tdcBra = (tdc - bullsEye.position).asBra
+          val tdcStr = mkBraString("tdc".pad(8), tdcBra)
+          drawTextLine(tdcStr, WHITE)
+        }
+
+        game.pdt.filter(_.isPositionKnown) foreach { pdt =>
+          val pdtBra = (pdt.position - bullsEye.position).asBra
+          val pdtStr = mkBraString("pdt".pad(8), pdtBra)
+          drawTextLine(pdtStr, contactColor(pdt, fromDatalink = false))
+        }
+
+      }
+    }}
+
+  }
+
+  protected def drawBullsEyeNumbers(game: GameData, textScale: Double, pos: Vec2): Unit = {
+
+    implicit val p = screenProjection
+
+    def mkBraString(prefix: String, bra: Bra): String = s"$prefix : ${bra.brString(displayUnits.m_to_distUnit)}"
+
+    val bullsEye = game.route.currentWaypoint
+    val selfBra = (self.position - bullsEye.position).asBra
+    val scale = config.symbolScale * textScale / font.getSpaceWidth
+
+    batched { at(pos) {
+
+      transform(_
+        .scalexy(scale)) {
+
+        val beStr = s"bullseye : wp ${bullsEye.index - 1}"
+        val selfStr = mkBraString("self".pad(8), selfBra)
+
+        var n = 0
+        def drawTextLine(str: String, color: Color): Unit = {
+          transform(_.translate(y = -n.toFloat * font.getLineHeight))(str.drawRaw(xAlign = 0.5f, color = color))
+          n += 1
+        }
+
+        drawTextLine(beStr, LIGHT_GRAY)
+        drawTextLine(selfStr, CYAN)
+
+        game.tdcPosition foreach { tdc =>
+          val tdcBra = (tdc - bullsEye.position).asBra
+          val tdcStr = mkBraString("tdc".pad(8), tdcBra)
+          drawTextLine(tdcStr, WHITE)
+        }
+
+        game.pdt.filter(_.isPositionKnown) foreach { pdt =>
+          val pdtBra = (pdt.position - bullsEye.position).asBra
+          val pdtStr = mkBraString("pdt".pad(8), pdtBra)
+          drawTextLine(pdtStr, contactColor(pdt, fromDatalink = false))
+        }
+
+      }
+    }}
+
+  }
+
   protected def drawContact[_: Projection](position: Vec3,
                                            heading: Option[Double],
                                            color: Color,

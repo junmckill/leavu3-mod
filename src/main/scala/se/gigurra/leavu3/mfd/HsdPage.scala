@@ -2,9 +2,8 @@ package se.gigurra.leavu3.mfd
 
 import com.badlogic.gdx.graphics.Color
 import se.gigurra.leavu3.datamodel._
-import se.gigurra.leavu3.gfx.Projection
 import se.gigurra.leavu3.gfx.RenderContext._
-import se.gigurra.leavu3.util.{CircleBuffer, CurTime}
+import se.gigurra.leavu3.util.CircleBuffer
 import se.gigurra.leavu3.interfaces.{Dlink, MouseClick}
 
 import scala.collection.mutable
@@ -62,8 +61,8 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD") {
       drawLockedTargets(game)
       drawTdc(game)
     }(ppiProjection)
-    drawBullsEyeNumbers(game)
-    drawBraNumbers(game)
+    drawBullsEyeNumbrs(game)
+    drawBraNumbrs(game)
     drawOwnHeading(game)
     drawModes(game)
     drawOsbs(game)
@@ -155,50 +154,11 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD") {
     }
   }
 
-  def drawBullsEyeNumbers(game: GameData) = {
-    implicit val p = screenProjection
-
-    def mkBraString(prefix: String, bra: Bra): String = s"$prefix : ${bra.brString(displayUnits.m_to_distUnit)}"
-
-    val bullsEye = game.route.currentWaypoint
-    val selfBra = (self.position - bullsEye.position).asBra
-    val scale = config.symbolScale * 0.02 / font.getSpaceWidth
-
-    batched { at((-0.9, 0.9)) {
-
-      transform(_
-        .scalexy(scale)) {
-
-        val beStr = s"bullseye : wp ${bullsEye.index - 1}"
-        val selfStr = mkBraString("self".pad(8), selfBra)
-
-        var n = 0
-        def drawTextLine(str: String, color: Color): Unit = {
-          transform(_.translate(y = -n.toFloat * font.getLineHeight))(str.drawRaw(xAlign = 0.5f, color = color))
-          n += 1
-        }
-
-        drawTextLine(beStr, LIGHT_GRAY)
-        drawTextLine(selfStr, CYAN)
-
-        game.tdcPosition foreach { tdc =>
-          val tdcBra = (tdc - bullsEye.position).asBra
-          val tdcStr = mkBraString("tdc".pad(8), tdcBra)
-          drawTextLine(tdcStr, WHITE)
-        }
-
-        game.pdt.filter(_.isPositionKnown) foreach { pdt =>
-          val pdtBra = (pdt.position - bullsEye.position).asBra
-          val pdtStr = mkBraString("pdt".pad(8), pdtBra)
-          drawTextLine(pdtStr, contactColor(pdt, fromDatalink = false))
-        }
-
-      }
-    }}
-
+  def drawBullsEyeNumbrs(game: GameData) = {
+    drawBullsEyeNumbers(game, 0.02, (-0.9, 0.9))
   }
 
-  def drawBraNumbers(game: GameData) = {
+  def drawBraNumbrs(game: GameData) = {
     implicit val p = screenProjection
 
     def mkBraString(prefix: String, bra: Bra): String = s"$prefix : ${bra.brString(displayUnits.m_to_distUnit)}"
