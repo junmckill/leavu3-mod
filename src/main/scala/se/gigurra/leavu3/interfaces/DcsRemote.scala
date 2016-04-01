@@ -1,17 +1,42 @@
 package se.gigurra.leavu3.interfaces
 
-import com.twitter.util.Await
-import se.gigurra.leavu3.datamodel.Configuration
-import se.gigurra.leavu3.util.RestClient
+import com.twitter.finagle.FailedFastException
+import com.twitter.util.{Await, Future}
+import se.gigurra.leavu3.datamodel.{Configuration, StaticData}
+import se.gigurra.leavu3.util.{DefaultTimer, IdenticalRequestPending, RestClient}
+import se.gigurra.serviceutils.json.JSON
+import se.gigurra.serviceutils.twitter.logging.Logging
 
 import scala.language.implicitConversions
 import scala.util.control.NonFatal
 
-case class DcsRemote private (config: Configuration) {
+case class DcsRemote private(config: Configuration) extends Logging {
+
   val client = RestClient(config.dcsRemoteAddress, config.dcsRemotePort, "Dcs Remote")
-  try Await.result(client.get(s"static-data")) catch {
-    case NonFatal(e) => throw new RuntimeException(s"Failed to communicate with dcs remote!", e)
+  @volatile var remoteConfig = initialDownloadConfig()
+
+  DefaultTimer.seconds(3) {
+    downloadConfig()
+      .onSuccess { staticData =>
+        remoteConfig = staticData
+      }
+      .onFailure {
+        case e: IdenticalRequestPending =>
+        case e: FailedFastException =>
+        case e => logger.warning(s"Unable to download configuration from Dcs Remote: $e")
+      }
   }
+
+  private def initialDownloadConfig(): StaticData = {
+    try Await.result(downloadConfig()) catch {
+      case NonFatal(e) => throw new RuntimeException(s"Failed to communicate with dcs remote!", e)
+    }
+  }
+
+  private def downloadConfig(): Future[StaticData] = {
+    client.get(s"static-data").map(JSON.read[StaticData])
+  }
+
 }
 
 /**
@@ -27,4 +52,6 @@ object DcsRemote {
   }
 
   implicit def remote2client(r: DcsRemote.type): RestClient = instance.client
+
+  def remoteConfig: StaticData = instance.remoteConfig
 }

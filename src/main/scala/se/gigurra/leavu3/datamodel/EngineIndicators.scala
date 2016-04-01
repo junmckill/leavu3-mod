@@ -11,6 +11,8 @@ case class EngineIndicators(source: SourceData = Map.empty) extends SafeParsed[E
   val temperature       = parse(schema.temperature)
   val fuelInternal      = parse(schema.fuelInternal)
   val fuelExternal      = parse(schema.fuelExternal)
+
+  def fuelTotal = fuelInternal + fuelExternal
 }
 
 object EngineIndicators extends Schema[EngineIndicators] {

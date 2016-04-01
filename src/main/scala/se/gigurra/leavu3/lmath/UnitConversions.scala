@@ -17,6 +17,8 @@ trait UnitConversions {
   val mps_to_kph = m_to_km * 3600.0
   val kts_to_mps = 1.0 / mps_to_kts
   val kph_to_mps = 1.0 / mps_to_kph
+  val kg_to_lbs = 2.20462262
+  val lbs_to_kg = 1.0 / kg_to_lbs
 
   implicit class MeterValues[T: Numeric](x: T) {
     def d = implicitly[Numeric[T]].toDouble(x)

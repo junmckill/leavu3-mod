@@ -94,3 +94,13 @@ object DlinkConfiguration extends Schema[DlinkConfiguration] {
   val team         = required[String]  ("team",         default = "BLUE_RABBITS")
   val callsign     = required[String]  ("callsign",     default = "JarJar")
 }
+
+case class MissionConfiguration(source: SourceData = Map.empty) extends Parsed[MissionConfiguration.type] {
+  val bingo        = parse(schema.bingo)
+  val joker        = parse(schema.joker)
+}
+
+object MissionConfiguration extends Schema[MissionConfiguration] {
+  val bingo        = required[Double]  ("bingo",        default = 2500.0)
+  val joker        = required[Double]  ("joker",        default = 5000.0)
+}

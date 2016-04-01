@@ -26,11 +26,9 @@ object Dlink extends Logging {
     In.start()
     if (appCfg.relayDlink)
       Out.start()
-    CfgUpdate.start()
   }
 
   object CfgUpdate {
-
     def handleDlinkConfig(newConfig: DlinkConfiguration): Unit = {
       if (newConfig != config || dlinkClient.isEmpty) {
         logger.info(s"Updating dlink settings to: \n ${JSON.write(newConfig)}")
@@ -38,16 +36,6 @@ object Dlink extends Logging {
         In.clear()
         Out.clear()
         dlinkClient = Try(RestClient(newConfig.host, newConfig.port, "Data Link")).toOption
-      }
-    }
-
-    def start(): Unit = {
-      DefaultTimer.seconds(3) {
-        downloadDlinkConfig().map(handleDlinkConfig).onFailure {
-          case e: IdenticalRequestPending =>
-          case e: FailedFastException =>
-          case e => logger.warning(s"Unable to update data link configuration: $e")
-        }
       }
     }
   }
@@ -69,6 +57,9 @@ object Dlink extends Logging {
     def start(): Unit = {
 
       DefaultTimer.fps(1) {
+
+        CfgUpdate.handleDlinkConfig(DcsRemote.remoteConfig.dlinkSettings)
+
         dlinkClient.foreach(_
           .get(config.team, maxAge = Some(10000L))
           .map(JSON.readMap)
@@ -134,6 +125,8 @@ object Dlink extends Logging {
     def start(): Unit = {
 
       DefaultTimer.fps(2) {
+
+        CfgUpdate.handleDlinkConfig(DcsRemote.remoteConfig.dlinkSettings)
 
         val source = GameIn.snapshot
         if (source.err.isEmpty && source.age < 3.0) {

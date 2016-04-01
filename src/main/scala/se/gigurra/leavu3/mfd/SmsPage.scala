@@ -1,9 +1,13 @@
 package se.gigurra.leavu3.mfd
 
 import com.badlogic.gdx.graphics.Color
-import se.gigurra.leavu3.datamodel.{Configuration, CounterMeasures, DlinkData, GameData, Payload, Vec2}
+import com.google.common.base.Splitter
+import se.gigurra.leavu3.datamodel.{Configuration, CounterMeasures, DlinkData, EngineIndicators, GameData, Payload, Vec2}
 import se.gigurra.leavu3.gfx.{Blink, CountDown}
 import se.gigurra.leavu3.gfx.RenderContext._
+import se.gigurra.leavu3.interfaces.DcsRemote
+
+import scala.collection.JavaConversions._
 
 /**
   * Created by kjolh on 3/12/2016.
@@ -21,7 +25,7 @@ case class SmsPage(implicit config: Configuration) extends Page("SMS") {
       "STORES".drawCentered(WHITE, 1.5f)
     }
     drawBoxPayload(game.payload)
-    drawTextPayload(game.payload, game.electronicWarf.counterMeasures)
+    drawTextPayload(game.payload, game.electronicWarf.counterMeasures, game.indicators.engines)
   }
 
   def drawBoxPayload(payload: Payload): Unit = {
@@ -83,7 +87,7 @@ case class SmsPage(implicit config: Configuration) extends Page("SMS") {
     }
   }
 
-  def drawTextPayload(payload: Payload, cms: CounterMeasures): Unit = {
+  def drawTextPayload(payload: Payload, cms: CounterMeasures, eng: EngineIndicators): Unit = {
 
     val scale = config.symbolScale * 0.03 / font.getSpaceWidth
 
@@ -108,9 +112,25 @@ case class SmsPage(implicit config: Configuration) extends Page("SMS") {
           val chaffColor = getRightSideTextColor(cms.chaff, chaffBlinkCountdown)
           val flareColor = getRightSideTextColor(cms.flare, flareBlinkCountdown)
 
+          def drawFuel(name: String, value: Double, bingo: Double, joker: Double): Unit = {
+            val fuelNumber = Splitter.fixedLength(3).split(((value * kg_to_fuelUnit * 0.1).round*10).toString.reverse).mkString(".").reverse
+            val fuelString  = s"${fuelNumber.pad(leftPad)}x $name".padRight(rightPad)
+            val fuelColor = if (value < bingo) RED else if (value < joker) YELLOW else GREEN
+            drawTextLine(fuelString, fuelColor)
+          }
+
+
           drawTextLine(gunString, gunColor)
+          drawTextLine("", flareColor)
           drawTextLine(chaffString, chaffColor)
           drawTextLine(flareString, flareColor)
+          drawTextLine("", flareColor)
+
+          val bingo = DcsRemote.remoteConfig.missionSettings.bingo
+          val joker = DcsRemote.remoteConfig.missionSettings.joker
+          drawFuel("Fuel", eng.fuelTotal, bingo = bingo * lbs_to_kg, joker = joker * lbs_to_kg)
+          drawFuel("internal", eng.fuelInternal, bingo = bingo * lbs_to_kg, joker = joker * lbs_to_kg)
+          drawFuel("external", eng.fuelExternal, bingo = 1, joker = 0)
 
           if (gunLastCycle != payload.cannon.shells)
             gunBlinkCountdown = newCountdown()

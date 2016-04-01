@@ -29,6 +29,8 @@ abstract class Page(val name: String)(implicit config: Configuration) extends Lo
 
   def mps_to_speedUnit: Double = displayUnits.mps_to_speedUnit
 
+  def kg_to_fuelUnit: Double = displayUnits.kg_to_fuelUnit
+
   def displayUnitName: String = displayUnits.name
 
   def stepDisplayUnits(): Unit = {
