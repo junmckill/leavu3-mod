@@ -28,6 +28,7 @@ case class GameData(source: SourceData = Map.empty) extends SafeParsed[GameData.
   def selfData: SelfData = metaData.selfData
 
   def tdcPosition: Option[Vec2] = sensors.status.tdcPosition(selfData.heading, selfData.position)
+  def tdcBra: Option[Bra] = sensors.status.tdcBra(selfData.heading)
   def pdt: Option[Target] = sensors.pdt
 
   def aircraftMode: AircraftMode = indicators.nav.mode

@@ -224,18 +224,26 @@ case class FcrPage(implicit config: Configuration) extends Page("FCR") {
         val azLeftEdge = azDir - azWidth / 2.0 * 0.995
         val azRightEdge = azDir + azWidth / 2.0 * 0.995
 
-        val braLeftEdge = Bra(azLeftEdge, screenDistMeters * symbolOffs, 0.0)
-        val braRightEdge = Bra(azRightEdge, screenDistMeters * symbolOffs, 0.0)
+        val dist = screenDistMeters * symbolOffs
+        val braLeftEdge = Bra(azLeftEdge, dist, 0.0)
+        val braRightEdge = Bra(azRightEdge, dist, 0.0)
 
-        val leftPos = self.position + braLeftEdge.toOffset : Vec2
-        val rightPos = self.position + braRightEdge.toOffset : Vec2
-        val centerPos = 0.5 * (leftPos + rightPos)
+        game.tdcBra.foreach { tdcBra =>
 
-        val h = 0.05
+          val leftPos = self.position + braLeftEdge.toOffset : Vec2
+          val rightPos = self.position + braRightEdge.toOffset : Vec2
+          val centerPos = self.position + tdcBra.with2dLength(dist).toOffset : Vec2
+          val centerPos2x = self.position + tdcBra.with2dLength(screenDistMeters * 0.05).toOffset : Vec2
+          val h = 0.05
 
-        for (pos <- Seq(leftPos, centerPos, rightPos)) {
-          at(pos, heading = self.heading) {
-            lines(Seq(Vec2(0.0, -h) -> Vec2(0.0, h)) * symbolScale)
+          for (pos <- Seq(leftPos, centerPos, rightPos)) {
+            at(pos, heading = self.heading) {
+              lines(Seq(Vec2(0.0, -h) -> Vec2(0.0, h)) * symbolScale)
+            }
+          }
+
+          at(centerPos2x) {
+            bearingString((centerPos2x - self.position).asBra.bearing).drawCentered(WHITE, scale = stdTextSize)
           }
         }
       }
@@ -304,29 +312,31 @@ case class FcrPage(implicit config: Configuration) extends Page("FCR") {
     val left = -1.0 + inset
     val right = 1.0 - inset
     val max = game.sensors.status.scale.azimuth / 2.0
-    val y = -1.0 + inset * 0.85
+    val yDown = -1.0 + inset * 0.85
+    val yUp = 1.0 - inset * 0.85
     val dx = (right - left) / 4
     val dAngle = max / 2.0
 
-    for (i <- -2 to 2) {
-      val di = (i - -2).toDouble
-      val x = left + di * dx
+    for (y <- Seq(yDown, yUp)) {
+      for (i <- -2 to 2) {
+        val di = (i - -2).toDouble
+        val x = left + di * dx
 
-      transform(_.translate(x.toFloat, y.toFloat)) {
-        if (shouldDrawAbsBearings) {
-          val angle = NormalizeDegrees._0360(dAngle * di - max + self.heading)
-          angle.round.toString.pad(3, '0').drawCentered(GRAY, 0.60f)
-        } else {
-          if (i != 0) {
-            val angle = deltaAngleString(NormalizeDegrees.pm180(dAngle * di - max))
-            angle.drawCentered(GRAY, 0.60f)
+        transform(_.translate(x.toFloat, y.toFloat)) {
+          if (shouldDrawAbsBearings) {
+            val angle = NormalizeDegrees._0360(dAngle * di - max + self.heading)
+            angle.round.toString.pad(3, '0').drawCentered(GRAY, 0.60f)
           } else {
-            val angle = NormalizeDegrees._0360(self.heading)
-            angle.round.toString.pad(3, '0').drawCentered(WHITE, 0.75f)
+            if (i != 0) {
+              val angle = deltaAngleString(NormalizeDegrees.pm180(dAngle * di - max))
+              angle.drawCentered(GRAY, 0.60f)
+            } else {
+              val angle = NormalizeDegrees._0360(self.heading)
+              angle.round.toString.pad(3, '0').drawCentered(WHITE, 0.75f)
+            }
           }
         }
       }
-
     }
 
   }

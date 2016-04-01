@@ -5,6 +5,7 @@ import se.gigurra.leavu3.datamodel._
 import se.gigurra.leavu3.gfx.RenderContext._
 import se.gigurra.leavu3.gfx.{PpiProjection, Projection, ScreenProjection}
 import se.gigurra.leavu3.interfaces.{GameIn, MouseClick}
+import se.gigurra.leavu3.lmath.NormalizeDegrees
 import se.gigurra.leavu3.util.{CircleBuffer, CurTime}
 import se.gigurra.serviceutils.twitter.logging.Logging
 
@@ -152,6 +153,10 @@ abstract class Page(val name: String)(implicit config: Configuration) extends Lo
 
   protected def deltaAngleString(value: Double): String = {
     haveLeadingSign(s"${value.round}º")
+  }
+
+  protected def bearingString(value: Double): String = {
+    NormalizeDegrees._0360(value.round).round.pad(3, '0')
   }
 
   protected def haveLeadingSign(str: String): String = {
