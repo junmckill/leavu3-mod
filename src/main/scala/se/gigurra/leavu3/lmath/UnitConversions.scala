@@ -13,6 +13,10 @@ trait UnitConversions {
   val m_to_nmi = 1.0 / nmi_to_m
   val m_to_km = 1.0 / 1000.0
   val km_to_m = 1.0 / m_to_km
+  val mps_to_kts = m_to_nmi * 3600.0
+  val mps_to_kph = m_to_km * 3600.0
+  val kts_to_mps = 1.0 / mps_to_kts
+  val kph_to_mps = 1.0 / mps_to_kph
 
   implicit class MeterValues[T: Numeric](x: T) {
     def d = implicitly[Numeric[T]].toDouble(x)

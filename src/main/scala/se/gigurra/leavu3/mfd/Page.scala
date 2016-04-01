@@ -27,6 +27,8 @@ abstract class Page(val name: String)(implicit config: Configuration) extends Lo
 
   def m_to_altUnit: Double = displayUnits.m_to_altUnit
 
+  def mps_to_speedUnit: Double = displayUnits.mps_to_speedUnit
+
   def displayUnitName: String = displayUnits.name
 
   def stepDisplayUnits(): Unit = {
@@ -268,6 +270,15 @@ abstract class Page(val name: String)(implicit config: Configuration) extends Lo
       }
     }}
 
+  }
+
+  protected def deltaText(valueUnrounded: Double): String = {
+    val value = valueUnrounded.round
+    if (value >= 0) {
+      s"+$value"
+    } else {
+      value.toString
+    }
   }
 
   protected def drawBraNumbers(game: GameData, textScale: Double, pos: Vec2) = {

@@ -12,6 +12,7 @@ import scala.language.postfixOps
 case class DisplayUnits(name: String,
                         m_to_altUnit: Double,
                         m_to_distUnit: Double,
+                        mps_to_speedUnit: Double,
                         distScale: CircleBuffer[Double])
 
 object DisplayUnits {
@@ -19,8 +20,8 @@ object DisplayUnits {
   val imperialDistances = CircleBuffer(10 nmi, 20 nmi, 40 nmi, 80 nmi, 160 nmi).withDefaultValue(40 nmi)
   val metricDistances = CircleBuffer(20 km, 40 km, 80 km, 160 km, 320 km).withDefaultValue(80 km)
 
-  val imperialUnits = DisplayUnits("imperial", m_to_kft, m_to_nmi, imperialDistances)
-  val metricUnits = DisplayUnits("metric", m_to_km, m_to_km, metricDistances)
+  val imperialUnits = DisplayUnits("imperial", m_to_kft, m_to_nmi, mps_to_kts, imperialDistances)
+  val metricUnits = DisplayUnits("metric", m_to_km, m_to_km, mps_to_kph, metricDistances)
 
   val displayUnits = CircleBuffer(imperialUnits, metricUnits)
 

@@ -16,6 +16,7 @@ import scala.collection.mutable
 case class FcrPage(implicit config: Configuration) extends Page("FCR") {
 
   def screenDistMeters: Double = GameIn.snapshot.sensors.status.scale.distance
+
   def screenWidthDegrees: Double = GameIn.snapshot.sensors.status.scale.azimuth
 
   val inset = 0.2
@@ -72,12 +73,12 @@ case class FcrPage(implicit config: Configuration) extends Page("FCR") {
     }
   }
 
-  def braMiddleOfScreen = Bra(self.heading, screenDistMeters*0.5, 0.0)
+  def braMiddleOfScreen = Bra(self.heading, screenDistMeters * 0.5, 0.0)
 
   def drawScanZoneUnderlay[_: Projection](game: GameData): Unit = {
 
     def drawGreyUnderlay(): Unit = {
-      at(self.position + braMiddleOfScreen.toOffset : Vec2, heading = self.heading) {
+      at(self.position + braMiddleOfScreen.toOffset: Vec2, heading = self.heading) {
         rect(screenDistMeters, screenDistMeters, typ = FILL, color = DARK_GRAY.scaleAlpha(0.25f))
       }
     }
@@ -137,6 +138,7 @@ case class FcrPage(implicit config: Configuration) extends Page("FCR") {
 
     implicit class RichContact(c: Contact) {
       def index: Int = order(c.id)
+
       def news: Double = GameIn.rdrMemory(c).fold(1.0)(_.news)
     }
 
@@ -161,7 +163,8 @@ case class FcrPage(implicit config: Configuration) extends Page("FCR") {
       .sortBy(_.index)
 
     def drawKnownPosContacts(contacts: Seq[Contact]): Unit = {
-      for (contact <- contacts.reverse) { // draw lowest index (=highest prio) last
+      for (contact <- contacts.reverse) {
+        // draw lowest index (=highest prio) last
 
         val baseColor = contactColor(contact, fromDatalink = false)
         val color = baseColor.scaleAlpha(contact.news)
@@ -180,7 +183,8 @@ case class FcrPage(implicit config: Configuration) extends Page("FCR") {
     }
 
     def drawJammers(contacts: Seq[Contact]): Unit = {
-      for (contact <- contacts.reverse) { // draw lowest index (=highest prio) last
+      for (contact <- contacts.reverse) {
+        // draw lowest index (=highest prio) last
 
         val baseColor = YELLOW
         val color = baseColor.scaleAlpha(contact.news)
@@ -230,10 +234,10 @@ case class FcrPage(implicit config: Configuration) extends Page("FCR") {
 
         game.tdcBra.foreach { tdcBra =>
 
-          val leftPos = self.position + braLeftEdge.toOffset : Vec2
-          val rightPos = self.position + braRightEdge.toOffset : Vec2
-          val centerPos = self.position + tdcBra.with2dLength(dist).toOffset : Vec2
-          val centerPos2x = self.position + tdcBra.with2dLength(screenDistMeters * 0.05).toOffset : Vec2
+          val leftPos = self.position + braLeftEdge.toOffset: Vec2
+          val rightPos = self.position + braRightEdge.toOffset: Vec2
+          val centerPos = self.position + tdcBra.with2dLength(dist).toOffset: Vec2
+          val centerPos2x = self.position + tdcBra.with2dLength(screenDistMeters * 0.05).toOffset: Vec2
           val h = 0.05
 
           for (pos <- Seq(leftPos, centerPos, rightPos)) {
@@ -252,7 +256,7 @@ case class FcrPage(implicit config: Configuration) extends Page("FCR") {
     def drawVerticalStuff(): Unit = {
       if (game.sensors.status.sensorOn) {
 
-        def elev2dist(elev: Double): Double = screenDistMeters/2.0 + screenDistMeters * elev / 180.0
+        def elev2dist(elev: Double): Double = screenDistMeters / 2.0 + screenDistMeters * elev / 180.0
 
         val symbolOffs = 0.025
 
@@ -266,9 +270,9 @@ case class FcrPage(implicit config: Configuration) extends Page("FCR") {
         val braUp = Bra(az, distUp, 0.0)
         val braDown = Bra(az, distDown, 0.0)
 
-        val center = self.position + braCenter.toOffset : Vec2
-        val up = self.position + braUp.toOffset : Vec2
-        val down = self.position + braDown.toOffset : Vec2
+        val center = self.position + braCenter.toOffset: Vec2
+        val up = self.position + braUp.toOffset: Vec2
+        val down = self.position + braDown.toOffset: Vec2
 
         val w = 0.0225
 
@@ -444,12 +448,39 @@ case class FcrPage(implicit config: Configuration) extends Page("FCR") {
   }
 
   def drawTargetInfo[_: Projection](game: GameData): Unit = {
+
     implicit val p = screenProjection
-    game.pdt.filter(_.isPositionKnown).foreach { pdt =>
-      at((0.0, 0.09)) {
-       // val tgtSpeed = pdt.velocity.norm * m
-       // val closureText =
+
+    val textScale = config.symbolScale * 0.02 / font.getSpaceWidth
+
+    val ownSpeed = self.velocity.norm * mps_to_speedUnit
+    val ownSpeedText = s"self: ${ownSpeed.round}"
+
+    var n = 0
+    def drawTextLine(value: Any, color: Color): Unit = {
+      transform(_
+        .scalexy(textScale)
+        .translate(y = -n.toFloat * font.getLineHeight)
+      ) {
+        value.toString.drawRaw(xAlign = 0.5f, color = color)
       }
+      n += 1
+    }
+
+    at((-0.15, 0.925)) {
+
+      drawTextLine(ownSpeedText, CYAN)
+
+      game.pdt.filter(_.isPositionKnown).foreach { pdt =>
+        val vnToTgt = (pdt.position - self.position).normalized
+        val vnFromTgt = -vnToTgt
+        val tgtSpeed = pdt.velocity.norm * mps_to_speedUnit
+        val tgtClosure = ((pdt.velocity dot vnFromTgt) + (self.velocity dot vnToTgt)) * mps_to_speedUnit
+        val tgtClosureText = deltaText(tgtClosure)
+        val tgtSpeedText = s" pdt: ${tgtSpeed.round} c$tgtClosureText"
+        drawTextLine(tgtSpeedText, contactColor(pdt, fromDatalink = false))
+      }
+
     }
   }
 
