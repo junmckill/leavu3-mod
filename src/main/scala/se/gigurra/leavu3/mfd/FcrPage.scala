@@ -4,6 +4,7 @@ import se.gigurra.leavu3.datamodel.{Bra, Configuration, Contact, DlinkData, Game
 import se.gigurra.leavu3.gfx.{BScopeProjection, Projection}
 import se.gigurra.leavu3.interfaces.{GameIn, MouseClick}
 import se.gigurra.leavu3.gfx.RenderContext._
+import se.gigurra.leavu3.lmath.NormalizeDegrees
 import se.gigurra.leavu3.util.CurTime
 
 import scala.collection.mutable
@@ -19,9 +20,11 @@ case class FcrPage(implicit config: Configuration) extends Page("FCR") {
   val OSB_AI = 18
   val OSB_DL = 17
   val OSB_BE = 16
+  val OSB_ABS = 15
   var shouldDrawAi = true
   var shouldDrawDl = true
   var shouldDrawBe = true
+  var shouldDrawAbsBearings = false
 
   override def mouseClicked(click: MouseClick): Unit =  {
   }
@@ -31,6 +34,7 @@ case class FcrPage(implicit config: Configuration) extends Page("FCR") {
       case OSB_AI => shouldDrawAi = !shouldDrawAi
       case OSB_DL => shouldDrawDl = !shouldDrawDl
       case OSB_BE => shouldDrawBe = !shouldDrawBe
+      case OSB_ABS => shouldDrawAbsBearings = !shouldDrawAbsBearings
       case _ => // Nothing yet
     }
   }
@@ -297,6 +301,34 @@ case class FcrPage(implicit config: Configuration) extends Page("FCR") {
   }
 
   def drawBearings[_: Projection](game: GameData): Unit = {
+    val left = -1.0 + inset
+    val right = 1.0 - inset
+    val max = game.sensors.status.scale.azimuth / 2.0
+    val y = -1.0 + inset * 0.85
+    val dx = (right - left) / 4
+    val dAngle = max / 2.0
+
+    for (i <- -2 to 2) {
+      val di = (i - -2).toDouble
+      val x = left + di * dx
+
+      transform(_.translate(x.toFloat, y.toFloat)) {
+        if (shouldDrawAbsBearings) {
+          val angle = NormalizeDegrees._0360(dAngle * di - max + self.heading)
+          angle.round.toString.pad(3, '0').drawCentered(GRAY, 0.60f)
+        } else {
+          if (i != 0) {
+            val angle = deltaAngleString(NormalizeDegrees.pm180(dAngle * di - max))
+            angle.drawCentered(GRAY, 0.60f)
+          } else {
+            val angle = NormalizeDegrees._0360(self.heading)
+            angle.round.toString.pad(3, '0').drawCentered(WHITE, 0.75f)
+          }
+        }
+      }
+
+    }
+
   }
 
   def drawElevations[_: Projection](game: GameData): Unit = {
@@ -319,6 +351,7 @@ case class FcrPage(implicit config: Configuration) extends Page("FCR") {
     drawBoxed(OSB_AI, "AI", boxed = shouldDrawAi)
     drawBoxed(OSB_DL, "DL", boxed = shouldDrawDl)
     drawBoxed(OSB_BE, "BE", boxed = shouldDrawBe)
+    drawBoxed(OSB_ABS, "ABS", boxed = shouldDrawAbsBearings)
   }
 
   def drawDlzs[_: Projection](game: GameData): Unit = {
