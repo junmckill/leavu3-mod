@@ -18,9 +18,6 @@ abstract class Page(val name: String)(implicit config: Configuration) extends Lo
   val displayUnits = DisplayUnits.displayUnits.setBy(_.name == config.initialUnits)
   val shortName = this.getClass.getSimpleName.toLowerCase.subSequence(0, 3)
 
-  var wingmenTgtsLastTminus1 = Seq.empty[Vec3] // To calculate ai wingmen tgt headings
-  var wingmenTgtsLastTminus2 = Seq.empty[Vec3] // To calculate ai wingmen tgt headings
-
   logger.info(s"Created $shortName mfd page")
 
   def distScale: CircleBuffer[Double] = displayUnits.distScale
@@ -149,7 +146,7 @@ abstract class Page(val name: String)(implicit config: Configuration) extends Lo
                                            rightText: String = "",
                                            fill: Boolean = false,
                                            drawAlt: Boolean = true): Unit = {
-    val radius = 0.015 * symbolScale
+    val radius = 0.0175 * symbolScale
 
     at(position, heading.getOrElse(0.0)) {
       circle(radius = radius, color = color, typ = if (fill) FILL else LINE)
@@ -212,14 +209,15 @@ abstract class Page(val name: String)(implicit config: Configuration) extends Lo
   protected def drawAiWingmenTargets[_: Projection](game: GameData): Unit = {
 
     // Hack in heading of tgts if possible
-    val shouldDrawHeading =
-      game.aiWingmenTgts.size == wingmenTgtsLastTminus1.size &&
-        game.aiWingmenTgts.size == wingmenTgtsLastTminus2.size
+    val tgtsTMinus1 = GameIn.wingmenTgtsLastTminus1
+    val tgtsTMinus2 = GameIn.wingmenTgtsLastTminus2
+
+    val shouldDrawHeading = game.aiWingmenTgts.size == tgtsTMinus1.size && game.aiWingmenTgts.size == tgtsTMinus2.size
 
     for ((tgtPos, i) <- game.aiWingmenTgts.zipWithIndex) {
       if (shouldDrawHeading) {
-        val tMinus1 = wingmenTgtsLastTminus1(i)
-        val tMinus2 = wingmenTgtsLastTminus2(i)
+        val tMinus1 = tgtsTMinus1(i)
+        val tMinus2 = tgtsTMinus2(i)
         val delta = tMinus1 - tMinus2
         val heading = math.atan2(delta.x, delta.y).toDegrees
         drawContact(tgtPos, Some(heading), RED, rightText = "ai")
@@ -228,10 +226,6 @@ abstract class Page(val name: String)(implicit config: Configuration) extends Lo
       }
     }
 
-    if (wingmenTgtsLastTminus1 != game.aiWingmenTgts) {
-      wingmenTgtsLastTminus2 = wingmenTgtsLastTminus1
-      wingmenTgtsLastTminus1 = game.aiWingmenTgts
-    }
   }
 
   protected def drawDlinkMark[_: Projection](name: String, member: Member, id: String, mark: Mark): Unit = {

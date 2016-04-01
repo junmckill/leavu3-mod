@@ -2,7 +2,7 @@ package se.gigurra.leavu3.interfaces
 
 import com.twitter.finagle.FailedFastException
 import com.twitter.util.Future
-import se.gigurra.leavu3.datamodel.{Configuration, Contact, GameData, Waypoint}
+import se.gigurra.leavu3.datamodel.{Configuration, Contact, GameData, Vec3, Waypoint}
 import se.gigurra.leavu3.gfx.Drawable
 import se.gigurra.leavu3.util._
 import se.gigurra.serviceutils.json.JSON
@@ -68,6 +68,10 @@ object GameIn extends Logging {
   private val rdrMemory = ContactMemory()
   private val rdrLastTwsPositionUpdateMemory = new PositionChangeMemory()
 
+  @volatile var wingmenTgtsLastTminus1 = Seq.empty[Vec3] // To calculate ai wingmen tgt headings
+  @volatile var wingmenTgtsLastTminus2 = Seq.empty[Vec3] // To calculate ai wingmen tgt headings
+
+
   def rdrMemory(contact: Contact): Option[Memorized[Contact]] = {
     rdrMemory.get(contact)
   }
@@ -77,7 +81,7 @@ object GameIn extends Logging {
   }
 
   private def postProcess(newData: GameData): GameData = {
-    newData.waypointWorkaround().rdrMemoryWorkaround()
+    newData.waypointWorkaround().rdrMemoryWorkaround().aiWingmenTgtHeadingsWorkaround()
   }
 
   implicit class GameDataWorkarounds(newData: GameData) {
@@ -113,6 +117,14 @@ object GameIn extends Logging {
       val rwsContactsKnown = rdrMemory.update(newData.sensors.targets.all)
       rdrLastTwsPositionUpdateMemory.update(newData.sensors.targets.tws.map(_.contact))
       newData.withRwsMemory(rwsContactsKnown.map(_.t))
+    }
+
+    def aiWingmenTgtHeadingsWorkaround(): GameData = {
+      if (wingmenTgtsLastTminus1 != newData.aiWingmenTgts) {
+        wingmenTgtsLastTminus2 = wingmenTgtsLastTminus1
+        wingmenTgtsLastTminus1 = newData.aiWingmenTgts
+      }
+      newData
     }
 
   }

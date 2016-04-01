@@ -82,7 +82,7 @@ case class FcrPage(implicit config: Configuration) extends Page("FCR") {
 
     val contacts = new mutable.HashMap[Int, Contact] // id -> data
     val order = new mutable.HashMap[Int, Int] // id -> index
-    val rws = new mutable.HashMap[Int, Boolean] // id -> index
+  ///  val rws = new mutable.HashMap[Int, Boolean] // id -> index
 
     import game.sensors.targets._
 
@@ -92,12 +92,10 @@ case class FcrPage(implicit config: Configuration) extends Page("FCR") {
     } {
       order.put(contact.id, i)
       contacts.put(contact.id, contact)
-      rws.put(contact.id, isRws)
     }
 
     implicit class RichContact(c: Contact) {
       def index: Int = order(c.id)
-      def isRws: Boolean = rws(c.id)
       def news: Double = GameIn.rdrMemory(c).fold(1.0)(_.news)
     }
 
