@@ -20,7 +20,7 @@ case class RwrPage(implicit config: Configuration, mfd: MfdIfc) extends Page("RW
   var a2gFilter = CircleBuffer[LockLevel](LockLevel.Search, LockLevel.Lock, LockLevel.Launch)
 
   var shouldDrawDetailedHsi = true
-  val screenEdgeOffset = 0.75f
+  def screenEdgeOffset = if (verbose && shouldDrawOsbs) 0.75f else 0.875f
   val OSB_A2A = 1
   val OSB_A2G = 2
   val OSB_HSI = 3
