@@ -171,12 +171,12 @@ case class HsdPage(implicit config: Configuration, mfd: MfdIfc) extends Page("HS
       osb.drawBoxed(OSB_HSI, "HSI", boxed = shouldDrawDetailedHsi)
     }
     if (ownMarkpointActive)
-      osb.drawBoxed(OSB_DEL, "DEL", boxed = false)
+      osb.drawBoxed(OSB_DEL, "DEL", boxed = false, forceDraw = true)
     if (verbose) {
       osb.drawBoxed(OSB_MODES, "MOD", boxed = shouldDrawModes)
       osb.draw(OSB_UNITS, displayUnitName.toUpperCase.take(3))
     }
-    osb.drawBoxed(OSB_SCALE, (distScale.get * m_to_distUnit).round.toString, boxed = false)
+    osb.drawBoxed(OSB_SCALE, (distScale.get * m_to_distUnit).round.toString, boxed = false, forceDraw = true)
   }
 
   def drawOwnHeading(game: GameData): Unit = {

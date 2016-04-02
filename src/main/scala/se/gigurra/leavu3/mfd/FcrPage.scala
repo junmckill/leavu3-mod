@@ -325,10 +325,12 @@ case class FcrPage(implicit config: Configuration, mfd: MfdIfc) extends Page("FC
   }
 
   def drawOsbs[_: Projection](game: GameData): Unit = {
-    osb.drawBoxed(OSB_AI, "AI", boxed = shouldDrawAi)
-    osb.drawBoxed(OSB_DL, "DL", boxed = shouldDrawDl)
-    osb.drawBoxed(OSB_BE, "BE", boxed = shouldDrawBe)
-    osb.drawBoxed(OSB_ABS, "ABS", boxed = shouldDrawAbsBearings)
+    if (verbose) {
+      osb.drawBoxed(OSB_AI, "AI", boxed = shouldDrawAi)
+      osb.drawBoxed(OSB_DL, "DL", boxed = shouldDrawDl)
+      osb.drawBoxed(OSB_BE, "BE", boxed = shouldDrawBe)
+      osb.drawBoxed(OSB_ABS, "ABS", boxed = shouldDrawAbsBearings)
+    }
   }
 
 
