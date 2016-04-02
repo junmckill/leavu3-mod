@@ -482,7 +482,7 @@ case class FcrPage(implicit config: Configuration) extends Page("FCR") {
 
     implicit val p = screenProjection
 
-    val textScale = config.symbolScale * 0.015 / font.getSpaceWidth
+    val textScale = config.symbolScale * 0.0175 / font.getSpaceWidth
 
     val ownSpeed = self.velocity.norm * mps_to_speedUnit
     val ownSpeedText = s"self: ${ownSpeed.round} -> ${headingString(self.heading)}"
