@@ -31,6 +31,10 @@ case class RestClient(addr: String, port: Int, name: String)(implicit val timer:
     doIfNotAlreadyPending(path)(doPut(path, data))
   }
 
+  def delete(path: String): Future[Unit] = {
+    doIfNotAlreadyPending(path + "?cache_only=true")(doDelete(path + "?cache_only=true"))
+  }
+
   def post(path: String)(data: => String): Future[Unit] = {
     doIfNotAlreadyPending(path)(doPost(path, data))
   }
@@ -57,7 +61,17 @@ case class RestClient(addr: String, port: Int, name: String)(implicit val timer:
 
   private def doPost(path: String, data: String): Future[Unit] = {
     val request = Request(Version.Http11, Method.Post, path)
-    request.setContentString(data)
+    request.contentString = data
+    request.contentLength = request.length
+    request.contentType = "application/json"
+    client.apply(request).raiseWithin(timeout).flatMap {
+      case OkResponse(response)  => Future.Unit
+      case BadResponse(response) => Future.exception(ServiceException(response))
+    }
+  }
+
+  private def doDelete(path: String): Future[Unit] = {
+    val request = Request(Version.Http11, Method.Delete, path)
     client.apply(request).raiseWithin(timeout).flatMap {
       case OkResponse(response)  => Future.Unit
       case BadResponse(response) => Future.exception(ServiceException(response))
@@ -66,7 +80,9 @@ case class RestClient(addr: String, port: Int, name: String)(implicit val timer:
 
   private def doPut(path: String, data: String): Future[Unit] = {
     val request = Request(Version.Http11, Method.Put, path)
-    request.setContentString(data)
+    request.contentString = data
+    request.contentLength = request.length
+    request.contentType = "application/json"
     client.apply(request).raiseWithin(timeout).flatMap {
       case OkResponse(response)  => Future.Unit
       case BadResponse(response) => Future.exception(ServiceException(response))

@@ -1,9 +1,12 @@
 package se.gigurra.leavu3.interfaces
 
+import java.util.UUID
+
 import com.twitter.finagle.FailedFastException
 import com.twitter.util.Future
 import se.gigurra.heisenberg.MapDataParser
 import se.gigurra.leavu3.datamodel.{Configuration, DlinkConfiguration, DlinkData, Mark, Member}
+import se.gigurra.leavu3.interfaces.DcsRemote.Stored
 import se.gigurra.leavu3.util.{DefaultTimer, IdenticalRequestPending, RestClient}
 import se.gigurra.serviceutils.json.JSON
 import se.gigurra.serviceutils.twitter.logging.Logging
@@ -20,6 +23,8 @@ object Dlink extends Logging {
   @volatile var dlinkClient: Option[RestClient] = None
   @volatile var recvOk = false
 
+  val myId = UUID.randomUUID().toString
+
   def connected: Boolean = dlinkClient.isDefined && recvOk
 
   def start(appCfg: Configuration): Unit = {
@@ -34,7 +39,6 @@ object Dlink extends Logging {
         logger.info(s"Updating dlink settings to: \n ${JSON.write(newConfig)}")
         config = newConfig
         In.clear()
-        Out.clear()
         dlinkClient = Try(RestClient(newConfig.host, newConfig.port, "Data Link")).toOption
       }
     }
@@ -110,17 +114,10 @@ object Dlink extends Logging {
 
   object Out extends Logging {
 
-    @volatile private var marks: Map[String, Mark] = Map.empty
-
+    def marks: Map[String, Stored[Mark]] = DcsRemote.loadStatic[Mark]("marks")
     def hasMark(id: String): Boolean = marks.contains(id)
-
-    def addMark(mark: Mark): Unit = marks += mark.id -> mark
-
-    def deleteMark(id: String): Unit = marks -= id
-
-    def clear(): Unit = {
-      marks = Map.empty
-    }
+    def addMark(id: String, mark: Mark): Unit = DcsRemote.store("marks", id)(mark)
+    def deleteMark(id: String): Unit = DcsRemote.delete("marks", id)
 
     def start(): Unit = {
 
@@ -141,7 +138,7 @@ object Dlink extends Logging {
                 Member.velocity -> source.flightModel.velocity,
                 Member.targets -> source.sensors.targets.locked,
                 Member.selfData -> source.metaData.selfData,
-                Member.markPos -> marks
+                Member.markPos -> marks.mapValues(_.item)
               )
               JSON.write(self)
             }.onFailure {

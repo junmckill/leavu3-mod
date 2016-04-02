@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.Color
 import se.gigurra.leavu3.datamodel._
 import se.gigurra.leavu3.gfx.RenderContext._
 import se.gigurra.leavu3.gfx.{PpiProjection, Projection, ScreenProjection}
-import se.gigurra.leavu3.interfaces.{GameIn, MouseClick}
+import se.gigurra.leavu3.interfaces.{DcsRemote, GameIn, MouseClick}
 import se.gigurra.leavu3.lmath.NormalizeDegrees
 import se.gigurra.leavu3.util.{CircleBuffer, CurTime}
 import se.gigurra.serviceutils.twitter.logging.Logging

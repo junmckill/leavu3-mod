@@ -3,8 +3,8 @@ package se.gigurra.leavu3.mfd
 import com.badlogic.gdx.graphics.Color
 import se.gigurra.leavu3.datamodel._
 import se.gigurra.leavu3.gfx.RenderContext._
-import se.gigurra.leavu3.util.{CircleBuffer, CurTime, Memorized}
-import se.gigurra.leavu3.interfaces.{Dlink, GameIn, MouseClick}
+import se.gigurra.leavu3.util.CircleBuffer
+import se.gigurra.leavu3.interfaces.{Dlink, MouseClick}
 
 import scala.collection.mutable
 import scala.language.postfixOps
@@ -30,7 +30,7 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD") {
       case OSB_DEPR => deprFactor.stepDown()
       case OSB_HSI => shouldDrawDetailedHsi = !shouldDrawDetailedHsi
       case OSB_HDG => shouldDrawOwnHeading = !shouldDrawOwnHeading
-      case OSB_DEL => Dlink.Out.deleteMark(Dlink.config.callsign)
+      case OSB_DEL => deleteOwnMarkpoint()
       case OSB_UNITS => stepDisplayUnits()
       case _ => // Nothing yet
     }
@@ -42,7 +42,7 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD") {
     val relativeBra = offs.asBra
     val bra = relativeBra.copy(bearingRaw = self.heading + relativeBra.bearing)
     val clickPos = self.position + bra.toOffset
-    Dlink.Out.addMark(Mark(Dlink.config.callsign, clickPos))
+    addOwnMarkpoint(clickPos)
   }
 
   override def draw(game: GameData, dlinkIn: Seq[(String, DlinkData)]): Unit = {
@@ -64,7 +64,7 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD") {
     drawBraNumbrs(game)
     drawOwnHeading(game)
     drawModes(game)
-    drawOsbs(game)
+    drawOsbs(game, dlinkIn)
   }
 
   def drawHsi(game: GameData): Unit = {
@@ -147,13 +147,25 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD") {
     drawBraNumbers(game, 0.02, (0.45, 0.9))
   }
 
-  def drawOsbs(game: GameData): Unit = {
+  def ownMarkpointActive: Boolean = {
+    Dlink.Out.hasMark("own")
+  }
+
+  def addOwnMarkpoint(clickPos: Vec3): Unit = {
+    Dlink.Out.addMark("own", Mark(Dlink.config.callsign, clickPos))
+  }
+
+  def deleteOwnMarkpoint(): Unit = {
+    Dlink.Out.deleteMark("own")
+  }
+
+  def drawOsbs(game: GameData, dlinkIn: Seq[(String, DlinkData)]): Unit = {
     implicit val p = screenProjection
     import Mfd.Osb._
     drawBoxed(OSB_DEPR, "DEP", boxed = deprFactor.index != 0)
     drawBoxed(OSB_HDG, "HDG", boxed = shouldDrawOwnHeading)
     drawBoxed(OSB_HSI, "HSI", boxed = shouldDrawDetailedHsi)
-    if (Dlink.Out.hasMark(Dlink.config.callsign))
+    if (ownMarkpointActive)
       drawBoxed(OSB_DEL, "DEL", boxed = false)
     drawBoxed(OSB_SCALE, (distScale.get * m_to_distUnit).round.toString, boxed = false)
     Mfd.Osb.draw(OSB_UNITS, displayUnitName.toUpperCase.take(3))
