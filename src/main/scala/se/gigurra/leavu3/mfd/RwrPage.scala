@@ -225,8 +225,10 @@ case class RwrPage(implicit config: Configuration, mfd: MfdIfc) extends Page("RW
       }
     }
 
-    drawFilterOsb(OSB_A2A, "A2A", a2aFilter)
-    drawFilterOsb(OSB_A2G, "A2G", a2gFilter)
-    osb.drawBoxed(OSB_HSI, "HSI", shouldDrawDetailedHsi)
+    if (verbose) {
+      drawFilterOsb(OSB_A2A, "A2A", a2aFilter)
+      drawFilterOsb(OSB_A2G, "A2G", a2gFilter)
+      osb.drawBoxed(OSB_HSI, "HSI", shouldDrawDetailedHsi)
+    }
   }
 }
