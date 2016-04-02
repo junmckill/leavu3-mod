@@ -81,7 +81,14 @@ object GameIn extends Logging {
   }
 
   private def postProcess(newData: GameData): GameData = {
-    newData.waypointWorkaround().rdrMemoryWorkaround().aiWingmenTgtHeadingsWorkaround()
+    newData
+      .waypointWorkaround()
+      .rdrMemoryWorkaround()
+      .aiWingmenTgtHeadingsWorkaround()
+    // Unfortunately can't keep adding workarounds like this...
+    // .. Because Heisenberg flattens the whole shebang .. on every op
+    // that ideally should be equivalent of CaseClass.copy(..).. but isn't! :(((
+    // Need to rethink or replace heisenberg..
   }
 
   implicit class GameDataWorkarounds(newData: GameData) {
