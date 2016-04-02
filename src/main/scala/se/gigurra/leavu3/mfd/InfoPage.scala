@@ -15,7 +15,7 @@ import scala.language.postfixOps
 /**
   * Created by kjolh on 3/12/2016.
   */
-case class InfoPage(implicit config: Configuration) extends Page("INF") {
+case class InfoPage(implicit config: Configuration, mfd: MfdIfc) extends Page("INF") {
 
   implicit val projection = screenProjection
   val OSB_UPDATE_COVER = 2
@@ -120,7 +120,7 @@ case class InfoPage(implicit config: Configuration) extends Page("INF") {
     }}
 
     if (updateAvailable) {
-      Mfd.Osb.drawHighlighted(OSB_UPDATE, clickToUpdateText, highlighted = blink)
+      osb.drawHighlighted(OSB_UPDATE, clickToUpdateText, highlighted = blink)
     }
 
   }

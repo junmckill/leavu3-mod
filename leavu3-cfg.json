@@ -21,5 +21,10 @@
   "units"            : "imperial",
   "initialQp"        : 0,
   "qps"              : ["HSD", "RWR", "SMS", "FCR", "INF"],
-  "use3dBscope"      : true
+  "use3dBscope"      : true,
+  "hsd-hsi"          : true,
+  "hsd-modes"        : true,
+  "hsd-heading"      : true,
+  "osbs"             : true,
+  "dclt"             : false
 }

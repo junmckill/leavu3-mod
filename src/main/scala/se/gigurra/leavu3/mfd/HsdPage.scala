@@ -12,15 +12,17 @@ import scala.language.postfixOps
 /**
   * Created by kjolh on 3/12/2016.
   */
-case class HsdPage(implicit config: Configuration) extends Page("HSD") {
+case class HsdPage(implicit config: Configuration, mfd: MfdIfc) extends Page("HSD") {
 
-  var shouldDrawDetailedHsi = true
-  var shouldDrawOwnHeading = true
+  var shouldDrawDetailedHsi = config.hsdHsi
+  var shouldDrawOwnHeading = config.hsdHeading
+  var shouldDrawModes = config.hsdModes
   val deprFactor = CircleBuffer(0.0, 0.5).withDefaultValue(0.5)
 
   val OSB_DEPR = 1
   val OSB_HDG = 2
   val OSB_SCALE = 17
+  val OSB_MODES = 15
   val OSB_HSI = 3
   val OSB_DEL = 7
   val OSB_UNITS = 9
@@ -31,6 +33,7 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD") {
       case OSB_HSI => shouldDrawDetailedHsi = !shouldDrawDetailedHsi
       case OSB_HDG => shouldDrawOwnHeading = !shouldDrawOwnHeading
       case OSB_DEL => deleteOwnMarkpoint()
+      case OSB_MODES => shouldDrawModes = !shouldDrawModes
       case OSB_UNITS => stepDisplayUnits()
       case _ => // Nothing yet
     }
@@ -63,7 +66,8 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD") {
     drawBullsEyeNumbrs(game)
     drawBraNumbrs(game)
     drawOwnHeading(game)
-    drawModes(game)
+    if (shouldDrawModes)
+      drawModes(game)
     drawOsbs(game, dlinkIn)
   }
 
@@ -161,14 +165,14 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD") {
 
   def drawOsbs(game: GameData, dlinkIn: Seq[(String, DlinkData)]): Unit = {
     implicit val p = screenProjection
-    import Mfd.Osb._
-    drawBoxed(OSB_DEPR, "DEP", boxed = deprFactor.index != 0)
-    drawBoxed(OSB_HDG, "HDG", boxed = shouldDrawOwnHeading)
-    drawBoxed(OSB_HSI, "HSI", boxed = shouldDrawDetailedHsi)
+    osb.drawBoxed(OSB_DEPR, "DEP", boxed = deprFactor.index != 0)
+    osb.drawBoxed(OSB_HDG, "HDG", boxed = shouldDrawOwnHeading)
+    osb.drawBoxed(OSB_HSI, "HSI", boxed = shouldDrawDetailedHsi)
     if (ownMarkpointActive)
-      drawBoxed(OSB_DEL, "DEL", boxed = false)
-    drawBoxed(OSB_SCALE, (distScale.get * m_to_distUnit).round.toString, boxed = false)
-    Mfd.Osb.draw(OSB_UNITS, displayUnitName.toUpperCase.take(3))
+      osb.drawBoxed(OSB_DEL, "DEL", boxed = false)
+    osb.drawBoxed(OSB_MODES, "MOD", boxed = shouldDrawModes)
+    osb.drawBoxed(OSB_SCALE, (distScale.get * m_to_distUnit).round.toString, boxed = false)
+    osb.draw(OSB_UNITS, displayUnitName.toUpperCase.take(3))
   }
 
   def drawOwnHeading(game: GameData): Unit = {
@@ -188,7 +192,7 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD") {
     val scale = config.symbolScale * 0.02 / font.getSpaceWidth
 
     batched {
-      at((-0.9, 0.65)) {
+      at((-0.9, 0.60)) {
 
         transform(_
           .scalexy(scale)) {

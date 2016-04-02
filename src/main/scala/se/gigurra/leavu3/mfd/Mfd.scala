@@ -11,9 +11,12 @@ import se.gigurra.leavu3.gfx.RenderContext._
 import se.gigurra.leavu3.interfaces.{Key, KeyPress, MouseClick}
 import se.gigurra.leavu3.lmath.Box
 
-case class Mfd(implicit config: Configuration) extends Instrument(config) {
+case class Mfd(implicit config: Configuration)
+  extends Instrument(config)
+  with MfdIfc {
 
   implicit val _p = ScreenProjection()
+  implicit val mfdIfc = this
 
   val hsd = HsdPage()
   val rwr = RwrPage()
@@ -42,7 +45,7 @@ case class Mfd(implicit config: Configuration) extends Instrument(config) {
 
   def drawQps(): Unit = {
     for ((iQp, page) <- qPages) {
-      Mfd.Osb.drawHighlighted(qp2Osb(iQp), page.name, iQp == iQPage)
+      osb.drawHighlighted(qp2Osb(iQp), page.name, iQp == iQPage)
     }
   }
 
@@ -126,6 +129,78 @@ case class Mfd(implicit config: Configuration) extends Instrument(config) {
     }
   }
 
+  val osb = new OsbIfc {
+
+    def draw(iOsb: Int,
+             text: String,
+             boxType: ShapeType = null,
+             color: Color = null,
+             forceDraw: Boolean = false)(implicit config: Configuration): Unit = {
+
+      implicit val _p = ScreenProjection()
+
+      val white = if (color != null) color else LIGHT_GRAY
+      val black = BLACK
+
+      if (boxType != null) {
+        at(Mfd.Osb.positions(iOsb)) {
+
+          val extraWidth = if (text.length > 3) {
+            text.length.toFloat/3.0f
+          } else {
+            1.0f
+          }
+
+          rect(symbolScale * Mfd.Osb.boxWidth * extraWidth, symbolScale * Mfd.Osb.boxHeight, color = white, typ = boxType)
+        }
+      }
+
+      val pos = Mfd.Osb.positions(iOsb)
+      at(pos) {
+        text.drawCentered(if (boxType == FILL) black else white)
+      }
+
+    }
+
+
+  }
+
+  var isDcltOn: Boolean = config.dclt
+
+  var shouldDrawOsbs: Boolean = config.osbs
+
+}
+
+trait MfdIfc {
+
+  def isDcltOn: Boolean
+  def shouldDrawOsbs: Boolean
+  def osb: OsbIfc
+
+  trait OsbIfc {
+
+    def drawBoxed(iOsb: Int,
+                  text: String,
+                  boxed: Boolean = true,
+                  color: Color = null,
+                  forceDraw: Boolean = false)(implicit config: Configuration): Unit = {
+      draw(iOsb, text, if (boxed) LINE else null, color, forceDraw = forceDraw)
+    }
+
+    def drawHighlighted(iOsb: Int,
+                        text: String,
+                        highlighted: Boolean = true,
+                        color: Color = null,
+                        forceDraw: Boolean = false)(implicit config: Configuration): Unit = {
+      draw(iOsb, text, if (highlighted) FILL else null, color, forceDraw = forceDraw)
+    }
+
+    def draw(iOsb: Int,
+             text: String,
+             boxType: ShapeType = null,
+             color: Color = null,
+             forceDraw: Boolean = false)(implicit config: Configuration)
+  }
 }
 
 object Mfd {
@@ -178,52 +253,5 @@ object Mfd {
 
     val positions = Seq(upperBoxCenters, rightBoxCenters, lowerBoxCenters, leftBoxCenters).flatten
 
-
-    def drawBoxed(iOsb: Int,
-                  text: String,
-                  boxed: Boolean = true,
-                  color: Color = null)(implicit config: Configuration): Unit = {
-      draw(iOsb, text, if (boxed) LINE else null, color)
-    }
-
-    def drawHighlighted(iOsb: Int,
-                        text: String,
-                        highlighted: Boolean = true,
-                        color: Color = null)(implicit config: Configuration): Unit = {
-      draw(iOsb, text, if (highlighted) FILL else null, color)
-    }
-
-    def draw(iOsb: Int,
-             text: String,
-             boxType: ShapeType = null,
-             color: Color = null)(implicit config: Configuration): Unit = {
-
-      implicit val _p = ScreenProjection()
-
-      val white = if (color != null) color else LIGHT_GRAY
-      val black = BLACK
-
-      if (boxType != null) {
-        at(Mfd.Osb.positions(iOsb)) {
-
-          val extraWidth = if (text.length > 3) {
-             text.length.toFloat/3.0f
-          } else {
-            1.0f
-          }
-
-          rect(symbolScale * Mfd.Osb.boxWidth * extraWidth, symbolScale * Mfd.Osb.boxHeight, color = white, typ = boxType)
-        }
-      }
-
-      val pos = Mfd.Osb.positions(iOsb)
-      at(pos) {
-        text.drawCentered(if (boxType == FILL) black else white)
-      }
-
-    }
-
-
   }
-
 }

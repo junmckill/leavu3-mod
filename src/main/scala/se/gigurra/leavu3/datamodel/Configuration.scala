@@ -10,6 +10,7 @@ import se.gigurra.serviceutils.twitter.logging.Logging
 import scala.util.{Failure, Success, Try}
 
 case class Configuration(source: SourceData = Map.empty) extends Parsed[Configuration.type] {
+
   val title             = parse(schema.title)
   val x                 = parse(schema.x)
   val y                 = parse(schema.y)
@@ -33,6 +34,11 @@ case class Configuration(source: SourceData = Map.empty) extends Parsed[Configur
   val initialQp         = parse(schema.initialQp)
   val qps               = parse(schema.qps)
   val use3dBscope       = parse(schema.use3dBscope)
+  val hsdHsi            = parse(schema.hsdHsi)
+  val hsdModes          = parse(schema.hsdModes)
+  val hsdHeading        = parse(schema.hsdHeading)
+  val osbs              = parse(schema.osbs)
+  val dclt              = parse(schema.dclt)
 
   require(title.length > 0, "Configured title must be > 0")
   require(width > 0, "Configured width must be > 0")
@@ -66,6 +72,11 @@ object Configuration extends Schema[Configuration] with Logging {
   val initialQp         = required[Int]         ("initialQp",         default = 0)
   val qps               = required[Seq[String]] ("qps",               default = Seq("HSD", "RWR", "SMS", "FCR", "INF"))
   val use3dBscope       = required[Boolean]     ("use3dBscope",       default = true)
+  val hsdHsi            = required[Boolean]     ("hsd-hsi",           default = true)
+  val hsdModes          = required[Boolean]     ("hsd-modes",         default = true)
+  val hsdHeading        = required[Boolean]     ("hsd-heading",       default = true)
+  val osbs              = required[Boolean]     ("osbs",              default = true)
+  val dclt              = required[Boolean]     ("dclt",              default = true)
 
   def readFromFile(s: String = "leavu3-cfg.json"): Configuration = {
     logger.info(s"Loading configuration file: $s")

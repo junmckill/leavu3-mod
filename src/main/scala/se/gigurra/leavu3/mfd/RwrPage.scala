@@ -13,7 +13,7 @@ import scala.language.postfixOps
 /**
   * Created by kjolh on 3/12/2016.
   */
-case class RwrPage(implicit config: Configuration) extends Page("RWR") {
+case class RwrPage(implicit config: Configuration, mfd: MfdIfc) extends Page("RWR") {
 
   val blinkSpeed = 1.0 / 3.0
   var a2aFilter = CircleBuffer[LockLevel](LockLevel.Search, LockLevel.Lock, LockLevel.Launch)
@@ -216,18 +216,17 @@ case class RwrPage(implicit config: Configuration) extends Page("RWR") {
 
   def drawOsbs(game: GameData): Unit = {
     implicit val _p = screenProjection
-    import Mfd.Osb._
 
     def drawFilterOsb(i: Int, str: String, setting: LockLevel): Unit = {
       setting match {
-        case LockLevel.Search => drawHighlighted(i, str)
-        case LockLevel.Lock => drawBoxed(i, str)
-        case _ => Mfd.Osb.draw(i, str)
+        case LockLevel.Search => osb.drawHighlighted(i, str)
+        case LockLevel.Lock => osb.drawBoxed(i, str)
+        case _ => osb.draw(i, str)
       }
     }
 
     drawFilterOsb(OSB_A2A, "A2A", a2aFilter)
     drawFilterOsb(OSB_A2G, "A2G", a2gFilter)
-    drawBoxed(OSB_HSI, "HSI", shouldDrawDetailedHsi)
+    osb.drawBoxed(OSB_HSI, "HSI", shouldDrawDetailedHsi)
   }
 }

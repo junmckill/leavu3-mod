@@ -11,7 +11,7 @@ import se.gigurra.serviceutils.twitter.logging.Logging
 
 import scala.language.postfixOps
 
-abstract class Page(val name: String)(implicit config: Configuration) extends Logging {
+abstract class Page(val name: String)(implicit config: Configuration, mfd: MfdIfc) extends Logging {
 
   val stdTextSize = 0.75f
   val ppiProjection = new PpiProjection
@@ -43,6 +43,11 @@ abstract class Page(val name: String)(implicit config: Configuration) extends Lo
 
   def draw(game: GameData, dlinkIn: Seq[(String, DlinkData)]): Unit
 
+  def osb: MfdIfc#OsbIfc = mfd.osb
+
+  def isDcltOn: Boolean = mfd.isDcltOn
+
+  def shouldDrawOsbs: Boolean = mfd.shouldDrawOsbs
 
   //////////////////////////////////////////////////////////////////////////////
   // Common studd

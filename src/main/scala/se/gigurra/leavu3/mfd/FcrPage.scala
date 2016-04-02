@@ -6,14 +6,13 @@ import se.gigurra.leavu3.gfx.RenderContext._
 import se.gigurra.leavu3.gfx.{BScopeProjection, Projection}
 import se.gigurra.leavu3.interfaces.GameIn
 import se.gigurra.leavu3.lmath.NormalizeDegrees
-import se.gigurra.leavu3.util.CurTime
 
 import scala.collection.mutable
 
 /**
   * Created by kjolh on 3/12/2016.
   */
-case class FcrPage(implicit config: Configuration) extends Page("FCR") {
+case class FcrPage(implicit config: Configuration, mfd: MfdIfc) extends Page("FCR") {
 
   def screenDistMeters: Double = GameIn.snapshot.sensors.status.scale.distance
 
@@ -326,11 +325,10 @@ case class FcrPage(implicit config: Configuration) extends Page("FCR") {
   }
 
   def drawOsbs[_: Projection](game: GameData): Unit = {
-    import Mfd.Osb._
-    drawBoxed(OSB_AI, "AI", boxed = shouldDrawAi)
-    drawBoxed(OSB_DL, "DL", boxed = shouldDrawDl)
-    drawBoxed(OSB_BE, "BE", boxed = shouldDrawBe)
-    drawBoxed(OSB_ABS, "ABS", boxed = shouldDrawAbsBearings)
+    osb.drawBoxed(OSB_AI, "AI", boxed = shouldDrawAi)
+    osb.drawBoxed(OSB_DL, "DL", boxed = shouldDrawDl)
+    osb.drawBoxed(OSB_BE, "BE", boxed = shouldDrawBe)
+    osb.drawBoxed(OSB_ABS, "ABS", boxed = shouldDrawAbsBearings)
   }
 
 
