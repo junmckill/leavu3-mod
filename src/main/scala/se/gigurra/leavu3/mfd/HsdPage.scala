@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.Color
 import se.gigurra.leavu3.datamodel._
 import se.gigurra.leavu3.gfx.RenderContext._
 import se.gigurra.leavu3.util.CircleBuffer
-import se.gigurra.leavu3.interfaces.{Dlink, MouseClick}
+import se.gigurra.leavu3.interfaces.{Dlink, GameIn, MouseClick}
 
 import scala.collection.mutable
 import scala.language.postfixOps
@@ -110,6 +110,7 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD") {
 
     implicit class ContactWithIndex(c: Contact) {
       def index: Int = order(c.id)
+      def news: Double = GameIn.rdrMemory(c).fold(1.0)(_.news)
     }
 
     import game.sensors.targets._
@@ -136,10 +137,14 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD") {
     }
 
     for (contact <- positionsDesignated.reverse) { // draw lowest index (=highest prio) last
+
+      val baseColor = contactColor(contact, fromDatalink = false)
+      val color = baseColor.scaleAlpha(contact.news)
+
       drawContact(
         position = contact.position,
         heading = Some(contact.heading),
-        color = contactColor(contact, fromDatalink = false),
+        color = color,
         centerText = (contact.index + 1).toString,
         fill = true
       )

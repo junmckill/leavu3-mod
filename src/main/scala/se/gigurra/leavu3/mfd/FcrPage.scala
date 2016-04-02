@@ -139,7 +139,6 @@ case class FcrPage(implicit config: Configuration) extends Page("FCR") {
 
     implicit class RichContact(c: Contact) {
       def index: Int = order(c.id)
-
       def news: Double = GameIn.rdrMemory(c).fold(1.0)(_.news)
     }
 
@@ -498,10 +497,10 @@ case class FcrPage(implicit config: Configuration) extends Page("FCR") {
 
     implicit val p = screenProjection
 
-    val textScale = config.symbolScale * 0.02 / font.getSpaceWidth
+    val textScale = config.symbolScale * 0.015 / font.getSpaceWidth
 
     val ownSpeed = self.velocity.norm * mps_to_speedUnit
-    val ownSpeedText = s"self: ${ownSpeed.round}"
+    val ownSpeedText = s"self: ${ownSpeed.round} -> ${headingString(self.heading)}"
 
     var n = 0
     def drawTextLine(value: Any, color: Color): Unit = {
@@ -514,7 +513,7 @@ case class FcrPage(implicit config: Configuration) extends Page("FCR") {
       n += 1
     }
 
-    at((-0.15, 0.925)) {
+    at((-0.20, 0.925)) {
 
       drawTextLine(ownSpeedText, CYAN)
 
@@ -524,7 +523,7 @@ case class FcrPage(implicit config: Configuration) extends Page("FCR") {
         val tgtSpeed = pdt.velocity.norm * mps_to_speedUnit
         val tgtClosure = ((pdt.velocity dot vnFromTgt) + (self.velocity dot vnToTgt)) * mps_to_speedUnit
         val tgtClosureText = deltaText(tgtClosure)
-        val tgtSpeedText = s" pdt: ${tgtSpeed.round} c$tgtClosureText"
+        val tgtSpeedText = s" pdt: ${tgtSpeed.round} -> ${headingString(pdt.heading)} c$tgtClosureText"
         drawTextLine(tgtSpeedText, contactColor(pdt, fromDatalink = false))
       }
 

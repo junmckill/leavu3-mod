@@ -178,6 +178,10 @@ abstract class Page(val name: String)(implicit config: Configuration) extends Lo
     NormalizeDegrees._0360(value.round).round.pad(3, '0')
   }
 
+  protected def headingString(value: Double): String = {
+    bearingString(value)
+  }
+
   protected def haveLeadingSign(str: String): String = {
     if (str.startsWith("+") || str.startsWith("-")) {
       str
