@@ -1,0 +1,947 @@
+{
+    "electronicWarfare": {
+        "rwr": {
+            "Emitters": [
+                {
+                    "ID": 16778240,
+                    "SignalType": "scan",
+                    "Azimuth": 0.07394004613161087,
+                    "Priority": 160.58726501464844,
+                    "Power": 0.5872617959976196,
+                    "Type": {
+                        "level3": 1,
+                        "level1": 1,
+                        "level4": 1,
+                        "level2": 1
+                    }
+                },
+                {
+                    "ID": 16777984,
+                    "SignalType": "scan",
+                    "Azimuth": 0.09932585060596466,
+                    "Priority": 160.59312438964844,
+                    "Power": 0.5931276082992554,
+                    "Type": {
+                        "level3": 1,
+                        "level1": 1,
+                        "level4": 1,
+                        "level2": 1
+                    }
+                },
+                {
+                    "ID": 16780032,
+                    "SignalType": "scan",
+                    "Azimuth": -2.264655590057373,
+                    "Priority": 110.87767028808594,
+                    "Power": 0.8776695728302002,
+                    "Type": {
+                        "level3": 5,
+                        "level1": 1,
+                        "level4": 27,
+                        "level2": 1
+                    }
+                }
+            ],
+            "Mode": 0
+        },
+        "counterMeasures": {
+            "chaff": 120,
+            "flare": 60
+        }
+    },
+    "payload": {
+        "Stations": [
+            {
+                "CLSID": "{40EF17B7-F508-45de-8566-6FFECC0C1AB8}",
+                "container": false,
+                "count": 1,
+                "weapon": {
+                    "level3": 7,
+                    "level1": 4,
+                    "level4": 106,
+                    "level2": 4
+                }
+            },
+            {
+                "CLSID": "{40EF17B7-F508-45de-8566-6FFECC0C1AB8}",
+                "container": false,
+                "count": 1,
+                "weapon": {
+                    "level3": 7,
+                    "level1": 4,
+                    "level4": 106,
+                    "level2": 4
+                }
+            },
+            {
+                "CLSID": "",
+                "container": false,
+                "count": 0,
+                "weapon": {
+                    "level3": 0,
+                    "level1": 0,
+                    "level4": 0,
+                    "level2": 0
+                }
+            },
+            {
+                "CLSID": "",
+                "container": false,
+                "count": 0,
+                "weapon": {
+                    "level3": 0,
+                    "level1": 0,
+                    "level4": 0,
+                    "level2": 0
+                }
+            },
+            {
+                "CLSID": "{6CEB49FC-DED8-4DED-B053-E1F033FF72D3}",
+                "container": false,
+                "count": 1,
+                "weapon": {
+                    "level3": 7,
+                    "level1": 4,
+                    "level4": 22,
+                    "level2": 4
+                }
+            },
+            {
+                "CLSID": "{6CEB49FC-DED8-4DED-B053-E1F033FF72D3}",
+                "container": false,
+                "count": 1,
+                "weapon": {
+                    "level3": 7,
+                    "level1": 4,
+                    "level4": 22,
+                    "level2": 4
+                }
+            },
+            {
+                "CLSID": "{C8E06185-7CD6-4C90-959F-044679E90751}",
+                "container": false,
+                "count": 1,
+                "weapon": {
+                    "level3": 7,
+                    "level1": 4,
+                    "level4": 24,
+                    "level2": 4
+                }
+            },
+            {
+                "CLSID": "{C8E06185-7CD6-4C90-959F-044679E90751}",
+                "container": false,
+                "count": 1,
+                "weapon": {
+                    "level3": 7,
+                    "level1": 4,
+                    "level4": 24,
+                    "level2": 4
+                }
+            },
+            {
+                "CLSID": "{C8E06185-7CD6-4C90-959F-044679E90751}",
+                "container": false,
+                "count": 1,
+                "weapon": {
+                    "level3": 7,
+                    "level1": 4,
+                    "level4": 24,
+                    "level2": 4
+                }
+            },
+            {
+                "CLSID": "{C8E06185-7CD6-4C90-959F-044679E90751}",
+                "container": false,
+                "count": 1,
+                "weapon": {
+                    "level3": 7,
+                    "level1": 4,
+                    "level4": 24,
+                    "level2": 4
+                }
+            },
+            {
+                "CLSID": "{E1F29B21-F291-4589-9FD8-3272EEC69506}",
+                "container": false,
+                "count": 1,
+                "weapon": {
+                    "level3": 43,
+                    "level1": 1,
+                    "level4": 10,
+                    "level2": 3
+                }
+            }
+        ],
+        "CurrentStation": 1,
+        "Cannon": {
+            "shells": 940
+        }
+    },
+    "flightModel": {
+        "heading": 5.5856122970581055,
+        "glideDeviation": -1,
+        "vv": -8.797237396240234,
+        "windVectorVelocity": {
+            "x": -14.53492546081543,
+            "y": 0.15844133496284485,
+            "z": 16.85394859313965
+        },
+        "vectorVelocity": {
+            "x": 185.4434051513672,
+            "y": -8.797237396240234,
+            "z": -149.68939208984375
+        },
+        "TAS": 238.48178100585938,
+        "altitudeAboveGroundLevel": 5165.86279296875,
+        "IAS": 198.7333221435547,
+        "atmospherePressure": 755,
+        "roll": -0.061539627611637115,
+        "altitudeAboveSeaLevel": 5202.25048828125,
+        "slipBallPosition": 0.00013765353651251644,
+        "mach": 0.8132572174072266,
+        "pitch": 0.01528096105903387,
+        "sideDeviation": -1,
+        "acc": {
+            "x": 0.48595187067985535,
+            "y": 1.033817172050476,
+            "z": -0.000251524499617517
+        },
+        "magneticYaw": 5.478437423706055,
+        "AOA": 2.852145195007324,
+        "angularVelocity": {
+            "y": 0.0018107809592038,
+            "x": -0.0034152055159211,
+            "z": -0.0010959439678118
+        }
+    },
+    "sensor": {
+        "status": {
+            "LaunchAuthorized": true,
+            "optical_system_on": false,
+            "scale": {
+                "azimuth": 1.0471974611282349,
+                "distance": 74080
+            },
+            "TDC": {
+                "y": 0.1938314586877823,
+                "x": 0.10315854102373123
+            },
+            "radar_on": true,
+            "Manufacturer": "USA",
+            "ScanZone": {
+                "coverage_H": {
+                    "min": 1289.626708984375,
+                    "max": 8567.2236328125
+                },
+                "size": {
+                    "azimuth": 1.0471974611282349,
+                    "elevation": 0.16406092047691345
+                },
+                "position": {
+                    "azimuth": 0.08082333952188492,
+                    "elevation": -0.006193529814481735
+                }
+            },
+            "laser_on": false,
+            "PRF": {
+                "selection": "ILV",
+                "current": "HI"
+            },
+            "ECM_on": false
+        },
+        "targets": {
+            "detected": [
+                {
+                    "ID": 16777984,
+                    "course": 3.764491319656372,
+                    "timestamp": 1459557722.404,
+                    "flags": 8,
+                    "delta_psi": 3.0832417011260986,
+                    "fin": -0.024558639153838158,
+                    "updates_number": 0,
+                    "start_of_lock": 22.103,
+                    "reflection": 4,
+                    "forces": {
+                        "x": 0.0014096674276515841,
+                        "y": 0.9888913035392761,
+                        "z": 0
+                    },
+                    "country": 1,
+                    "jammer_burned": true,
+                    "isjamming": 0,
+                    "convergence_velocity": 481.96875,
+                    "mach": 0.840756893157959,
+                    "position": {
+                        "y": {
+                            "x": 0.030953072011470795,
+                            "y": 0.9988960027694702,
+                            "z": -0.035337284207344055
+                        },
+                        "x": {
+                            "x": -0.8116218447685242,
+                            "y": 0.045752741396427155,
+                            "z": 0.5823887586593628
+                        },
+                        "p": {
+                            "x": -260602.09375,
+                            "y": 4999.39990234375,
+                            "z": 636866.625
+                        },
+                        "z": {
+                            "x": -0.5833625793457031,
+                            "y": -0.010653791949152946,
+                            "z": -0.812142014503479
+                        }
+                    },
+                    "type": {
+                        "level3": 1,
+                        "level1": 1,
+                        "level4": 1,
+                        "level2": 1
+                    },
+                    "velocity": {
+                        "x": -216.03248596191406,
+                        "y": 0.1459701657295227,
+                        "z": 161.01377868652344
+                    },
+                    "fim": 0.08008705824613571,
+                    "distance": 44385.29296875
+                }
+            ],
+            "tws": [
+                {
+                    "target": {
+                        "ID": 16777728,
+                        "course": 3.6733646392822266,
+                        "timestamp": 1459557722.404,
+                        "flags": 32,
+                        "delta_psi": 2.979515314102173,
+                        "fin": 0.0472773052752018,
+                        "updates_number": 0,
+                        "start_of_lock": 0,
+                        "reflection": 60,
+                        "forces": {
+                            "x": -0.26569250226020813,
+                            "y": 0.7560890913009644,
+                            "z": -0.013330308720469475
+                        },
+                        "country": 1,
+                        "jammer_burned": true,
+                        "isjamming": 0,
+                        "convergence_velocity": 509.322265625,
+                        "mach": 1.033056616783142,
+                        "position": {
+                            "y": {
+                                "x": -0.4583852291107178,
+                                "y": 0.8466001749038696,
+                                "z": 0.270464688539505
+                            },
+                            "x": {
+                                "x": -0.7296797037124634,
+                                "y": -0.5322291254997253,
+                                "z": 0.4293012320995331
+                            },
+                            "p": {
+                                "x": -262754.53125,
+                                "y": 8033.7607421875,
+                                "z": 634161.375
+                            },
+                            "z": {
+                                "x": -0.5073956847190857,
+                                "y": 0.0005672425031661987,
+                                "z": -0.8617129325866699
+                            }
+                        },
+                        "type": {
+                            "level3": 2,
+                            "level1": 1,
+                            "level4": 25,
+                            "level2": 1
+                        },
+                        "velocity": {
+                            "x": -229.44496154785156,
+                            "y": -164.2760009765625,
+                            "z": 146.77923583984375
+                        },
+                        "fim": 0.017718477174639702,
+                        "distance": 43204.41796875
+                    },
+                    "DLZ": {
+                        "RAERO": 39410.046875,
+                        "RMIN": 700,
+                        "RPI": 39237.83984375,
+                        "RTR": 13136.6689453125
+                    }
+                },
+                {
+                    "target": {
+                        "ID": 16777472,
+                        "course": 3.696232795715332,
+                        "timestamp": 1459557722.404,
+                        "flags": 32,
+                        "delta_psi": 3.001218795776367,
+                        "fin": 0.0011572660878300667,
+                        "updates_number": 0,
+                        "start_of_lock": 0,
+                        "reflection": 60,
+                        "forces": {
+                            "x": 0.00015846980386413634,
+                            "y": 0.9263949990272522,
+                            "z": -0.002685775049030781
+                        },
+                        "country": 1,
+                        "jammer_burned": true,
+                        "isjamming": 0,
+                        "convergence_velocity": 508.161865234375,
+                        "mach": 0.8771822452545166,
+                        "position": {
+                            "y": {
+                                "x": 0.04729757085442543,
+                                "y": 0.9984602928161621,
+                                "z": -0.028984729200601578
+                            },
+                            "x": {
+                                "x": -0.8487726449966431,
+                                "y": 0.05547162890434265,
+                                "z": 0.525840163230896
+                            },
+                            "p": {
+                                "x": -263433.9375,
+                                "y": 6013.96142578125,
+                                "z": 634716.875
+                            },
+                            "z": {
+                                "x": -0.5266383290290833,
+                                "y": 0.00026951730251312256,
+                                "z": -0.8500894904136658
+                            }
+                        },
+                        "type": {
+                            "level3": 2,
+                            "level1": 1,
+                            "level4": 25,
+                            "level2": 1
+                        },
+                        "velocity": {
+                            "x": -231.2622833251953,
+                            "y": 0.0336579754948616,
+                            "z": 153.3009033203125
+                        },
+                        "fim": 0.0165291428565979,
+                        "distance": 42111.7578125
+                    },
+                    "DLZ": {
+                        "RAERO": 39410.046875,
+                        "RMIN": 700,
+                        "RPI": 39280.7890625,
+                        "RTR": 13136.6689453125
+                    }
+                },
+                {
+                    "target": {
+                        "ID": 16778240,
+                        "course": 3.762582540512085,
+                        "timestamp": 1459557722.404,
+                        "flags": 32,
+                        "delta_psi": 3.066669225692749,
+                        "fin": -0.02567978948354721,
+                        "updates_number": 0,
+                        "start_of_lock": 0,
+                        "reflection": 4,
+                        "forces": {
+                            "x": -0.007471381686627865,
+                            "y": 0.9510254859924316,
+                            "z": 0
+                        },
+                        "country": 1,
+                        "jammer_burned": true,
+                        "isjamming": 0,
+                        "convergence_velocity": 503.232666015625,
+                        "mach": 0.8404913544654846,
+                        "position": {
+                            "y": {
+                                "x": 0.03392932191491127,
+                                "y": 0.9989535808563232,
+                                "z": -0.03066597878932953
+                            },
+                            "x": {
+                                "x": -0.8126020431518555,
+                                "y": 0.04543689638376236,
+                                "z": 0.5810449719429016
+                            },
+                            "p": {
+                                "x": -262084.21875,
+                                "y": 4999.63232421875,
+                                "z": 636667.375
+                            },
+                            "z": {
+                                "x": -0.5818303227424622,
+                                "y": -0.005204776301980019,
+                                "z": -0.8132933378219604
+                            }
+                        },
+                        "type": {
+                            "level3": 1,
+                            "level1": 1,
+                            "level4": 1,
+                            "level2": 1
+                        },
+                        "velocity": {
+                            "x": -216.1702117919922,
+                            "y": -0.10358785092830658,
+                            "z": 160.68496704101562
+                        },
+                        "fim": 0.07246430218219757,
+                        "distance": 41895.0625
+                    },
+                    "DLZ": {
+                        "RAERO": 39410.046875,
+                        "RMIN": 700,
+                        "RPI": 39373.15234375,
+                        "RTR": 13136.6689453125
+                    }
+                },
+                {
+                    "target": {
+                        "ID": 16777984,
+                        "course": 3.7624192237854004,
+                        "timestamp": 1459557722.404,
+                        "flags": 8,
+                        "delta_psi": 3.0648562908172607,
+                        "fin": -0.026365047320723534,
+                        "updates_number": 0,
+                        "start_of_lock": 22.103,
+                        "reflection": 4,
+                        "forces": {
+                            "x": 0.00007927369006210938,
+                            "y": 0.9167765378952026,
+                            "z": 0
+                        },
+                        "country": 1,
+                        "jammer_burned": true,
+                        "isjamming": 0,
+                        "convergence_velocity": 506.7086486816406,
+                        "mach": 0.8408050537109375,
+                        "position": {
+                            "y": {
+                                "x": 0.03418884798884392,
+                                "y": 0.9989585280418396,
+                                "z": -0.030213773250579834
+                            },
+                            "x": {
+                                "x": -0.8126853704452515,
+                                "y": 0.04538420960307121,
+                                "z": 0.5809326767921448
+                            },
+                            "p": {
+                                "x": -262157.15625,
+                                "y": 4999.8935546875,
+                                "z": 638023
+                            },
+                            "z": {
+                                "x": -0.5816988348960876,
+                                "y": -0.004692872986197472,
+                                "z": -0.8133906126022339
+                            }
+                        },
+                        "type": {
+                            "level3": 1,
+                            "level1": 1,
+                            "level4": 1,
+                            "level2": 1
+                        },
+                        "velocity": {
+                            "x": -216.35304260253906,
+                            "y": 0.02558453381061554,
+                            "z": 160.60597229003906
+                        },
+                        "fim": 0.10027916729450226,
+                        "distance": 40851.75390625
+                    },
+                    "DLZ": {
+                        "RAERO": 39410.046875,
+                        "RMIN": 700,
+                        "RPI": 39371.34765625,
+                        "RTR": 13136.6689453125
+                    }
+                }
+            ],
+            "locked": [
+                {
+                    "target": {
+                        "ID": 16777984,
+                        "course": 3.7624192237854004,
+                        "timestamp": 1459557722.404,
+                        "flags": 8,
+                        "delta_psi": 3.0648562908172607,
+                        "fin": -0.026365047320723534,
+                        "updates_number": 0,
+                        "start_of_lock": 22.103,
+                        "reflection": 4,
+                        "forces": {
+                            "x": 0.00007927369006210938,
+                            "y": 0.9167765378952026,
+                            "z": 0
+                        },
+                        "country": 1,
+                        "jammer_burned": true,
+                        "isjamming": 0,
+                        "convergence_velocity": 506.7086486816406,
+                        "mach": 0.8408050537109375,
+                        "position": {
+                            "y": {
+                                "x": 0.03418884798884392,
+                                "y": 0.9989585280418396,
+                                "z": -0.030213773250579834
+                            },
+                            "x": {
+                                "x": -0.8126853704452515,
+                                "y": 0.04538420960307121,
+                                "z": 0.5809326767921448
+                            },
+                            "p": {
+                                "x": -262157.15625,
+                                "y": 4999.8935546875,
+                                "z": 638023
+                            },
+                            "z": {
+                                "x": -0.5816988348960876,
+                                "y": -0.004692872986197472,
+                                "z": -0.8133906126022339
+                            }
+                        },
+                        "type": {
+                            "level3": 1,
+                            "level1": 1,
+                            "level4": 1,
+                            "level2": 1
+                        },
+                        "velocity": {
+                            "x": -216.35304260253906,
+                            "y": 0.02558453381061554,
+                            "z": 160.60597229003906
+                        },
+                        "fim": 0.10027916729450226,
+                        "distance": 40851.75390625
+                    },
+                    "DLZ": {
+                        "RAERO": 39410.046875,
+                        "RMIN": 700,
+                        "RPI": 39371.34765625,
+                        "RTR": 13136.6689453125
+                    }
+                }
+            ]
+        }
+    },
+    "wingTargets": [
+        {
+            "x": -263741.03125,
+            "y": 6013.9970703125,
+            "z": 634920.5
+        },
+        {
+            "x": -263192.59375,
+            "y": 7719.10595703125,
+            "z": 634441.75
+        },
+        {
+            "x": -262158.21875,
+            "y": 4999.8935546875,
+            "z": 638023.75
+        },
+        {
+            "x": -262275.96875,
+            "y": 4999.5166015625,
+            "z": 636809.875
+        }
+    ],
+    "indicators": {
+        "nav": {
+            "Requirements": {
+                "altitude": 5486.39990234375,
+                "vertical_speed": 0,
+                "roll": 0.06963980197906494,
+                "pitch": 0.29943040013313293,
+                "speed": 250
+            },
+            "ACS": {
+                "autothrust": false,
+                "mode": "FOLLOW_ROUTE"
+            },
+            "SystemMode": {
+                "submode": "TWS",
+                "master": "BVR"
+            }
+        },
+        "beacon": {
+            "glideslope_deviation_beacon_lock": false,
+            "course_deviation_beacon_lock": false,
+            "airfield_far": false,
+            "airfield_near": false
+        },
+        "engines": {
+            "EngineStart": {
+                "left": 0,
+                "right": 0
+            },
+            "HydraulicPressure": {
+                "left": 0,
+                "right": 0
+            },
+            "FuelConsumption": {
+                "left": 0.09065206348896027,
+                "right": 0.09065206348896027
+            },
+            "fuel_internal": 6102.8911132813,
+            "RPM": {
+                "left": 96,
+                "right": 96
+            },
+            "fuel_external": 1786.2391357422,
+            "Temperature": {
+                "left": 922.8956298828125,
+                "right": 922.8956298828125
+            }
+        },
+        "mech": {
+            "wheelbrakes": {
+                "status": 0,
+                "value": 0
+            },
+            "wing": {
+                "status": 0,
+                "value": 0
+            },
+            "gear": {
+                "value": 0,
+                "nose": {
+                    "rod": 0
+                },
+                "main": {
+                    "left": {
+                        "rod": 0
+                    },
+                    "right": {
+                        "rod": 0
+                    }
+                },
+                "status": 0
+            },
+            "controlsurfaces": {
+                "eleron": {
+                    "left": 0,
+                    "right": -0.00035564065910875797
+                },
+                "elevator": {
+                    "left": 0.11433501541614532,
+                    "right": 0.11422060430049896
+                },
+                "rudder": {
+                    "left": 0.0007543203537352383,
+                    "right": 0.0007543203537352383
+                }
+            },
+            "airintake": {
+                "status": 0,
+                "value": 0
+            },
+            "refuelingboom": {
+                "status": 0,
+                "value": 0
+            },
+            "flaps": {
+                "status": 0,
+                "value": 0
+            },
+            "parachute": {
+                "status": 0,
+                "value": 0
+            },
+            "noseflap": {
+                "status": 0,
+                "value": 0
+            },
+            "hook": {
+                "status": 0,
+                "value": 0
+            },
+            "speedbrakes": {
+                "status": 0,
+                "value": 0
+            },
+            "canopy": {
+                "status": 0,
+                "value": 0
+            }
+        },
+        "failures": {
+            "CanopyOpen": false,
+            "CannonFailure": false,
+            "RightTailPlaneFailure": false,
+            "LeftAileronFailure": false,
+            "AutopilotFailure": false,
+            "HydraulicsFailure": false,
+            "HUDFailure": false,
+            "RightWingPumpFailure": false,
+            "LeftWingPumpFailure": false,
+            "ECMFailure": false,
+            "RightEngineFailure": false,
+            "StallSignalization": false,
+            "HelmetFailure": false,
+            "RadarFailure": false,
+            "RightMainPumpFailure": false,
+            "ACSFailure": false,
+            "MFDFailure": false,
+            "LeftEngineFailure": false,
+            "LeftTailPlaneFailure": false,
+            "MLWSFailure": false,
+            "EOSFailure": false,
+            "AutopilotOn": false,
+            "LeftMainPumpFailure": false,
+            "RightAileronFailure": false,
+            "RWSFailure": false,
+            "MasterWarning": false,
+            "FuelTankDamage": false,
+            "GearFailure": false
+        },
+        "HSI": {
+            "RMI_raw": 0.6626058220863342,
+            "CourseDeviation": -0.00025424142950214446,
+            "Course": 0.0342603400349617,
+            "Heading_raw": 0.8047480583190918,
+            "HeadingPointer": 0.6968289613723755,
+            "BearingPointer": 0.03441091999411583,
+            "ADF_raw": 0.662617027759552
+        }
+    },
+    "wingMen": [
+        null,
+        {
+            "ordered_task": "INTERCEPT",
+            "current_target": 0,
+            "current_task": "ROUTE",
+            "wingmen_position": {
+                "y": {
+                    "x": -0.09433682262897491,
+                    "y": 0.9955396056175232,
+                    "z": -0.001183443353511393
+                },
+                "x": {
+                    "x": 0.7621673345565796,
+                    "y": 0.07145772129297256,
+                    "z": -0.6434242129325867
+                },
+                "p": {
+                    "x": -295937.875,
+                    "y": 5210.60302734375,
+                    "z": 662295.25
+                },
+                "z": {
+                    "x": 0.6404697299003601,
+                    "y": 0.06160057708621025,
+                    "z": 0.7655088901519775
+                }
+            },
+            "wingmen_id": 16780544,
+            "ordered_target": 0
+        }
+    ],
+    "requestId": "df5a7056-ec93-4ad5-999b-5ceec59aa8c4",
+    "route": {
+        "route": [],
+        "goto_point": {
+            "world_point": {
+                "x": -269634.84375,
+                "y": 5486.39990234375,
+                "z": 640402.5625
+            },
+            "speed_req": 250,
+            "estimated_time": 160.32640176225,
+            "this_point_num": 2,
+            "next_point_num": 3,
+            "point_action": "TURNPOINT"
+        }
+    },
+    "metaData": {
+        "camPos": {
+            "y": {
+                "x": 0.08429556339979172,
+                "y": 0.9851806163787842,
+                "z": -0.1493767499923706
+            },
+            "x": {
+                "x": 0.7624536752700806,
+                "y": -0.16028738021850586,
+                "z": -0.6268750429153442
+            },
+            "p": {
+                "x": -295961.9375,
+                "y": 5203.46142578125,
+                "z": 660945.375
+            },
+            "z": {
+                "x": 0.6415283679962158,
+                "y": 0.061050064861774445,
+                "z": 0.7646661400794983
+            }
+        },
+        "playerPlaneId": 16780288,
+        "modelTime": 29.3,
+        "version": {
+            "ProductName": "DCS",
+            "FileVersion": [
+                1,
+                5,
+                3,
+                51417
+            ],
+            "ProductVersion": [
+                1,
+                5,
+                3,
+                51417
+            ]
+        },
+        "selfData": {
+            "Flags": {
+                "AI_ON": true,
+                "Jamming": false,
+                "Born": true,
+                "Static": false,
+                "Human": true,
+                "RadarActive": true,
+                "IRJamming": false,
+                "Invisible": false
+            },
+            "UnitName": "New callsign",
+            "Name": "F-15C",
+            "LatLongAlt": {
+                "Long": 42.193149567659,
+                "Lat": 42.10161456597,
+                "Alt": 5202.2326886064
+            },
+            "Coalition": "Enemies",
+            "Country": 2,
+            "Position": {
+                "x": -295966.875,
+                "y": 5202.23291015625,
+                "z": 660949.625
+            },
+            "GroupName": "F-15C Intercept",
+            "CoalitionID": 2,
+            "Heading": 5.5856122970581055,
+            "Pitch": 0.01528096105903387,
+            "Bank": -0.061539627611637115,
+            "Type": {
+                "level3": 1,
+                "level1": 1,
+                "level4": 6,
+                "level2": 1
+            }
+        },
+        "missionStartTime": 36000,
+        "pilotName": "New callsign"
+    }
+}

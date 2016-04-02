@@ -8,6 +8,8 @@ val leavu3 = Project(id = "leavu3", base = file("."))
     scalaVersion := "2.11.8",
     scalacOptions ++= Seq("-feature", "-unchecked", "-deprecation"),
 
+    mainClass in assembly := Some("se.gigurra.leavu3.DesktopMain"),
+
     libraryDependencies ++= Seq(
       "com.badlogicgames.gdx" %   "gdx"                   % ext_libgdxVersion,
       "com.badlogicgames.gdx" %   "gdx-freetype"          % ext_libgdxVersion,
