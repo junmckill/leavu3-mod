@@ -63,6 +63,7 @@ case class GameData(err: Option[String] = None,
 
   def withRoute(newRoute: Route) = copy(route = newRoute)
   def withRwsMemory(rwsContacts: Seq[Contact]): GameData = copy(sensors = sensors.withRwsMemory(rwsContacts))
+  def withoutHiddenContacts: GameData = copy(sensors = sensors.withoutHiddenContacts)
 
   val timeStamp: Double = CurTime.seconds
   def age: Double = CurTime.seconds - timeStamp

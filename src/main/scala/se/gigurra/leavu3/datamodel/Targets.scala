@@ -18,6 +18,16 @@ case class Targets(detected: Seq[Contact] = Nil,
   def all: Seq[Contact] = detected ++ tws.map(_.contact) ++ locked.map(_.contact)
   def pdt: Option[Target] = locked.headOption
   def withRwsMemory(rwsContacts: Seq[Contact]): Targets = copy(detected = rwsContacts)
+
+  def withoutHiddenContacts: Targets = {
+    val fromOwnRadar = Contact.FromOwnRadar(order = Map.empty)
+    import fromOwnRadar._
+    Targets.this.copy(
+      detected = detected.filterNot(_.hidden),
+      tws = tws.filterNot(_.contact.hidden),
+      locked = locked.filterNot(_.contact.hidden)
+    )
+  }
 }
 
 object TargetsWire extends Schema[TargetsWire] {

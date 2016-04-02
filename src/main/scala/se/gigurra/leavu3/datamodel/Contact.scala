@@ -92,10 +92,12 @@ object Contact extends Schema[Contact] {
 
   case class FromOwnRadar(order: scala.collection.Map[Int, Int]) {
     implicit class RichContact(c: Contact) {
-      def index: Int = order(c.id)
+      def index: Int = order.getOrElse(c.id, -1)
       def memorized[T](default: => T, f: Memorized[Contact] => T): T = if (!c.isRws || c.isDesignated) GameIn.rdrPositionMemory(c).fold(default)(f) else GameIn.rdrMemory(c).fold(default)(f)
       def news: Double = memorized(1.0, _.news)
       def age: Double = memorized(0.0, _.age)
+      def visible: Boolean = !hidden
+      def hidden: Boolean = memorized(false, _.hidden)
       def lag: Double = if (c.isRws) 0.0 else age
     }
   }

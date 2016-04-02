@@ -126,6 +126,7 @@ object GameIn extends Logging {
       // Cannot do for detected contacts since they are broken for TWS in the export by DCS
       rdrPositionUpdateMemory.update((newData.sensors.targets.tws ++ newData.sensors.targets.locked).map(_.contact))
       newData.withRwsMemory(rwsContactsKnown.map(_.t))
+      newData.withoutHiddenContacts
     }
 
     def aiWingmenTgtHeadingsWorkaround(): GameData = {

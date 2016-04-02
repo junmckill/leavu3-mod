@@ -14,6 +14,9 @@ case class Sensors(status: SensorsStatus = SensorsStatus(),
                    targets: Targets = Targets()) {
   def pdt: Option[Target] = targets.pdt
   def withRwsMemory(rwsContacts: Seq[Contact]): Sensors = copy(targets = targets.withRwsMemory(rwsContacts))
+
+  def withoutHiddenContacts: Sensors = copy(targets = targets.withoutHiddenContacts)
+
 }
 
 object SensorsWire extends Schema[SensorsWire] {

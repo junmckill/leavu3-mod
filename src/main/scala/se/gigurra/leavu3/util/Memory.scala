@@ -46,6 +46,7 @@ case class Memorized[T](t: T, timeoutSeconds: Double, gameTimestamp: Double, tim
   def age = CurTime.seconds - gameTimestamp
   def timeoutAge = CurTime.seconds - timeoutTimestamp
   def expired = timeoutAge > timeoutSeconds
+  def hidden = age > timeoutSeconds
   def news: Double = math.max(0.0, 1.0 - age / timeoutSeconds)
 }
 
