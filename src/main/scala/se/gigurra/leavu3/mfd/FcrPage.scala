@@ -2,9 +2,9 @@ package se.gigurra.leavu3.mfd
 
 import com.badlogic.gdx.graphics.Color
 import se.gigurra.leavu3.datamodel.{Bra, Configuration, Contact, DlinkData, GameData, Vec2, self}
+import se.gigurra.leavu3.gfx.RenderContext._
 import se.gigurra.leavu3.gfx.{BScopeProjection, Projection}
 import se.gigurra.leavu3.interfaces.GameIn
-import se.gigurra.leavu3.gfx.RenderContext._
 import se.gigurra.leavu3.lmath.NormalizeDegrees
 import se.gigurra.leavu3.util.CurTime
 
@@ -137,10 +137,8 @@ case class FcrPage(implicit config: Configuration) extends Page("FCR") {
       contacts.put(contact.id, contact)
     }
 
-    implicit class RichContact(c: Contact) {
-      def index: Int = order(c.id)
-      def news: Double = GameIn.rdrMemory(c).fold(1.0)(_.news)
-    }
+    val fromOwnRadar = Contact.FromOwnRadar(order)
+    import fromOwnRadar._
 
     val positionsEchoed = contacts.values.toSeq
       .filterNot(_.isDesignated)
@@ -165,20 +163,7 @@ case class FcrPage(implicit config: Configuration) extends Page("FCR") {
     def drawKnownPosContacts(contacts: Seq[Contact]): Unit = {
       for (contact <- contacts.reverse) {
         // draw lowest index (=highest prio) last
-
-        val baseColor = contactColor(contact, fromDatalink = false)
-        val color = baseColor.scaleAlpha(contact.news)
-        val lag = if (contact.isDesignated || contact.isRws) 0.0 else GameIn.rdrLastTwsPositionUpdate(contact).fold(0.0)(CurTime.seconds - _.timestamp)
-        val position = contact.position + contact.velocity * lag
-
-        drawContact(
-          position = position,
-          heading = if (contact.isRws) None else Some(contact.heading),
-          color = color,
-          centerText = if (contact.isDesignated) (contact.index + 1).toString else "",
-          fill = contact.isDesignated,
-          drawAlt = !contact.isRws
-        )
+        drawOwnContact(contact, fromOwnRadar)
       }
     }
 

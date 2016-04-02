@@ -3,7 +3,7 @@ package se.gigurra.leavu3.mfd
 import com.badlogic.gdx.graphics.Color
 import se.gigurra.leavu3.datamodel._
 import se.gigurra.leavu3.gfx.RenderContext._
-import se.gigurra.leavu3.util.CircleBuffer
+import se.gigurra.leavu3.util.{CircleBuffer, CurTime, Memorized}
 import se.gigurra.leavu3.interfaces.{Dlink, GameIn, MouseClick}
 
 import scala.collection.mutable
@@ -107,13 +107,8 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD") {
 
     val contacts = new mutable.HashMap[Int, Contact] // id -> data
     val order = new mutable.HashMap[Int, Int] // id -> index
-
-    implicit class ContactWithIndex(c: Contact) {
-      def index: Int = order(c.id)
-      def news: Double = GameIn.rdrMemory(c).fold(1.0)(_.news)
-    }
-
     import game.sensors.targets._
+
     for {
       collection <- Seq(detected, tws.map(_.contact), locked.map(_.contact))
       (contact, i) <- collection.zipWithIndex
@@ -121,6 +116,9 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD") {
       order.put(contact.id, i)
       contacts.put(contact.id, contact)
     }
+
+    val fromOwnRadar = Contact.FromOwnRadar(order)
+    import fromOwnRadar._
 
     val positionsDesignated = contacts.values.toSeq
       .filter(_.isDesignated)
@@ -137,17 +135,7 @@ case class HsdPage(implicit config: Configuration) extends Page("HSD") {
     }
 
     for (contact <- positionsDesignated.reverse) { // draw lowest index (=highest prio) last
-
-      val baseColor = contactColor(contact, fromDatalink = false)
-      val color = baseColor.scaleAlpha(contact.news)
-
-      drawContact(
-        position = contact.position,
-        heading = Some(contact.heading),
-        color = color,
-        centerText = (contact.index + 1).toString,
-        fill = true
-      )
+      drawOwnContact(contact, fromOwnRadar)
     }
   }
 

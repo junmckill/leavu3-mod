@@ -2,7 +2,10 @@ package se.gigurra.leavu3.datamodel
 
 import se.gigurra.heisenberg.MapData._
 import se.gigurra.heisenberg.Schema
-import se.gigurra.leavu3.util.CurTime
+import se.gigurra.leavu3.interfaces.GameIn
+import se.gigurra.leavu3.util.{CurTime, Memorized}
+
+import scala.collection.mutable
 
 object SensorFlags {
   val RADAR_VIEW   = 0x0002
@@ -85,4 +88,16 @@ object Contact extends Schema[Contact] {
   val velocity               = required[Vec3]("velocity")
   val distance               = required[Float]("distance")
   val timestamp              = required[Double]("timestamp", default = CurTime.seconds)
+
+
+  case class FromOwnRadar(order: scala.collection.Map[Int, Int]) {
+    implicit class RichContact(c: Contact) {
+      def index: Int = order(c.id)
+      def memorized[T](default: => T, f: Memorized[Contact] => T): T = if (!c.isRws || c.isDesignated) GameIn.rdrPositionMemory(c).fold(default)(f) else GameIn.rdrMemory(c).fold(default)(f)
+      def news: Double = memorized(1.0, _.news)
+      def age: Double = memorized(0.0, _.age)
+      def lag: Double = if (c.isRws) 0.0 else age
+    }
+  }
+
 }

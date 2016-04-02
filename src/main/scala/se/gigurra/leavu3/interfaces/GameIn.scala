@@ -67,7 +67,7 @@ object GameIn extends Logging {
 
   private val knownNavWaypoints = new mutable.HashMap[Int, Waypoint]
   private val rdrMemory = ContactMemory()
-  private val rdrLastTwsPositionUpdateMemory = new PositionChangeMemory()
+  private val rdrPositionUpdateMemory = new PositionChangeMemory()
 
   @volatile var wingmenTgtsLastTminus1 = Seq.empty[Vec3] // To calculate ai wingmen tgt headings
   @volatile var wingmenTgtsLastTminus2 = Seq.empty[Vec3] // To calculate ai wingmen tgt headings
@@ -77,8 +77,8 @@ object GameIn extends Logging {
     rdrMemory.get(contact)
   }
 
-  def rdrLastTwsPositionUpdate(contact: Contact): Option[Memorized[Contact]] = {
-    rdrLastTwsPositionUpdateMemory.get(contact)
+  def rdrPositionMemory(contact: Contact): Option[Memorized[Contact]] = {
+    rdrPositionUpdateMemory.get(contact)
   }
 
   private def postProcess(newData: GameData): GameData = {
@@ -123,7 +123,8 @@ object GameIn extends Logging {
 
     def rdrMemoryWorkaround(): GameData = {
       val rwsContactsKnown = rdrMemory.update(newData.sensors.targets.all)
-      rdrLastTwsPositionUpdateMemory.update(newData.sensors.targets.tws.map(_.contact))
+      // Cannot do for detected contacts since they are broken for TWS in the export by DCS
+      rdrPositionUpdateMemory.update((newData.sensors.targets.tws ++ newData.sensors.targets.locked).map(_.contact))
       newData.withRwsMemory(rwsContactsKnown.map(_.t))
     }
 

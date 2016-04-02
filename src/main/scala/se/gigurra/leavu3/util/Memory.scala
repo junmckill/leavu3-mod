@@ -55,7 +55,7 @@ case class ContactMemory(timeoutSeconds: Double = 10.0) extends Memory[Contact](
 class PositionChangeMemory(timeoutSeconds: Double = 10.0) extends ContactMemory(timeoutSeconds) {
   protected override def update(t: Contact): Unit = {
     get(t) match {
-      case Some(prevContact) if prevContact.position == t.position =>
+      case Some(prevContact) if prevContact.position == t.position && t.velocity.norm > 0.01 =>
       case _ => super.update(t)
     }
   }

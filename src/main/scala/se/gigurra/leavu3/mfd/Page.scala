@@ -331,6 +331,24 @@ abstract class Page(val name: String)(implicit config: Configuration) extends Lo
 
   }
 
+  protected def drawOwnContact[_: Projection](contact: Contact, fromOwnRadar: Contact.FromOwnRadar): Unit = {
+
+    import fromOwnRadar._
+
+    val baseColor = contactColor(contact, fromDatalink = false)
+    val color = baseColor.scaleAlpha(contact.news)
+    val position = contact.position + contact.velocity * contact.lag
+
+    drawContact(
+      position = position,
+      heading = if (contact.isRws) None else Some(contact.heading),
+      color = color,
+      centerText = if (contact.isDesignated) (contact.index + 1).toString else "",
+      fill = contact.isDesignated,
+      drawAlt = !contact.isRws
+    )
+  }
+
   protected def drawContact[_: Projection](position: Vec3,
                                            heading: Option[Double],
                                            color: Color,
