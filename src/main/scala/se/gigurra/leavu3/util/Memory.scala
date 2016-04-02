@@ -24,6 +24,10 @@ abstract class Memory[T](timeoutSeconds: Double) {
     data.get(idOf(t))
   }
 
+  def all: Seq[Memorized[T]] = synchronized {
+    data.values.toArray.toSeq
+  }
+
   protected def update(t: T, gameTimeStamp: Double): Unit = {
     val id = idOf(t)
     data += id -> Memorized(t, timeoutSeconds, gameTimeStamp, CurTime.seconds)
@@ -31,10 +35,6 @@ abstract class Memory[T](timeoutSeconds: Double) {
 
   protected def update(t: T): Unit = {
     update(t, CurTime.seconds)
-  }
-
-  private def all: Seq[Memorized[T]] = {
-    data.values.toArray.toSeq
   }
 
   private def clearExpired(): Unit = {

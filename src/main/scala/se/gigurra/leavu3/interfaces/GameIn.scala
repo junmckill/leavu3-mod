@@ -122,9 +122,10 @@ object GameIn extends Logging {
     }
 
     def rdrMemoryWorkaround(): GameData = {
-      val rwsContactsKnown = rdrMemory.update(newData.sensors.targets.all)
+      rdrMemory.update(newData.sensors.targets.all)
       // Cannot do for detected contacts since they are broken for TWS in the DCS export
       rdrPositionUpdateMemory.update((newData.sensors.targets.tws ++ newData.sensors.targets.locked).map(_.contact))
+      val rwsContactsKnown = rdrMemory.all.filter(_.isRws)
       newData.withRwsMemory(rwsContactsKnown.map(_.t)).withoutHiddenContacts
     }
 
