@@ -36,7 +36,7 @@ object GameIn extends Logging {
 
       DefaultTimer.fps(fps) {
         DcsRemote
-          .get(path, Some(maxAge))
+          .get(path, Some(if (appCfg.slaveMode) Int.MaxValue else maxAge))
           .map(JSON.read[GameDataWire])
           .map(_.toGameData)
           .map(postProcess)

@@ -26,5 +26,6 @@
   "hsd-modes"        : true,
   "hsd-heading"      : true,
   "osbs"             : true,
-  "dclt"             : false
+  "dclt"             : false,
+  "slave-mode"       : false
 }

@@ -24,7 +24,6 @@ case class Configuration(source: SourceData = Map.empty) extends Parsed[Configur
   val aaSamples         = parse(schema.aaSamples)
   val instrument        = parse(schema.instrument)
   val symbolScale       = parse(schema.symbolScale)
-  val relayDlink        = parse(schema.relayDlink)
   val borderless        = parse(schema.borderless)
   val noFocusOnClick    = parse(schema.noFocusOnClick)
   val alwaysOnTop       = parse(schema.alwaysOnTop)
@@ -39,6 +38,8 @@ case class Configuration(source: SourceData = Map.empty) extends Parsed[Configur
   val hsdHeading        = parse(schema.hsdHeading)
   val osbs              = parse(schema.osbs)
   val dclt              = parse(schema.dclt)
+  val slaveMode         = parse(schema.slaveMode)
+  val relayDlink        = parse(schema.relayDlink) && !slaveMode
 
   require(title.length > 0, "Configured title must be > 0")
   require(width > 0, "Configured width must be > 0")
@@ -77,6 +78,7 @@ object Configuration extends Schema[Configuration] with Logging {
   val hsdHeading        = required[Boolean]     ("hsd-heading",       default = true)
   val osbs              = required[Boolean]     ("osbs",              default = true)
   val dclt              = required[Boolean]     ("dclt",              default = false)
+  val slaveMode         = required[Boolean]     ("slave-mode",        default = false)
 
   def readFromFile(s: String = "leavu3-cfg.json"): Configuration = {
     logger.info(s"Loading configuration file: $s")
