@@ -76,7 +76,7 @@ object Configuration extends Schema[Configuration] with Logging {
   val hsdModes          = required[Boolean]     ("hsd-modes",         default = true)
   val hsdHeading        = required[Boolean]     ("hsd-heading",       default = true)
   val osbs              = required[Boolean]     ("osbs",              default = true)
-  val dclt              = required[Boolean]     ("dclt",              default = true)
+  val dclt              = required[Boolean]     ("dclt",              default = false)
 
   def readFromFile(s: String = "leavu3-cfg.json"): Configuration = {
     logger.info(s"Loading configuration file: $s")
