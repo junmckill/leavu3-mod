@@ -24,9 +24,13 @@ abstract class Memory[T](timeoutSeconds: Double) {
     data.get(idOf(t))
   }
 
-  protected def update(t: T): Unit = {
+  protected def update(t: T, gameTimeStamp: Double): Unit = {
     val id = idOf(t)
-    data += id -> Memorized(t, timeoutSeconds, CurTime.seconds)
+    data += id -> Memorized(t, timeoutSeconds, gameTimeStamp, CurTime.seconds)
+  }
+
+  protected def update(t: T): Unit = {
+    update(t, CurTime.seconds)
   }
 
   private def all: Seq[Memorized[T]] = {
@@ -38,9 +42,10 @@ abstract class Memory[T](timeoutSeconds: Double) {
   }
 }
 
-case class Memorized[T](t: T, timeoutSeconds: Double, timestamp: Double) {
-  def age = CurTime.seconds - timestamp
-  def expired = age > timeoutSeconds
+case class Memorized[T](t: T, timeoutSeconds: Double, gameTimestamp: Double, timeoutTimestamp: Double) {
+  def age = CurTime.seconds - gameTimestamp
+  def timeoutAge = CurTime.seconds - timeoutTimestamp
+  def expired = timeoutAge > timeoutSeconds
   def news: Double = math.max(0.0, 1.0 - age / timeoutSeconds)
 }
 
@@ -56,7 +61,9 @@ class PositionChangeMemory(timeoutSeconds: Double = 10.0) extends ContactMemory(
   protected override def update(t: Contact): Unit = {
     get(t) match {
       case Some(prevContact) if prevContact.position == t.position && t.velocity.norm > 0.01 =>
-      case _ => super.update(t)
+        super.update(t, gameTimeStamp = prevContact.gameTimestamp)
+      case _ =>
+        super.update(t)
     }
   }
 }
