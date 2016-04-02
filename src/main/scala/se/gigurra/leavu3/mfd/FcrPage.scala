@@ -551,7 +551,7 @@ case class FcrPage(implicit config: Configuration) extends Page("FCR") {
         firstWord
       }
     } else {
-      "unknown"
+      "UKN"
     }
   }
 
