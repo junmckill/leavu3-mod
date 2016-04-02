@@ -120,6 +120,8 @@ object Key {
   val OSB_17 = new Combination(_7, p => p.isControlDown && p.isAltDown)
   val OSB_18 = new Combination(_8, p => p.isControlDown && p.isAltDown)
   val OSB_19 = new Combination(_9, p => p.isControlDown && p.isAltDown)
+  val NEXT_QP = new Combination(RIGHT, p => p.isControlDown && p.isShiftDown)
+  val PREV_QP = new Combination(LEFT, p => p.isControlDown && p.isShiftDown)
 
   object OSB {
     def unapply(keyPress: KeyPress): Option[Int] = {
@@ -199,7 +201,7 @@ case class KeyPress(key: Int, keysDown: Set[Int]) {
   }
 }
 
-class Combination(key: Int, modifierTest: KeyPress => Boolean = _ => true) {
+case class Combination(key: Int, modifierTest: KeyPress => Boolean = _ => true) {
   def unapply(keyPress: KeyPress): Boolean = {
     modifierTest(keyPress) && keyPress.key == key
   }

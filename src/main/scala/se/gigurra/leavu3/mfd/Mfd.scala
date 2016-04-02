@@ -66,8 +66,16 @@ case class Mfd(implicit config: Configuration) extends Instrument(config) {
     }
   }
 
+  def changeQpByOffset(offet: Int): Unit = {
+    if (!mainMenuOpen) {
+      iQPage = math.max(0, (5 + iQPage + offet) % 5)
+    }
+  }
+
   def keyPressed(press: KeyPress): Unit = {
     press match {
+      case Key.NEXT_QP() => changeQpByOffset(1)
+      case Key.PREV_QP() => changeQpByOffset(-1)
       case Key.OSB(i) => pressOsb(i)
       case _ =>
     }
