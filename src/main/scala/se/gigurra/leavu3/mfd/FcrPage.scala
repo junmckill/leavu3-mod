@@ -22,7 +22,7 @@ case class FcrPage(implicit config: Configuration, mfd: MfdIfc) extends Page("FC
   val OSB_AI = 18
   val OSB_DL = 17
   val OSB_BE = 16
-  val OSB_ABS = 15
+  val OSB_ABS = 8
   var shouldDrawAi = true
   var shouldDrawDl = true
   var shouldDrawBe = true

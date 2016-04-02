@@ -47,6 +47,8 @@ abstract class Page(val name: String)(implicit config: Configuration, mfd: MfdIf
 
   def isDcltOn: Boolean = mfd.isDcltOn
 
+  def verbose: Boolean = mfd.verbose
+
   def shouldDrawOsbs: Boolean = mfd.shouldDrawOsbs
 
   //////////////////////////////////////////////////////////////////////////////

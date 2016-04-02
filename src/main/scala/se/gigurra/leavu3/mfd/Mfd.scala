@@ -43,10 +43,14 @@ case class Mfd(implicit config: Configuration)
     currentPage.foreach(_.draw(game, dlinkIn))
   }
 
-  def drawQps(): Unit = {
+  def drawOsbs(): Unit = {
     for ((iQp, page) <- qPages) {
-      osb.drawHighlighted(qp2Osb(iQp), page.name, iQp == iQPage)
+      if (iQPage == iQp || verbose) {
+        osb.drawHighlighted(qp2Osb(iQp), page.name, iQp == iQPage)
+      }
     }
+    osb.drawBoxed(15, "OSB", boxed = shouldDrawOsbs, forceDraw = true)
+    osb.drawBoxed(9, "DCL", boxed = isDcltOn)
   }
 
   def drawMainMenu(): Unit = {
@@ -65,7 +69,7 @@ case class Mfd(implicit config: Configuration)
       drawMainMenu()
     } else {
       drawPage(game, dlinkIn)
-      drawQps()
+      drawOsbs()
     }
   }
 
@@ -79,6 +83,9 @@ case class Mfd(implicit config: Configuration)
     press match {
       case Key.NEXT_QP() => changeQpByOffset(1)
       case Key.PREV_QP() => changeQpByOffset(-1)
+      case Key.OSB(i) => pressOsb(i)
+      case Key.OSB_15() => shouldDrawOsbs = !shouldDrawOsbs
+      case Key.OSB_9() => isDcltOn = !isDcltOn
       case Key.OSB(i) => pressOsb(i)
       case _ =>
     }
@@ -94,6 +101,10 @@ case class Mfd(implicit config: Configuration)
     } else {
       if (isQpOsb(i)) {
         pressQpOsb(osb2Qp(i))
+      } else if (i == 9) {
+        isDcltOn = !isDcltOn
+      } else if (i == 15) {
+        shouldDrawOsbs = !shouldDrawOsbs
       } else {
         currentPage.foreach(_.pressOsb(i))
       }
@@ -137,31 +148,34 @@ case class Mfd(implicit config: Configuration)
              color: Color = null,
              forceDraw: Boolean = false)(implicit config: Configuration): Unit = {
 
-      implicit val _p = ScreenProjection()
+      if (shouldDrawOsbs || forceDraw) {
 
-      val white = if (color != null) color else LIGHT_GRAY
-      val black = BLACK
+        implicit val _p = ScreenProjection()
 
-      if (boxType != null) {
-        at(Mfd.Osb.positions(iOsb)) {
+        val white = if (color != null) color else LIGHT_GRAY
+        val black = BLACK
 
-          val extraWidth = if (text.length > 3) {
-            text.length.toFloat/3.0f
-          } else {
-            1.0f
+        if (boxType != null) {
+          at(Mfd.Osb.positions(iOsb)) {
+
+            val extraWidth = if (text.length > 3) {
+              text.length.toFloat / 3.0f
+            } else {
+              1.0f
+            }
+
+            rect(symbolScale * Mfd.Osb.boxWidth * extraWidth, symbolScale * Mfd.Osb.boxHeight, color = white, typ = boxType)
           }
-
-          rect(symbolScale * Mfd.Osb.boxWidth * extraWidth, symbolScale * Mfd.Osb.boxHeight, color = white, typ = boxType)
         }
-      }
 
-      val pos = Mfd.Osb.positions(iOsb)
-      at(pos) {
-        text.drawCentered(if (boxType == FILL) black else white)
+        val pos = Mfd.Osb.positions(iOsb)
+        at(pos) {
+          text.drawCentered(if (boxType == FILL) black else white)
+        }
+
       }
 
     }
-
 
   }
 
@@ -174,6 +188,7 @@ case class Mfd(implicit config: Configuration)
 trait MfdIfc {
 
   def isDcltOn: Boolean
+  def verbose: Boolean = !isDcltOn
   def shouldDrawOsbs: Boolean
   def osb: OsbIfc
 

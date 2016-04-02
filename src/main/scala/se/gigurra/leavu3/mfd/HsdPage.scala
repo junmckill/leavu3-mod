@@ -22,10 +22,10 @@ case class HsdPage(implicit config: Configuration, mfd: MfdIfc) extends Page("HS
   val OSB_DEPR = 1
   val OSB_HDG = 2
   val OSB_SCALE = 17
-  val OSB_MODES = 15
+  val OSB_MODES = 16
   val OSB_HSI = 3
   val OSB_DEL = 7
-  val OSB_UNITS = 9
+  val OSB_UNITS = 8
 
   override def pressOsb(i: Int): Unit = {
     i match {
@@ -66,7 +66,7 @@ case class HsdPage(implicit config: Configuration, mfd: MfdIfc) extends Page("HS
     drawBullsEyeNumbrs(game)
     drawBraNumbrs(game)
     drawOwnHeading(game)
-    if (shouldDrawModes)
+    if (shouldDrawModes && verbose)
       drawModes(game)
     drawOsbs(game, dlinkIn)
   }
@@ -165,14 +165,18 @@ case class HsdPage(implicit config: Configuration, mfd: MfdIfc) extends Page("HS
 
   def drawOsbs(game: GameData, dlinkIn: Seq[(String, DlinkData)]): Unit = {
     implicit val p = screenProjection
-    osb.drawBoxed(OSB_DEPR, "DEP", boxed = deprFactor.index != 0)
-    osb.drawBoxed(OSB_HDG, "HDG", boxed = shouldDrawOwnHeading)
-    osb.drawBoxed(OSB_HSI, "HSI", boxed = shouldDrawDetailedHsi)
+    if (verbose) {
+      osb.drawBoxed(OSB_DEPR, "DEP", boxed = deprFactor.index != 0)
+      osb.drawBoxed(OSB_HDG, "HDG", boxed = shouldDrawOwnHeading)
+      osb.drawBoxed(OSB_HSI, "HSI", boxed = shouldDrawDetailedHsi)
+    }
     if (ownMarkpointActive)
       osb.drawBoxed(OSB_DEL, "DEL", boxed = false)
-    osb.drawBoxed(OSB_MODES, "MOD", boxed = shouldDrawModes)
+    if (verbose) {
+      osb.drawBoxed(OSB_MODES, "MOD", boxed = shouldDrawModes)
+      osb.draw(OSB_UNITS, displayUnitName.toUpperCase.take(3))
+    }
     osb.drawBoxed(OSB_SCALE, (distScale.get * m_to_distUnit).round.toString, boxed = false)
-    osb.draw(OSB_UNITS, displayUnitName.toUpperCase.take(3))
   }
 
   def drawOwnHeading(game: GameData): Unit = {
