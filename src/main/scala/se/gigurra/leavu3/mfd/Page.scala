@@ -146,9 +146,9 @@ abstract class Page(val name: String)(implicit config: Configuration, mfd: MfdIf
   }
 
   protected def contactColor(contact: Contact, fromDatalink: Boolean): Color = {
-    if (self.coalition == contact.country) {
+    if (contact.haveIff && self.coalition == contact.country) {
       GREEN
-    } else if (fromDatalink) {
+    } else if (contact.haveIff && fromDatalink) {
       RED
     } else {
       YELLOW

@@ -65,6 +65,9 @@ case class Contact(source: SourceData) extends SafeParsed[Contact.type] {
   def isDesignated           = flags.hasAnyOf(RADAR_BUG | EOS_BUG | RADAR_HOJ)
   def isPositionKnown        = flags.hasNoneOf(RADAR_HOJ) && (!jamming || burnthrough)
   def isRws                  = flags.hasAnyOf(RADAR_VIEW | EOS_VIEW)
+
+  def haveIff: Boolean       = isPositionKnown && flags.hasAnyOf(RADAR_BUG | RADAR_VIEW | RADAR_TWS)
+
 }
 
 object Contact extends Schema[Contact] {
