@@ -1,6 +1,6 @@
 package se.gigurra.leavu3
 
-import se.gigurra.leavu3.datamodel.GameData
+import se.gigurra.leavu3.datamodel.GameDataWire
 import se.gigurra.leavu3.util.{CurTime, Resource2String}
 import se.gigurra.serviceutils.json.JSON
 
@@ -13,7 +13,7 @@ object TestHeisenbergPerformance {
 
     val json = Resource2String("TestGameData.json")
     val duration = 30.0
-    val iterations = benchMark("GameDataBenchmark", duration)(JSON.read[GameData](json))
+    val iterations = benchMark("GameDataBenchmark", duration)(JSON.read[GameDataWire](json))
 
     val nBytesTotal = json.length.toLong * iterations.toLong
     val bytesPerSecond = nBytesTotal.toDouble / duration

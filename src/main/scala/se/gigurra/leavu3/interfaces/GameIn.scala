@@ -2,7 +2,7 @@ package se.gigurra.leavu3.interfaces
 
 import com.twitter.finagle.FailedFastException
 import com.twitter.util.Future
-import se.gigurra.leavu3.datamodel.{Configuration, Contact, GameData, Vec3, Waypoint}
+import se.gigurra.leavu3.datamodel.{Configuration, Contact, GameData, GameDataWire, Vec3, Waypoint}
 import se.gigurra.leavu3.gfx.Drawable
 import se.gigurra.leavu3.util._
 import se.gigurra.serviceutils.json.JSON
@@ -36,7 +36,8 @@ object GameIn extends Logging {
       DefaultTimer.fps(fps) {
         DcsRemote
           .get(path, Some(maxAge))
-          .map(JSON.read[GameData])
+          .map(JSON.read[GameDataWire])
+          .map(_.toGameData)
           .map(postProcess)
           .map { newSnapshot =>
             snapshot = newSnapshot
@@ -144,8 +145,8 @@ object GameIn extends Logging {
 
       DefaultTimer.seconds(1) {
         if (dcsGameConnected && !snapshot.isValid) {
-          DcsRemote.get(GameIn.path).map(JSON.read[GameData]).flatMap {
-            case BadGameData() =>
+          DcsRemote.get(GameIn.path).map(JSON.read[GameDataWire]).flatMap {
+            case data if data.err.isDefined =>
               logger.info(s"Injecting data export script .. -> ${GameIn.path}")
               DcsRemote.post("export")(luaDataExportScript)
             case _ =>
@@ -159,11 +160,6 @@ object GameIn extends Logging {
         }
       }
     }
-
-    object BadGameData {
-      def unapply(data: GameData): Boolean = data.err.isDefined
-    }
-
   }
 
 }

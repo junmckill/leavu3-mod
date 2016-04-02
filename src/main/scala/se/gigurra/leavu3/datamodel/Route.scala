@@ -3,15 +3,19 @@ package se.gigurra.leavu3.datamodel
 import se.gigurra.heisenberg.MapData._
 import se.gigurra.heisenberg.{Schema, Parsed}
 
-case class Route(source: SourceData = Map.empty) extends SafeParsed[Route.type] {
+case class RouteWire(source: SourceData = Map.empty) extends SafeParsed[RouteWire.type] {
   val waypoints       = parse(schema.waypoints)
   val currentWaypoint = parse(schema.currentWaypoint)
-
-  def withWaypoints(wps: Seq[Waypoint]) = marshal(this, schema.waypoints -> wps)
+  def toRoute: Route = Route(waypoints.map(_.toWaypoint), currentWaypoint.toWaypoint)
 }
 
-object Route extends Schema[Route] {
-  val waypoints       = required[Seq[Waypoint]]("route", default = Seq.empty)
-  val currentWaypoint = required[Waypoint]("goto_point", default = Waypoint())
+case class Route(waypoints: Seq[Waypoint] = Nil,
+                 currentWaypoint: Waypoint = Waypoint()) {
+  def withWaypoints(wps: Seq[Waypoint]) = copy(waypoints = wps)
+}
+
+object RouteWire extends Schema[RouteWire] {
+  val waypoints       = required[Seq[WaypointWire]]("route", default = Seq.empty)
+  val currentWaypoint = required[WaypointWire]("goto_point", default = WaypointWire())
 }
 

@@ -6,7 +6,7 @@ import se.gigurra.leavu3.util.CurTime
 import se.gigurra.serviceutils.twitter.logging.Logging
 import scala.language.implicitConversions
 
-case class GameData(source: SourceData = Map.empty) extends SafeParsed[GameData.type] {
+case class GameDataWire(source: SourceData = Map.empty) extends SafeParsed[GameDataWire.type] {
 
   // DCS Remote Metadata
   val err       = parse(schema.err)
@@ -25,6 +25,34 @@ case class GameData(source: SourceData = Map.empty) extends SafeParsed[GameData.
   val route           = parse(schema.route)
   val metaData        = parse(schema.metadata)
 
+  def toGameData: GameData = GameData(
+    err,
+    requestId,
+    electronicWarf,
+    payload,
+    flightModel,
+    sensors.toSensors,
+    aiWingmenTgts,
+    indicators,
+    aiWingmen,
+    route.toRoute,
+    metaData
+  )
+
+}
+
+case class GameData(err: Option[String] = None,
+                    requestId: Option[String] = None,
+                    electronicWarf: ElectronicWarfare = ElectronicWarfare(),
+                    payload: Payload = Payload(),
+                    flightModel: FlightModel = FlightModel(),
+                    sensors: Sensors = Sensors(),
+                    aiWingmenTgts: Seq[Vec3] = Nil,
+                    indicators: Indicators = Indicators(),
+                    aiWingmen: Seq[AiWingman] = Nil,
+                    route: Route = Route(),
+                    metaData: MetaData = MetaData()) {
+
   def selfData: SelfData = metaData.selfData
 
   def tdcPosition: Option[Vec2] = sensors.status.tdcPosition(selfData.heading, selfData.position)
@@ -33,8 +61,8 @@ case class GameData(source: SourceData = Map.empty) extends SafeParsed[GameData.
 
   def aircraftMode: AircraftMode = indicators.nav.mode
 
-  def withRoute(newRoute: Route) = marshal(this, schema.route -> newRoute)
-  def withRwsMemory(rwsContacts: Seq[Contact]): GameData = marshal(this, schema.sensors -> sensors.withRwsMemory(rwsContacts))
+  def withRoute(newRoute: Route) = copy(route = newRoute)
+  def withRwsMemory(rwsContacts: Seq[Contact]): GameData = copy(sensors = sensors.withRwsMemory(rwsContacts))
 
   val timeStamp: Double = CurTime.seconds
   def age: Double = CurTime.seconds - timeStamp
@@ -46,7 +74,7 @@ case class GameData(source: SourceData = Map.empty) extends SafeParsed[GameData.
   def isValid: Boolean = hasRequestId && !hasError && !timedOut
 }
 
-object GameData extends Schema[GameData] with Logging {
+object GameDataWire extends Schema[GameDataWire] with Logging {
 
   // DCS Remote Metadata
   val err       = optional[String]("err")
@@ -56,11 +84,11 @@ object GameData extends Schema[GameData] with Logging {
   val electronicWarf  = required[ElectronicWarfare]("electronicWarfare", default = ElectronicWarfare())
   val payload         = required[Payload]("payload", default = Payload())
   val flightModel     = required[FlightModel]("flightModel", default = FlightModel())
-  val sensors         = required[Sensors]("sensor", default = Sensors())
+  val sensors         = required[SensorsWire]("sensor", default = SensorsWire())
   val aiWingmenTgts   = required[Seq[Vec3]]("wingTargets", default = Seq.empty)
   val indicators      = required[Indicators]("indicators", default = Indicators())
   val aiWingmen       = required[Seq[Option[AiWingman]]]("wingMen", default = Seq.empty)
-  val route           = required[Route]("route", default = Route())
+  val route           = required[RouteWire]("route", default = RouteWire())
   val metadata        = required[MetaData]("metaData", default = MetaData())
 }
 
