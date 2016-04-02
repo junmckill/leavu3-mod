@@ -1,7 +1,7 @@
 package se.gigurra.leavu3.mfd
 
 import com.badlogic.gdx.graphics.Color
-import se.gigurra.leavu3.datamodel.{Bra, Configuration, Contact, DlinkData, GameData, Vec2, self}
+import se.gigurra.leavu3.datamodel.{Bra, Configuration, Contact, DlinkData, GameData, UnitType, Vec2, self}
 import se.gigurra.leavu3.gfx.RenderContext._
 import se.gigurra.leavu3.gfx.{BScopeProjection, Projection}
 import se.gigurra.leavu3.interfaces.GameIn
@@ -473,7 +473,14 @@ case class FcrPage(implicit config: Configuration) extends Page("FCR") {
         }
 
         at(self.position + braTgt.toOffset, heading = self.heading) {
+
+          val tgtClosureText = closureTextOf(pdt)
+          val color = contactColor(pdt, fromDatalink = false)
+
           rect(w, h / 2.0, color = contactColor(pdt, fromDatalink = false), typ = FILL)
+          transform(_.rotate(self.heading)) {
+           s" $tgtClosureText ".drawLeftOf(color, scale = 0.5f)
+          }
         }
       }
   }
@@ -503,15 +510,48 @@ case class FcrPage(implicit config: Configuration) extends Page("FCR") {
       drawTextLine(ownSpeedText, CYAN)
 
       game.pdt.filter(_.isPositionKnown).foreach { pdt =>
-        val vnToTgt = (pdt.position - self.position).normalized
-        val vnFromTgt = -vnToTgt
         val tgtSpeed = pdt.velocity.norm * mps_to_speedUnit
-        val tgtClosure = ((pdt.velocity dot vnFromTgt) + (self.velocity dot vnToTgt)) * mps_to_speedUnit
-        val tgtClosureText = deltaText(tgtClosure)
+        val tgtClosureText = closureTextOf(pdt)
         val tgtSpeedText = s" pdt: ${tgtSpeed.round} -> ${headingString(pdt.heading)} c$tgtClosureText"
+        val unitTypeString = createUnitTypeString(pdt)
         drawTextLine(tgtSpeedText, contactColor(pdt, fromDatalink = false))
+        drawTextLine(s"      $unitTypeString", contactColor(pdt, fromDatalink = false))
       }
 
+    }
+  }
+
+  def closureOf(target: Contact): Double = {
+    val vnToTgt = (target.position - self.position).normalized
+    val vnFromTgt = -vnToTgt
+    val tgtClosure = ((target.velocity dot vnFromTgt) + (self.velocity dot vnToTgt)) * mps_to_speedUnit
+    tgtClosure
+  }
+
+  def closureTextOf(target: Contact): String = {
+    deltaText(closureOf(target))
+  }
+
+  def createUnitTypeString(contact: Contact): String = {
+
+    if ((contact.position - self.position).norm < 25.nmi) {
+
+      val fullName = contact.typ.fullName.toUpperCase
+      val firstWord = fullName.split(' ').headOption.getOrElse("")
+      val iDashP1 = firstWord.indexOf('-') + 1
+      if (iDashP1 >= 0 && iDashP1 < firstWord.length) {
+        val (start, rightOfDash) = firstWord.splitAt(iDashP1)
+        val iNotNumber = rightOfDash.indexWhere(!_.isDigit)
+        if (iNotNumber >= 0) {
+          firstWord.substring(0, start.length + iNotNumber)
+        } else {
+          firstWord
+        }
+      } else {
+        firstWord
+      }
+    } else {
+      "unknown"
     }
   }
 
