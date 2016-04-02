@@ -1,6 +1,7 @@
 package se.gigurra.leavu3.interfaces
 
 import com.twitter.finagle.FailedFastException
+import com.twitter.finagle.http.Status
 import com.twitter.util.Future
 import se.gigurra.leavu3.datamodel.{Configuration, Contact, GameData, GameDataWire, Vec3, Waypoint}
 import se.gigurra.leavu3.gfx.Drawable
@@ -47,7 +48,10 @@ object GameIn extends Logging {
           }.onFailure {
           case e: IdenticalRequestPending => // Ignore
           case e: ServiceException =>
-            logger.warning(s"Dcs Remote replied: Could not fetch game data from Dcs Remote: $e")
+            e.response.status match {
+              case Status.ServiceUnavailable => // No need to log every message when not having dcs up and running
+              case _ => logger.warning(s"Dcs Remote replied: Could not fetch game data from Dcs Remote: $e")
+            }
             dcsRemoteConnected = true
             dcsGameConnected = false
             snapshot = GameData()
@@ -156,7 +160,10 @@ object GameIn extends Logging {
           }.onFailure {
             case e: IdenticalRequestPending => // Ignore ..
             case e: FailedFastException => // Ignore ..
-            case e: ServiceException => logger.warning(s"Dcs Remote replied: Unable to inject game export script: $e")
+            case e: ServiceException => e.response.status match {
+              case Status.ServiceUnavailable => // No need to log every message when not having dcs up and running
+              case _ => logger.warning(s"Dcs Remote replied: Unable to inject game export script: $e")
+            }
             case e => logger.error(e, s"Unable to inject export script")
           }
         }

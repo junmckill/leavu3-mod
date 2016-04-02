@@ -7,8 +7,8 @@ import com.twitter.util.{Await, Future}
 import se.gigurra.heisenberg.MapData.SourceData
 import se.gigurra.heisenberg._
 import se.gigurra.leavu3.datamodel.DlinkData._
-import se.gigurra.leavu3.datamodel.{Configuration, DcsRemoteRemoteConfig, Member, SafeParsed}
-import se.gigurra.leavu3.util.{CurTime, DefaultTimer, IdenticalRequestPending, RestClient}
+import se.gigurra.leavu3.datamodel.{Configuration, DcsRemoteRemoteConfig}
+import se.gigurra.leavu3.util.{DefaultTimer, IdenticalRequestPending, RestClient}
 import se.gigurra.serviceutils.json.JSON
 import se.gigurra.serviceutils.twitter.logging.Logging
 
