@@ -38,7 +38,7 @@ object DesktopMain extends Logging {
   } match {
     case Success(_) =>
     case Failure(e) =>
-      JOptionPane.showMessageDialog(null, e.getMessage, s"Leavu 3 failed", JOptionPane.ERROR_MESSAGE)
+      JOptionPane.showMessageDialog(null, Option(e.getMessage).getOrElse("") + Option(e.getCause).fold("")(" - " + _.getMessage), s"Leavu 3 failed", JOptionPane.ERROR_MESSAGE)
       logger.error(e, s"Leavu 3 failed")
       System.exit(1)
   }

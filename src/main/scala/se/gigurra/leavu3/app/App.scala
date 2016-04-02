@@ -23,7 +23,7 @@ case class App(appCfg: Configuration, onCreate: () => Unit) extends ApplicationA
         throw e
     }
   logger.info(s"Creating instrument: $instrumentClass")
-  lazy val instrument = instrumentClass.getConstructor(classOf[Configuration]).newInstance(appCfg)
+  val instrument = instrumentClass.getConstructor(classOf[Configuration]).newInstance(appCfg)
 
   override def render(): Unit = {
     while(!Keyboard.inputQue.isEmpty)

@@ -19,15 +19,14 @@ object RenderContext
   def x11Scale = if (pixelWidth > pixelHeight) pixelWidth / pixelHeight else 1.0f
   def y11Scale = if (pixelWidth > pixelHeight) 1.0f else pixelHeight / pixelWidth
 
-  val shapeRenderer = new ShapeRenderer()
-  val camera = new OrthographicCamera(1.0f, 1.0f)
-  val batch = new SpriteBatch
-  val font = Font.fromTtfFile("fonts/pt-mono/PTM55FT.ttf", size = 40)
-  val transform = new Matrix4Stack(32, { t =>
+  lazy val shapeRenderer = new ShapeRenderer()
+  lazy val camera = new OrthographicCamera(1.0f, 1.0f)
+  lazy val batch = new SpriteBatch
+  lazy val font = Font.fromTtfFile("fonts/pt-mono/PTM55FT.ttf", size = 40)
+  lazy val transform = new Matrix4Stack(32, { t =>
     batch.setTransformMatrix(t)
     shapeRenderer.setTransformMatrix(t)
   })
-  font.setColor(RED)
 
   def symbolScale(implicit config: Configuration, _p: Projection[_]) = config.symbolScale * screen2World
 
