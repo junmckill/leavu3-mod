@@ -7,7 +7,7 @@
   "borderless"       : false,
   "noFocusOnClick"   : false,
   "alwaysOnTop"      : false,
-  "forceExit"        : true,
+  "forceExit"        : false,
   "vSyncEnabled"     : true,
   "gameDataFps"      : 40,
   "dcsRemoteAddress" : "127.0.0.1",
