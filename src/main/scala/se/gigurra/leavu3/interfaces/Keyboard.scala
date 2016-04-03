@@ -10,8 +10,6 @@ import se.gigurra.leavu3.util.{DefaultTimer, IdenticalRequestPending}
 import se.gigurra.serviceutils.json.JSON
 import se.gigurra.serviceutils.twitter.logging.Logging
 
-import scala.util.{Failure, Success, Try}
-
 /**
   * Created by kjolh on 3/18/2016.
   */
@@ -21,28 +19,29 @@ object Keyboard extends Logging {
 
   def start(configuration: Configuration, drawable: Drawable): Unit = {
 
-    var oldKeysPressed = Set.empty[Int]
+    if (configuration.keyInputEnabled) {
+      var oldKeysPressed = Set.empty[Int]
 
-    DefaultTimer.fps(configuration.gameDataFps) {
-      DcsRemote.get("keyboard", maxAge = Some(Int.MaxValue))
-        .map(JSON.readMap(_).keys.map(_.toInt).toSet.map((x: Int) => x - configuration.keyBindingOffset))
-        .map { keysPressed =>
-          if (keysPressed != oldKeysPressed) {
-            for (press <- keysPressed -- oldKeysPressed) {
-              val event = KeyPress(press, keysPressed)
-              inputQue.add(event)
+      DefaultTimer.fps(configuration.gameDataFps) {
+        DcsRemote.get("keyboard", maxAge = Some(Int.MaxValue))
+          .map(JSON.readMap(_).keys.map(_.toInt).toSet)
+          .map { keysPressed =>
+            if (keysPressed != oldKeysPressed) {
+              for (press <- keysPressed -- oldKeysPressed) {
+                val event = KeyPress(press, keysPressed)
+                inputQue.add(event)
+              }
+              drawable.draw()
             }
-            drawable.draw()
-          }
-          oldKeysPressed = keysPressed
-      }.onFailure {
-        case e: IdenticalRequestPending => // Ignore ..
-        case e: FailedFastException => // Ignore ..
-        case e => logger.warning(s"Unable to read keyboard state from dcs remote: $e")
+            oldKeysPressed = keysPressed
+          }.onFailure {
+          case e: IdenticalRequestPending => // Ignore ..
+          case e: FailedFastException => // Ignore ..
+          case e => logger.warning(s"Unable to read keyboard state from dcs remote: $e")
+        }
       }
     }
   }
-
 }
 
 object Key {
@@ -100,61 +99,48 @@ object Key {
   val X = 88
   val Y = 89
   val Z = 90
-  val OSB_0 = new Combination(_0, p => p.isControlDown && p.isShiftDown)
-  val OSB_1 = new Combination(_1, p => p.isControlDown && p.isShiftDown)
-  val OSB_2 = new Combination(_2, p => p.isControlDown && p.isShiftDown)
-  val OSB_3 = new Combination(_3, p => p.isControlDown && p.isShiftDown)
-  val OSB_4 = new Combination(_4, p => p.isControlDown && p.isShiftDown)
-  val OSB_5 = new Combination(_5, p => p.isControlDown && p.isShiftDown)
-  val OSB_6 = new Combination(_6, p => p.isControlDown && p.isShiftDown)
-  val OSB_7 = new Combination(_7, p => p.isControlDown && p.isShiftDown)
-  val OSB_8 = new Combination(_8, p => p.isControlDown && p.isShiftDown)
-  val OSB_9 = new Combination(_9, p => p.isControlDown && p.isShiftDown)
-  val OSB_10 = new Combination(_0, p => p.isControlDown && p.isAltDown)
-  val OSB_11 = new Combination(_1, p => p.isControlDown && p.isAltDown)
-  val OSB_12 = new Combination(_2, p => p.isControlDown && p.isAltDown)
-  val OSB_13 = new Combination(_3, p => p.isControlDown && p.isAltDown)
-  val OSB_14 = new Combination(_4, p => p.isControlDown && p.isAltDown)
-  val OSB_15 = new Combination(_5, p => p.isControlDown && p.isAltDown)
-  val OSB_16 = new Combination(_6, p => p.isControlDown && p.isAltDown)
-  val OSB_17 = new Combination(_7, p => p.isControlDown && p.isAltDown)
-  val OSB_18 = new Combination(_8, p => p.isControlDown && p.isAltDown)
-  val OSB_19 = new Combination(_9, p => p.isControlDown && p.isAltDown)
-  val NEXT_QP = new Combination(RIGHT, p => p.isControlDown && p.isShiftDown)
-  val PREV_QP = new Combination(LEFT, p => p.isControlDown && p.isShiftDown)
+  val F1 = 0x70
+  val F2 = 0x71
+  val F3 = 0x72
+  val F4 = 0x73
+  val F5 = 0x74
+  val F6 = 0x75
+  val F7 = 0x76
+  val F8 = 0x77
+  val F9 = 0x78
+  val F10 = 0x79
+  val F11 = 0x7A
+  val F12 = 0x7B
+  val F13 = 0x7C
+  val F14 = 0x7D
+  val F15 = 0x7E
+  val F16 = 0x7F
+  val F17 = 0x80
+  val F18 = 0x81
+  val F19 = 0x82
+  val F20 = 0x83
+  val F21 = 0x84
+  val F22 = 0x85
+  val F23 = 0x86
+  val F24 = 0x87
 
-  object OSB {
-    def unapply(keyPress: KeyPress): Option[Int] = {
-      keyPress match {
-        case OSB_0() => Some(0)
-        case OSB_1() => Some(1)
-        case OSB_2() => Some(2)
-        case OSB_3() => Some(3)
-        case OSB_4() => Some(4)
+  private val typ = scala.reflect.runtime.universe.typeOf[this.type]
+  private val fieldsByName = typ.members
+    .filterNot(_.isMethod)
+    .map(_.asTerm)
+    .map(t => t.name.toString.trim.toUpperCase -> t)
+    .toMap
 
-        case OSB_5() => Some(5)
-        case OSB_6() => Some(6)
-        case OSB_7() => Some(7)
-        case OSB_8() => Some(8)
-        case OSB_9() => Some(9)
+  private val mirror = scala.reflect.runtime.universe.runtimeMirror(getClass.getClassLoader)
 
-        case OSB_10() => Some(10)
-        case OSB_11() => Some(11)
-        case OSB_12() => Some(12)
-        case OSB_13() => Some(13)
-        case OSB_14() => Some(14)
+  def getVkode(name: String): Option[Int] = {
 
-        case OSB_15() => Some(15)
-        case OSB_16() => Some(16)
-        case OSB_17() => Some(17)
-        case OSB_18() => Some(18)
-        case OSB_19() => Some(19)
-        case _ => None
-      }
-    }
+    val termSymbol =
+      fieldsByName
+        .get(name)
+        .orElse(fieldsByName.get("_" + name))
+    termSymbol.map(t => mirror.reflect(this).reflectField(t).get.asInstanceOf[Int])
   }
-
-  val modifiers = Set(LSHIFT, RSHIFT, SHIFT, LCONTROL, RCONTROL, CONTROL, ALT)
 }
 
 case class MouseClick(screenX: Int, screenY: Int, button: Int) {
@@ -191,7 +177,7 @@ case class KeyPress(key: Int, keysDown: Set[Int]) {
   override def toString: String = {
     val char = key.toString.toInt.toChar
     val base: String =
-      if (Key.modifiers.contains(key))
+      if (KeyPress.modifiers.contains(key))
         ""
       else if (char.isLetterOrDigit)
         char.toString
@@ -201,8 +187,18 @@ case class KeyPress(key: Int, keysDown: Set[Int]) {
   }
 }
 
-case class Combination(key: Int, modifierTest: KeyPress => Boolean = _ => true) {
+object KeyPress {
+  import Key._
+  val modifiers = Set(LSHIFT, RSHIFT, SHIFT, LCONTROL, RCONTROL, CONTROL, ALT)
+}
+
+case class Combination(key: Int, modifierTest: Combination.ModifierTest = _ => true) {
   def unapply(keyPress: KeyPress): Boolean = {
     modifierTest(keyPress) && keyPress.key == key
   }
+}
+
+object Combination {
+  val UNBOUND = Combination(0, _ => false)
+  type ModifierTest = KeyPress => Boolean
 }

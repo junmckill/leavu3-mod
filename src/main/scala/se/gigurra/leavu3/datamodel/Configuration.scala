@@ -5,6 +5,7 @@ import javax.swing.JOptionPane
 
 import se.gigurra.heisenberg.MapData._
 import se.gigurra.heisenberg.{Parsed, Schema}
+import se.gigurra.leavu3.mfd.DefaultMfdKeyBindings
 import se.gigurra.serviceutils.json.JSON
 import se.gigurra.serviceutils.twitter.logging.Logging
 
@@ -28,7 +29,6 @@ case class Configuration(source: SourceData = Map.empty) extends Parsed[Configur
   val borderless        = parse(schema.borderless)
   val noFocusOnClick    = parse(schema.noFocusOnClick)
   val alwaysOnTop       = parse(schema.alwaysOnTop)
-  val keyBindingOffset  = parse(schema.keyBindingOffset)
   val rwrSeparateSrTr   = parse(schema.rwrSeparateSrTr)
   val initialUnits      = parse(schema.units)
   val initialQp         = parse(schema.initialQp)
@@ -39,6 +39,11 @@ case class Configuration(source: SourceData = Map.empty) extends Parsed[Configur
   val hsdHeading        = parse(schema.hsdHeading)
   val osbs              = parse(schema.osbs)
   val dclt              = parse(schema.dclt)
+  val keyInputEnabled   = parse(schema.keyInputEnabled)
+  val keyBindings       = parse(schema.keyBindings)
+
+  if (parse(schema.keyBindingOffset) != 0)
+    JOptionPane.showMessageDialog(null, "The 'keyBindingOffset' option no longer exists \n ->Specify actual key bindings instead in the config file!")
 
   if (!parse(schema.relayDlink))
     JOptionPane.showMessageDialog(null, "The 'relayDlink' option no longer exists (it has been automated)\n Please remove it from your config file")
@@ -84,6 +89,8 @@ object Configuration extends Schema[Configuration] with Logging {
   val osbs              = required[Boolean]     ("osbs",              default = true)
   val dclt              = required[Boolean]     ("dclt",              default = false)
   val slaveMode         = required[Boolean]     ("slave-mode",        default = false)
+  val keyInputEnabled   = required[Boolean]     ("keyInputEnabled",   default = true)
+  val keyBindings       = required[Map[String, String]] ("keyBindings", default = DefaultMfdKeyBindings())
 
   def readFromFile(s: String = "leavu3-cfg.json"): Configuration = {
     logger.info(s"Loading configuration file: $s")

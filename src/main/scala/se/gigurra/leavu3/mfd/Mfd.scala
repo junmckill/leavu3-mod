@@ -8,7 +8,7 @@ import se.gigurra.leavu3.gfx.ScreenProjection
 
 import scala.language.postfixOps
 import se.gigurra.leavu3.gfx.RenderContext._
-import se.gigurra.leavu3.interfaces.{Key, KeyPress, MouseClick}
+import se.gigurra.leavu3.interfaces.{KeyPress, MouseClick}
 import se.gigurra.leavu3.lmath.Box
 
 case class Mfd(implicit config: Configuration)
@@ -28,6 +28,9 @@ case class Mfd(implicit config: Configuration)
   var qPages = config.qps.zipWithIndex.map(p => (p._2, pageByName(p._1))).toMap
   var iQPage = config.initialQp
   var mainMenuOpen: Boolean = false
+  val keyBindings = MfdKeyBindings(config.keyBindings)
+  var isDcltOn = config.dclt
+  var shouldDrawOsbs = config.osbs
 
   def pageByName(name: String): Page = {
     available.find(_.name == name.toUpperCase).getOrElse(throw new RuntimeException(s"No Mfd Page found for name: $name"))
@@ -81,12 +84,9 @@ case class Mfd(implicit config: Configuration)
 
   def keyPressed(press: KeyPress): Unit = {
     press match {
-      case Key.NEXT_QP() => changeQpByOffset(1)
-      case Key.PREV_QP() => changeQpByOffset(-1)
-      case Key.OSB(i) => pressOsb(i)
-      case Key.OSB_15() => shouldDrawOsbs = !shouldDrawOsbs
-      case Key.OSB_9() => isDcltOn = !isDcltOn
-      case Key.OSB(i) => pressOsb(i)
+      case keyBindings.NEXT_QP() => changeQpByOffset(1)
+      case keyBindings.PREV_QP() => changeQpByOffset(-1)
+      case keyBindings.OSB(i) => pressOsb(i)
       case _ =>
     }
   }
@@ -182,10 +182,6 @@ case class Mfd(implicit config: Configuration)
     }
 
   }
-
-  var isDcltOn: Boolean = config.dclt
-
-  var shouldDrawOsbs: Boolean = config.osbs
 
 }
 
