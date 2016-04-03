@@ -30,8 +30,8 @@ object WindowTweaks extends Logging with JavaReflectImplicits {
     Rect(
       display.reflectGetter("getX").asInstanceOf[Int],
       display.reflectGetter("getY").asInstanceOf[Int],
-      display.reflectGetter("getWidth").asInstanceOf[Int],
-      display.reflectGetter("getHeight").asInstanceOf[Int]
+      display.reflectGetter("getWidth").asInstanceOf[Int] + extraWidth,
+      display.reflectGetter("getHeight").asInstanceOf[Int] + extraHeight
     )
   }
 
@@ -75,8 +75,8 @@ object WindowTweaks extends Logging with JavaReflectImplicits {
         (if (on) HWND_TOPMOST else HWND_BOTTOM): java.lang.Long,
         oldWindowPos.x: java.lang.Integer,
         oldWindowPos.y: java.lang.Integer,
-        extraWidth + oldWindowPos.width: java.lang.Integer,
-        extraHeight + oldWindowPos.height: java.lang.Integer,
+        oldWindowPos.width: java.lang.Integer,
+        oldWindowPos.height: java.lang.Integer,
         SWP_FRAMECHANGED: java.lang.Long
       )
 
