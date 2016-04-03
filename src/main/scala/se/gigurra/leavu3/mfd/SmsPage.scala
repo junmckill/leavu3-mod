@@ -12,7 +12,7 @@ import scala.collection.JavaConversions._
 /**
   * Created by kjolh on 3/12/2016.
   */
-case class SmsPage(implicit config: Configuration, mfd: MfdIfc) extends Page("SMS") {
+case class SmsPage(implicit config: Configuration, mfd: MfdIfc) extends Page("SMS", Page.Priorities.SMS) {
 
   implicit val p = screenProjection
   val yTitle = 0.85

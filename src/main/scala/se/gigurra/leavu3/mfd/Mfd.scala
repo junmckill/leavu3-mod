@@ -127,6 +127,10 @@ case class Mfd(implicit config: Configuration)
     }
   }
 
+  def priority: Int = {
+    currentPage.fold(0)(_.priority)
+  }
+
   def pressOsbInMenu(i: Int): Unit = {
     mainMenuOpen = false
   }

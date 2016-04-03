@@ -9,11 +9,8 @@ object DefaultTimer {
 
   val underlying = new JavaTimer(isDaemon = true)
 
-  def seconds(interval: Int)(op: => Unit): Unit = {
-    underlying.schedule(Time.now, Duration.fromSeconds(interval))(op)
-  }
-
   def fps(fps: Int)(op: => Unit): Unit = {
+    require(fps > 0, "Must run with at least 1 fps!")
     underlying.schedule(Duration.fromMilliseconds(1000 / fps))(op)
   }
 }

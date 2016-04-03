@@ -1,7 +1,5 @@
 package se.gigurra.leavu3.interfaces
 
-import java.util.UUID
-
 import com.twitter.finagle.FailedFastException
 import com.twitter.util.Future
 import se.gigurra.heisenberg.MapDataParser
@@ -23,14 +21,11 @@ object Dlink extends Logging {
   @volatile var dlinkClient: Option[RestClient] = None
   @volatile var recvOk = false
 
-  val myId = UUID.randomUUID().toString
-
   def connected: Boolean = dlinkClient.isDefined && recvOk
 
   def start(appCfg: Configuration): Unit = {
     In.start()
-    if (appCfg.relayDlink)
-      Out.start()
+    Out.start()
   }
 
   object CfgUpdate {
@@ -114,7 +109,7 @@ object Dlink extends Logging {
 
   object Out extends Logging {
 
-    def marks: Map[String, Stored[Mark]] = DcsRemote.loadStatic[Mark]("marks")
+    def marks: Map[String, Stored[Mark]] = DcsRemote.loadStatic[Mark]("marks", maxAge = Some(Int.MaxValue))
     def hasMark(id: String): Boolean = marks.contains(id)
     def addMark(id: String, mark: Mark): Unit = DcsRemote.store("marks", id)(mark)
     def deleteMark(id: String): Unit = DcsRemote.delete("marks", id)
@@ -123,10 +118,8 @@ object Dlink extends Logging {
 
       DefaultTimer.fps(2) {
 
-        CfgUpdate.handleDlinkConfig(DcsRemote.remoteConfig.dlinkSettings)
-
         val source = GameIn.snapshot
-        if (source.err.isEmpty && source.age < 3.0) {
+        if (DcsRemote.isActingMaster && source.err.isEmpty && source.age < 3.0) {
 
           dlinkClient.foreach {
             _.put(s"${config.team}/${config.callsign}") {

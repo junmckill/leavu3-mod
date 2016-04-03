@@ -21,7 +21,6 @@ object GameIn extends Logging {
 
   @volatile var snapshot = GameData()
   @volatile var dcsRemoteConnected = true
-  // App doesnt even start otherwise!
   @volatile var dcsGameConnected = false
 
   def start(appCfg: Configuration, drawable: Drawable): Unit = {
@@ -32,11 +31,10 @@ object GameIn extends Logging {
   object Updater {
     def start(appCfg: Configuration, drawable: Drawable): Unit = {
       val fps = appCfg.gameDataFps
-      val maxAge = (1000.0 / fps.toDouble / 2.0).toLong
 
       DefaultTimer.fps(fps) {
         DcsRemote
-          .get(path, Some(if (appCfg.slaveMode) Int.MaxValue else maxAge))
+          .get(path, Some(if (DcsRemote.isActingMaster) 0L else 1000L)) // Master will always invalidate cache!
           .map(JSON.read[GameDataWire])
           .map(_.toGameData)
           .map(postProcess)
@@ -149,8 +147,8 @@ object GameIn extends Logging {
 
     def start(appCfg: Configuration): Unit = {
 
-      DefaultTimer.seconds(1) {
-        if (dcsGameConnected && !snapshot.isValid) {
+      DefaultTimer.fps(1) {
+        if (DcsRemote.isActingMaster && dcsGameConnected && !snapshot.isValid) {
           DcsRemote.get(GameIn.path).map(JSON.read[GameDataWire]).flatMap {
             case data if data.err.isDefined =>
               logger.info(s"Injecting data export script .. -> ${GameIn.path}")

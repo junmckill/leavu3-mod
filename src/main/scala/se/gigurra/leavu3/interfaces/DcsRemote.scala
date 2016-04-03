@@ -7,7 +7,7 @@ import com.twitter.util.{Await, Future}
 import se.gigurra.heisenberg.MapData.SourceData
 import se.gigurra.heisenberg._
 import se.gigurra.leavu3.datamodel.DlinkData._
-import se.gigurra.leavu3.datamodel.{Configuration, DcsRemoteRemoteConfig}
+import se.gigurra.leavu3.datamodel.{Configuration, DcsRemoteRemoteConfig, Leavu3Instance}
 import se.gigurra.leavu3.util.{DefaultTimer, IdenticalRequestPending, RestClient}
 import se.gigurra.serviceutils.json.JSON
 import se.gigurra.serviceutils.twitter.logging.Logging
@@ -18,14 +18,14 @@ import scala.util.control.NonFatal
 case class DcsRemote private(config: Configuration) extends Logging {
   import DcsRemote._
 
-  val myId = UUID.randomUUID().toString
-  val client = RestClient(config.dcsRemoteAddress, config.dcsRemotePort, "Dcs Remote")
-  val cache = new scala.collection.concurrent.TrieMap[String, Map[String, Stored[_]]]
+  private val ownInstanceId = UUID.randomUUID().toString
+  private val client = RestClient(config.dcsRemoteAddress, config.dcsRemotePort, "Dcs Remote")
+  private val cache = new scala.collection.concurrent.TrieMap[String, Map[String, Stored[_]]]
   @volatile var remoteConfig = initialDownloadConfig()
+  @volatile var ownPriority: Int = 0
 
-
-  DefaultTimer.seconds(3) {
-    downloadConfig()
+  DefaultTimer.fps(1) {
+    downloadUpdatedConfig()
       .onSuccess { staticData =>
         remoteConfig = staticData
       }
@@ -33,6 +33,15 @@ case class DcsRemote private(config: Configuration) extends Logging {
         case e: IdenticalRequestPending =>
         case e: FailedFastException =>
         case e => logger.warning(s"Unable to download configuration from Dcs Remote: $e")
+      }
+  }
+
+  DefaultTimer.fps(config.gameDataFps / 2) {
+    registerLeavu3Instance()
+      .onFailure {
+        case e: IdenticalRequestPending =>
+        case e: FailedFastException =>
+        case e => logger.warning(s"Unable to register Leavu3 instance on Dcs Remote: $e")
       }
   }
 
@@ -48,9 +57,9 @@ case class DcsRemote private(config: Configuration) extends Logging {
     * Load will always be empty on the first attempt,
     * since it triggers the actual download from the Dcs Remote
     */
-  def loadStatic[T: MapParser](category: String): Map[String, Stored[T]] = {
+  def loadStatic[T: MapParser](category: String, maxAge: Option[Long]): Map[String, Stored[T]] = {
 
-    client.get(category, maxAge = Some(Int.MaxValue)).map { data =>
+    client.get(category, maxAge = maxAge).map { data =>
 
       val rawData = JSON.readMap(data).asInstanceOf[Map[String, SourceData]].map {
         case (k, v) => k ->
@@ -73,15 +82,36 @@ case class DcsRemote private(config: Configuration) extends Logging {
   }
 
   private def initialDownloadConfig(): DcsRemoteRemoteConfig = {
-    try Await.result(downloadConfig()) catch {
+    try Await.result(downloadUpdatedConfig()) catch {
       case NonFatal(e) => throw new RuntimeException(s"Failed to communicate with dcs remote!", e)
     }
   }
 
-  private def downloadConfig(): Future[DcsRemoteRemoteConfig] = {
+  private def downloadUpdatedConfig(): Future[DcsRemoteRemoteConfig] = {
     client.get(s"static-data").map(JSON.read[DcsRemoteRemoteConfig])
   }
 
+  private def registerLeavu3Instance(): Future[Unit] = {
+    store("leavu3-instances", ownInstanceId)(Leavu3Instance(ownInstanceId, ownPriority, isActingMaster))
+  }
+
+  def isActingMaster: Boolean = {
+
+    val instanceLkup = loadStatic[Leavu3Instance]("leavu3-instances", maxAge = Some(1000L))
+
+    instanceLkup.get(ownInstanceId) match {
+      case None => true
+      case Some(myInstance) =>
+        val instances: Seq[Leavu3Instance] = instanceLkup.values.map(_.item).toSeq.sortBy(_.id)
+        val highestPriority = instances.map(_.priority).max
+        val instancesWithHighestPrio = instances.filter(_.priority == highestPriority)
+        if (instancesWithHighestPrio.size == 1) {
+          instancesWithHighestPrio.head.id == ownInstanceId
+        } else {
+          instances.head.id == ownInstanceId
+        }
+    }
+  }
 }
 
 /**

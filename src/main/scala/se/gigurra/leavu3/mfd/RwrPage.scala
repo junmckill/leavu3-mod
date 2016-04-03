@@ -13,7 +13,7 @@ import scala.language.postfixOps
 /**
   * Created by kjolh on 3/12/2016.
   */
-case class RwrPage(implicit config: Configuration, mfd: MfdIfc) extends Page("RWR") {
+case class RwrPage(implicit config: Configuration, mfd: MfdIfc) extends Page("RWR", Page.Priorities.RWR) {
 
   val blinkSpeed = 1.0 / 3.0
   var a2aFilter = CircleBuffer[LockLevel](LockLevel.Search, LockLevel.Lock, LockLevel.Launch)

@@ -29,6 +29,7 @@ case class App(appCfg: Configuration, onCreate: () => Unit) extends ApplicationA
     while(!Keyboard.inputQue.isEmpty)
       instrument.keyPressed(Keyboard.inputQue.poll)
     instrument.update(GameIn.snapshot, Dlink.In.ownTeam.toSeq.sortBy(_._1))
+    DcsRemote.ownPriority = instrument.priority
   }
 
   override def create(): Unit = {

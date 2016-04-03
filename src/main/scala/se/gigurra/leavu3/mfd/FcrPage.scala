@@ -12,7 +12,7 @@ import scala.collection.mutable
 /**
   * Created by kjolh on 3/12/2016.
   */
-case class FcrPage(implicit config: Configuration, mfd: MfdIfc) extends Page("FCR") {
+case class FcrPage(implicit config: Configuration, mfd: MfdIfc) extends Page("FCR", Page.Priorities.FCR) {
 
   def screenDistMeters: Double = GameIn.snapshot.sensors.status.scale.distance
 

@@ -1,6 +1,7 @@
 package se.gigurra.leavu3.datamodel
 
 import java.io.FileNotFoundException
+import javax.swing.JOptionPane
 
 import se.gigurra.heisenberg.MapData._
 import se.gigurra.heisenberg.{Parsed, Schema}
@@ -38,8 +39,12 @@ case class Configuration(source: SourceData = Map.empty) extends Parsed[Configur
   val hsdHeading        = parse(schema.hsdHeading)
   val osbs              = parse(schema.osbs)
   val dclt              = parse(schema.dclt)
-  val slaveMode         = parse(schema.slaveMode)
-  val relayDlink        = parse(schema.relayDlink) && !slaveMode
+
+  if (!parse(schema.relayDlink))
+    JOptionPane.showMessageDialog(null, "The 'relayDlink' option no longer exists (it has been automated)\n Please remove it from your config file")
+
+  if (parse(schema.slaveMode))
+    JOptionPane.showMessageDialog(null, "The 'slaveMode' option no longer exists (it has been automated) \n Please remove it from your config file")
 
   require(title.length > 0, "Configured title must be > 0")
   require(width > 0, "Configured width must be > 0")

@@ -12,7 +12,7 @@ import scala.language.postfixOps
 /**
   * Created by kjolh on 3/12/2016.
   */
-case class HsdPage(implicit config: Configuration, mfd: MfdIfc) extends Page("HSD") {
+case class HsdPage(implicit config: Configuration, mfd: MfdIfc) extends Page("HSD", Page.Priorities.HSD) {
 
   var shouldDrawDetailedHsi = config.hsdHsi
   var shouldDrawOwnHeading = config.hsdHeading

@@ -15,7 +15,7 @@ import scala.language.postfixOps
 /**
   * Created by kjolh on 3/12/2016.
   */
-case class InfoPage(implicit config: Configuration, mfd: MfdIfc) extends Page("INF") {
+case class InfoPage(implicit config: Configuration, mfd: MfdIfc) extends Page("INF", Page.Priorities.INF) {
 
   implicit val projection = screenProjection
   val OSB_UPDATE_COVER = 2
@@ -96,13 +96,13 @@ case class InfoPage(implicit config: Configuration, mfd: MfdIfc) extends Page("I
         drawTextLine("        DCS Game", if (GameIn.dcsGameConnected) "connected" else "disconnected", if (GameIn.dcsGameConnected) GREEN else RED)
         drawTextLine("           DLink", if (Dlink.connected) "connected" else "disconnected", if (Dlink.connected) GREEN else RED)
         drawTextLine("        Draw fps", Gdx.graphics.getFramesPerSecond, LIGHT_GRAY)
+        drawTextLine("   Acting Master", DcsRemote.isActingMaster, LIGHT_GRAY)
         drawTextLine("                ", "", LIGHT_GRAY)
         drawTextLine("----SETTINGS----", "--------------------------------", LIGHT_GRAY)
         drawTextLine("      DCS Remote", s"${config.dcsRemoteAddress}:${config.dcsRemotePort}", LIGHT_GRAY)
         drawTextLine("    DLink server", s"${Dlink.config.host}:${Dlink.config.port}", LIGHT_GRAY)
         drawTextLine("      DLink team", Dlink.config.team, LIGHT_GRAY)
         drawTextLine("  DLink callsign", Dlink.config.callsign, LIGHT_GRAY)
-        drawTextLine("      DLink mode", if (config.relayDlink) "receive + transmit" else "receive", LIGHT_GRAY)
         drawTextLine("     gameDataFps", config.gameDataFps, LIGHT_GRAY)
         drawTextLine("     symbolScale", config.symbolScale, LIGHT_GRAY)
         drawTextLine("                ", "", LIGHT_GRAY)

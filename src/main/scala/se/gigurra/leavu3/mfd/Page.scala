@@ -11,7 +11,7 @@ import se.gigurra.serviceutils.twitter.logging.Logging
 
 import scala.language.postfixOps
 
-abstract class Page(val name: String)(implicit config: Configuration, mfd: MfdIfc) extends Logging {
+abstract class Page(val name: String, val priority: Int)(implicit config: Configuration, mfd: MfdIfc) extends Logging {
 
   val stdTextSize = 0.75f
   val ppiProjection = new PpiProjection
@@ -19,7 +19,7 @@ abstract class Page(val name: String)(implicit config: Configuration, mfd: MfdIf
   private val displayUnits = DisplayUnits.displayUnits.setBy(_.name == config.initialUnits)
   val shortName = this.getClass.getSimpleName.toLowerCase.subSequence(0, 3)
 
-  logger.info(s"Created $shortName mfd page")
+  logger.info(s"Created $shortName (priority=$priority) mfd page")
 
   def distScale: CircleBuffer[Double] = displayUnits.distScale
 
@@ -492,5 +492,16 @@ abstract class Page(val name: String)(implicit config: Configuration, mfd: MfdIf
 
     }
 
+  }
+}
+
+object Page {
+  object Priorities {
+    val BNK = 0
+    val INF = 1
+    val SMS = 2
+    val RWR = 3
+    val HSD = 4
+    val FCR = 5
   }
 }

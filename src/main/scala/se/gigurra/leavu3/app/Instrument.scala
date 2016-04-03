@@ -10,4 +10,5 @@ abstract class Instrument(configuration: Configuration) {
   def update(game: GameData, dlink: Seq[(String, DlinkData)]): Unit
   def keyPressed(press: KeyPress): Unit
   def mouseClicked(click: MouseClick): Unit
+  def priority: Int // For determining which leavu3 instance should be acting master
 }
