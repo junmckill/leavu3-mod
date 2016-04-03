@@ -123,6 +123,7 @@ object DcsRemote {
   private var instance: DcsRemote = null
 
   def init(appCfg: Configuration): Unit = {
+    require(instance == null, "Cannot call DcsRemote.init twice!")
     instance = DcsRemote(appCfg)
   }
 
