@@ -1,12 +1,13 @@
 package se.gigurra.leavu3.windowstweaks
 
 import se.gigurra.leavu3.datamodel.Configuration
+import se.gigurra.leavu3.util.JavaReflectImplicits
 import se.gigurra.serviceutils.twitter.logging.Logging
 
 /**
   * Created by kjolh on 3/17/2016.
   */
-object WindowTweaks extends Logging {
+object WindowTweaks extends Logging with JavaReflectImplicits {
 
   val displayClass = Class.forName("org.lwjgl.opengl.Display")
   val windowsClass = Class.forName("org.lwjgl.opengl.WindowsDisplay")
@@ -21,33 +22,6 @@ object WindowTweaks extends Logging {
 
     if (configuration.alwaysOnTop)
       setAlwaysOnTop()
-  }
-
-  implicit class RichClass(cls: Class[_]) {
-
-    def reflectField(name: String, o: Object = null): Object = {
-      val field = cls.getDeclaredField(name)
-      field.setAccessible(true)
-      field.get(o)
-    }
-
-    def reflectGetter(name: String, o: Object = null): Object = {
-      val method = cls.getDeclaredMethod(name)
-      method.setAccessible(true)
-      method.invoke(o)
-    }
-
-  }
-
-  implicit class RichObjecy(o: Object) {
-    def reflectField(name: String):Object = {
-      o.getClass.reflectField(name, o)
-    }
-
-    def reflectGetter(name: String): Object = {
-      o.getClass.reflectGetter(name, o)
-    }
-
   }
 
   def getWindowPosition: Rect = {
@@ -66,16 +40,10 @@ object WindowTweaks extends Logging {
       val GWL_EXSTYLE = -20
       val WS_EX_NOACTIVATE = 0x08000000L
 
-      val getWindowLongMethod = display.getClass.getDeclaredMethods.find(_.getName == "getWindowLongPtr").get
-      val setWindowLongMethod = display.getClass.getDeclaredMethods.find(_.getName == "setWindowLongPtr").get
-
-      getWindowLongMethod.setAccessible(true)
-      setWindowLongMethod.setAccessible(true)
-
       val hwnd = display.reflectField("hwnd").asInstanceOf[Long]
 
-      def setWindowLong(index: Int, value: Long): Unit = setWindowLongMethod.invoke(display, hwnd: java.lang.Long, index : java.lang.Integer, value : java.lang.Long)
-      def getWindowLong(index: Int): Long = getWindowLongMethod.invoke(display, hwnd: java.lang.Long, index: java.lang.Integer).asInstanceOf[Long]
+      def setWindowLong(index: Int, value: Long): Unit = display.reflectInvoke("setWindowLongPtr", hwnd: java.lang.Long, index : java.lang.Integer, value : java.lang.Long) //setWindowLongMethod.invoke(display, hwnd: java.lang.Long, index : java.lang.Integer, value : java.lang.Long)
+      def getWindowLong(index: Int): Long = display.reflectInvoke("getWindowLongPtr", hwnd: java.lang.Long, index: java.lang.Integer).asInstanceOf[Long]
 
       val prevStyle = getWindowLong(GWL_EXSTYLE)
       val withStyle = prevStyle | WS_EX_NOACTIVATE
@@ -99,10 +67,8 @@ object WindowTweaks extends Logging {
       val hwnd = display.reflectField("hwnd").asInstanceOf[Long]
       val windowPos = getWindowPosition
 
-      val setWindowPosMethod = display.getClass.getDeclaredMethods.find(_.getName == "setWindowPos").get
-      setWindowPosMethod.setAccessible(true)
-      setWindowPosMethod.invoke(
-        display,
+      display.reflectInvoke(
+        "setWindowPos",
         hwnd: java.lang.Long,
         (if (on) HWND_TOPMOST else HWND_BOTTOM): java.lang.Long,
         windowPos.x: java.lang.Integer,
