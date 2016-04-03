@@ -82,11 +82,21 @@ case class Mfd(implicit config: Configuration)
     }
   }
 
+  def placeOnTop(): Unit = {
+    println("placeOnTop")
+  }
+
+  def placeBelow(): Unit = {
+    println("placeBelow")
+  }
+
   def keyPressed(press: KeyPress): Unit = {
     press match {
       case keyBindings.NEXT_QP() => changeQpByOffset(1)
       case keyBindings.PREV_QP() => changeQpByOffset(-1)
       case keyBindings.OSB(i) => pressOsb(i)
+      case keyBindings.PLACE_ON_TOP() => placeOnTop()
+      case keyBindings.PLACE_BELOW() => placeBelow()
       case _ =>
     }
   }

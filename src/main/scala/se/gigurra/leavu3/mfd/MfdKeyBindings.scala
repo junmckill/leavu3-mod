@@ -34,7 +34,9 @@ object DefaultMfdKeyBindings {
     "OSB_18" -> "CONTROL ALT 8",
     "OSB_19" -> "CONTROL ALT 9",
     "NEXT_QP" -> "CONTROL SHIFT RIGHT",
-    "PREV_QP" -> "CONTROL SHIFT LEFT"
+    "PREV_QP" -> "CONTROL SHIFT LEFT",
+    "PLACE_ON_TOP" -> "CONTROL SHIFT HOME",
+    "PLACE_BELOW" -> "CONTROL SHIFT END"
   )
 }
 
@@ -62,6 +64,8 @@ trait MfdKeyBindings {
   val OSB_19: Combination
   val NEXT_QP: Combination
   val PREV_QP: Combination
+  val PLACE_ON_TOP: Combination
+  val PLACE_BELOW: Combination
 
   object OSB {
     def unapply(keyPress: KeyPress): Option[Int] = {
@@ -154,6 +158,8 @@ object MfdKeyBindings {
       val OSB_19 = bindMappingFor("OSB_19")
       val NEXT_QP = bindMappingFor("NEXT_QP")
       val PREV_QP = bindMappingFor("PREV_QP")
+      val PLACE_ON_TOP = bindMappingFor("PLACE_ON_TOP")
+      val PLACE_BELOW = bindMappingFor("PLACE_BELOW")
     }
 
     val unhandledBtnNames = map.keys.toSet -- handledBtnNames.toSet
