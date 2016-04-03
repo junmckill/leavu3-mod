@@ -10,8 +10,8 @@ import se.gigurra.serviceutils.twitter.logging.Logging
 object WindowTweaks extends Logging with JavaReflectImplicits {
 
   val displayClass = Class.forName("org.lwjgl.opengl.Display")
-  val windowsClass = Class.forName("org.lwjgl.opengl.WindowsDisplay")
   val display = displayClass.reflectField("display_impl")
+
   var extraWidth: Int = 16 // Default on windows
   var extraHeight: Int = 39 // Default on windows
 
@@ -26,6 +26,10 @@ object WindowTweaks extends Logging with JavaReflectImplicits {
       setAlwaysOnTop()
   }
 
+  def isPlatformWindows: Boolean = {
+    display.getClass.getName == "org.lwjgl.opengl.WindowsDisplay"
+  }
+
   def getWindowPosition: Rect = {
     Rect(
       display.reflectGetter("getX").asInstanceOf[Int],
@@ -37,7 +41,7 @@ object WindowTweaks extends Logging with JavaReflectImplicits {
 
   def setNeverCaptureFocus(on: Boolean = true): Unit = {
 
-    if (windowsClass.isAssignableFrom(display.getClass)) {
+    if (isPlatformWindows) {
 
       val GWL_EXSTYLE = -20
       val WS_EX_NOACTIVATE = 0x08000000L
@@ -60,7 +64,7 @@ object WindowTweaks extends Logging with JavaReflectImplicits {
 
   def setAlwaysOnTop(on: Boolean = true): Unit = {
 
-    if (windowsClass.isAssignableFrom(display.getClass)) {
+    if (isPlatformWindows) {
 
       val SWP_FRAMECHANGED = 0x0020L
       val HWND_TOPMOST = -1L
