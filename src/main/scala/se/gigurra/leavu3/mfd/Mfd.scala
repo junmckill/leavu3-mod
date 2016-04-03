@@ -10,6 +10,7 @@ import scala.language.postfixOps
 import se.gigurra.leavu3.gfx.RenderContext._
 import se.gigurra.leavu3.interfaces.{KeyPress, MouseClick}
 import se.gigurra.leavu3.lmath.Box
+import se.gigurra.leavu3.windowstweaks.WindowTweaks
 
 case class Mfd(implicit config: Configuration)
   extends Instrument(config)
@@ -83,11 +84,11 @@ case class Mfd(implicit config: Configuration)
   }
 
   def placeOnTop(): Unit = {
-    println("placeOnTop")
+    WindowTweaks.setAlwaysOnTop(true)
   }
 
   def placeBelow(): Unit = {
-    println("placeBelow")
+    WindowTweaks.setAlwaysOnTop(false)
   }
 
   def keyPressed(press: KeyPress): Unit = {

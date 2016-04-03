@@ -12,6 +12,8 @@ object WindowTweaks extends Logging with JavaReflectImplicits {
   val displayClass = Class.forName("org.lwjgl.opengl.Display")
   val windowsClass = Class.forName("org.lwjgl.opengl.WindowsDisplay")
   val display = displayClass.reflectField("display_impl")
+  var extraWidth: Int = 16 // Default on windows
+  var extraHeight: Int = 39 // Default on windows
 
   case class Rect(x: Int, y: Int, width: Int, height: Int)
 
@@ -65,18 +67,28 @@ object WindowTweaks extends Logging with JavaReflectImplicits {
       val HWND_BOTTOM = 1L
 
       val hwnd = display.reflectField("hwnd").asInstanceOf[Long]
-      val windowPos = getWindowPosition
+      val oldWindowPos = getWindowPosition
 
-      display.reflectInvoke(
+      def invoke() = display.reflectInvoke(
         "setWindowPos",
         hwnd: java.lang.Long,
         (if (on) HWND_TOPMOST else HWND_BOTTOM): java.lang.Long,
-        windowPos.x: java.lang.Integer,
-        windowPos.y: java.lang.Integer,
-        windowPos.width: java.lang.Integer,
-        windowPos.height: java.lang.Integer,
+        oldWindowPos.x: java.lang.Integer,
+        oldWindowPos.y: java.lang.Integer,
+        extraWidth + oldWindowPos.width: java.lang.Integer,
+        extraHeight + oldWindowPos.height: java.lang.Integer,
         SWP_FRAMECHANGED: java.lang.Long
       )
+
+      invoke()
+
+      // Ensure that the window actually gets the desired size, otherwise, adjust
+      val newWindowPos = getWindowPosition
+      if (newWindowPos != oldWindowPos) {
+        extraWidth = oldWindowPos.width - newWindowPos.width
+        extraHeight = oldWindowPos.height - newWindowPos.height
+        invoke()
+      }
 
     } else {
       logger.warning(s"Setting configuration.alwaysOnTop unavailable on this operating system!")
