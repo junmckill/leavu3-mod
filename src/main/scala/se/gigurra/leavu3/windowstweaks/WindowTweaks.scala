@@ -19,6 +19,11 @@ object WindowTweaks extends Logging with JavaReflectImplicits {
 
   def apply(configuration: Configuration): Unit = {
 
+    if (configuration.borderless) {
+      extraWidth = 0
+      extraHeight = 0
+    }
+
     if (configuration.noFocusOnClick)
       setNeverCaptureFocus()
 
@@ -89,8 +94,8 @@ object WindowTweaks extends Logging with JavaReflectImplicits {
       // Ensure that the window actually gets the desired size, otherwise, adjust
       val newWindowPos = getWindowPosition
       if (newWindowPos != oldWindowPos) {
-        extraWidth = oldWindowPos.width - newWindowPos.width
-        extraHeight = oldWindowPos.height - newWindowPos.height
+        extraWidth += oldWindowPos.width - newWindowPos.width
+        extraHeight += oldWindowPos.height - newWindowPos.height
         invoke()
       }
 
