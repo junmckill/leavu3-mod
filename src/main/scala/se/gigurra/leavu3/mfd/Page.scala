@@ -468,7 +468,7 @@ abstract class Page(val name: String, val priority: Int)(implicit config: Config
 
     for ((name, member) <- dlinksOfInterest) {
 
-      val lag = CurTime.seconds - member.timestamp
+      val lag = self.modelTime - member.modelTime
       val memberPosition = member.position + member.velocity * lag
 
       drawContact(memberPosition, Some(member.heading), CYAN, centerText = name.take(2))

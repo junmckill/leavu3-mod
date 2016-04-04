@@ -45,8 +45,12 @@ case class DcsRemote private(config: Configuration) extends Logging {
       }
   }
 
-  def store[T: MapProducer](category: String, id: String)(data: => T): Future[Unit] = {
+  def store[T: MapProducer](category: String, id: String, data: => T): Future[Unit] = {
     client.put(s"$category/$id")(JSON.write(data))
+  }
+
+  def store(category: String, id: String, data: => String): Future[Unit] = {
+    client.put(s"$category/$id")(data)
   }
 
   def delete(category: String, id: String): Future[Unit] = {
@@ -92,7 +96,11 @@ case class DcsRemote private(config: Configuration) extends Logging {
   }
 
   private def registerLeavu3Instance(): Future[Unit] = {
-    store("leavu3-instances", ownInstanceId)(Leavu3Instance(ownInstanceId, ownPriority, isActingMaster))
+    store("leavu3-instances", ownInstanceId, Leavu3Instance(ownInstanceId, ownPriority, isActingMaster))
+  }
+
+  def isActingSlave: Boolean = {
+    !isActingMaster
   }
 
   def isActingMaster: Boolean = {

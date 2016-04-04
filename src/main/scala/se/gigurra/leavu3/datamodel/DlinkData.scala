@@ -11,14 +11,18 @@ import scala.language.implicitConversions
 
 case class DlinkData(source: SourceData = Map.empty) extends SafeParsed[DlinkData.type] {
   val timestamp = parse(schema.timestamp)
-  val age       = parse(schema.age)
   val data      = parse(schema.data)
 }
 
 object DlinkData extends Schema[DlinkData] {
   val timestamp = required[Double]("timestamp", default = CurTime.seconds)
-  val age = required[Double]("age", default = 0.0)
   val data = required[Member]("data", default = Member())
 
   implicit def toMember(d: DlinkData): Member = d.data
+}
+
+case class RawDlinkData(source: SourceData = Map.empty) extends SafeParsed[RawDlinkData.type] {
+}
+
+object RawDlinkData extends Schema[RawDlinkData] {
 }

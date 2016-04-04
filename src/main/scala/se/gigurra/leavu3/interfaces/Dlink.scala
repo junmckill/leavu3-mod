@@ -1,9 +1,8 @@
 package se.gigurra.leavu3.interfaces
 
 import com.twitter.finagle.FailedFastException
-import com.twitter.util.Future
 import se.gigurra.heisenberg.MapDataParser
-import se.gigurra.leavu3.datamodel.{Configuration, DlinkConfiguration, DlinkData, Mark, Member}
+import se.gigurra.leavu3.datamodel.{Configuration, DlinkConfiguration, DlinkData, Mark, Member, RawDlinkData}
 import se.gigurra.leavu3.interfaces.DcsRemote.Stored
 import se.gigurra.leavu3.util.{DefaultTimer, IdenticalRequestPending, RestClient}
 import se.gigurra.serviceutils.json.JSON
@@ -53,21 +52,15 @@ object Dlink extends Logging {
       allTeams = Map.empty
     }
 
-    def start(): Unit = {
-
-      DefaultTimer.fps(1) {
-
-        CfgUpdate.handleDlinkConfig(DcsRemote.remoteConfig.dlinkSettings)
-
-        dlinkClient.foreach(_
-          .get(config.team, maxAge = Some(10000L))
-          .map(JSON.readMap)
-          .map(membersByName)
-          .map { everyoneOnNetwork =>
-          allTeams = everyoneOnNetwork.groupBy(_._2.selfData.coalitionId)
-          ownTeam = allTeams.getOrElse(GameIn.snapshot.selfData.coalitionId, Map.empty)
-          recvOk = true
-        }.onFailure {
+    def doMasterUpdate(): Unit = {
+      dlinkClient.foreach(_
+        .get(config.team, maxAge = Some(10000L))
+        .foreach { rawData =>
+          val mapData = JSON.readMap(rawData)
+          processDlinkMapData(mapData)
+          DcsRemote.store("dlink-in", "all", rawData) // Store for slaves to use
+        }
+        .onFailure {
           case e: IdenticalRequestPending =>
           case e: ServiceException =>
             recvOk = false
@@ -79,8 +72,35 @@ object Dlink extends Logging {
           case e =>
             recvOk = false
             clear()
-            logger.error(e, s"Unexpected error when attempting to receive from dlink")
+            logger.error(e, s"Unexpected error when attempting to receive data link")
         })
+    }
+
+    def processDlinkMapData(mapData: Map[String, Any]): Unit = {
+      val everyoneOnNetwork = membersByName(mapData)
+      allTeams = everyoneOnNetwork.groupBy(_._2.selfData.coalitionId)
+      ownTeam = allTeams.getOrElse(GameIn.snapshot.selfData.coalitionId, Map.empty)
+      recvOk = true
+    }
+
+    def doSlaveUpdate(): Unit = {
+      DcsRemote.loadStatic[RawDlinkData]("dlink-in", maxAge = Some(3000L)).get("all") match {
+        case None => recvOk = false
+        case Some(data) => processDlinkMapData(data.item.source)
+      }
+    }
+
+    def start(): Unit = {
+      DefaultTimer.fps(1) {
+        CfgUpdate.handleDlinkConfig(DcsRemote.remoteConfig.dlinkSettings)
+        if (DcsRemote.isActingMaster) {
+          doMasterUpdate()
+        }
+      }
+      DefaultTimer.fps(10) {
+        if (DcsRemote.isActingSlave) {
+          doSlaveUpdate()
+        }
       }
     }
 
@@ -111,7 +131,7 @@ object Dlink extends Logging {
 
     def marks: Map[String, Stored[Mark]] = DcsRemote.loadStatic[Mark]("marks", maxAge = Some(Int.MaxValue))
     def hasMark(id: String): Boolean = marks.contains(id)
-    def addMark(id: String, mark: Mark): Unit = DcsRemote.store("marks", id)(mark)
+    def addMark(id: String, mark: Mark): Unit = DcsRemote.store("marks", id, mark)
     def deleteMark(id: String): Unit = DcsRemote.delete("marks", id)
 
     def start(): Unit = {
@@ -144,10 +164,6 @@ object Dlink extends Logging {
         }
       }
     }
-  }
-
-  private def downloadDlinkConfig(): Future[DlinkConfiguration] = {
-    DcsRemote.get(s"static-data/dlink-settings").map(JSON.read[DlinkConfiguration])
   }
 
 }
