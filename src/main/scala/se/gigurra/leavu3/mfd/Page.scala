@@ -455,30 +455,34 @@ abstract class Page(val name: String, val priority: Int)(implicit config: Config
 
   protected def drawDlinkMarks[_: Projection](dlinkIn: Seq[(String, DlinkData)]): Unit = {
     for {
-      (name, member) <- dlinkIn
+      (name, member) <- dlinkIn.filter(isInSameMission)
       (id, mark) <- member.marks
     } {
       drawDlinkMark(name, member, id, mark)
     }
   }
 
+  protected def isSelf(m: (String, DlinkData)): Boolean = {
+    m._2.data.planeId != self.planeId && m._1 != self.dlinkCallsign
+  }
+
+  protected def isInSameMission(m: (String, DlinkData)): Boolean = {
+    m._2.isInSameMission
+  }
+
   protected def drawDlinkMembersAndTargets[_: Projection](dlinkIn: Seq[(String, DlinkData)]): Unit = {
 
-    val dlinksOfInterest = dlinkIn.filter(m => m._2.data.planeId != self.planeId || m._1 != self.dlinkCallsign)
+    val dlinksOfInterest = dlinkIn.filterNot(isSelf).filter(isInSameMission)
 
-    for {
-      (name, member) <- dlinksOfInterest
-      lag = self.modelTime - member.modelTime
-      if math.abs(lag) < 5.0
-    } {
+    for ((name, member) <- dlinksOfInterest) {
 
-      val memberPosition = member.position + member.velocity * lag
+      val memberPosition = member.position + member.velocity * member.lag
 
       drawContact(memberPosition, Some(member.heading), CYAN, centerText = name.take(2))
 
       for (target <- member.targets.reverse) { // draw lowest index (=highest prio) last
 
-        val targetPosition = target.position + target.velocity * lag
+        val targetPosition = target.position + target.velocity * member.lag
 
         if (target.isPositionKnown) {
           drawContact(

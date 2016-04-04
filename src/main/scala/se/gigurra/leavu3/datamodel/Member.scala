@@ -8,16 +8,18 @@ import se.gigurra.heisenberg.Schema
   */
 
 case class Member(source: SourceData = Map.empty) extends SafeParsed[Member.type] {
-  val planeId   = parse(schema.planeId)
-  val modelTime = parse(schema.modelTime)
-  val position  = parse(schema.position)
-  val velocity  = parse(schema.velocity)
-  val selfData  = parse(schema.selfData)
-  val targets   = parse(schema.targets)
-  val marks     = parse(schema.markPos)
-  def pitch     = selfData.pitch
-  def roll      = selfData.roll
-  def heading   = selfData.heading
+  val planeId         = parse(schema.planeId)
+  val modelTime       = parse(schema.modelTime)
+  val position        = parse(schema.position)
+  val velocity        = parse(schema.velocity)
+  val selfData        = parse(schema.selfData)
+  val targets         = parse(schema.targets)
+  val marks           = parse(schema.markPos)
+  def pitch           = selfData.pitch
+  def roll            = selfData.roll
+  def heading         = selfData.heading
+  def lag             = self.modelTime - modelTime
+  def isInSameMission = math.abs(lag) < 5.0
 }
 
 object Member extends Schema[Member] {
