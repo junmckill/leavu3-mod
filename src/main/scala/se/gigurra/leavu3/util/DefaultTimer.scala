@@ -13,5 +13,9 @@ object DefaultTimer {
     require(fps > 0, "Must run with at least 1 fps!")
     underlying.schedule(Duration.fromMilliseconds(1000 / fps))(op)
   }
-}
 
+  def onceAfter(delay: Duration)(f: => Unit) = {
+    underlying.doLater(delay)(f)
+  }
+
+}

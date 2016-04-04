@@ -2,7 +2,7 @@ package se.gigurra.leavu3.interfaces
 
 import com.twitter.finagle.FailedFastException
 import com.twitter.finagle.http.Status
-import com.twitter.util.Future
+import com.twitter.util.{Duration, Future}
 import se.gigurra.leavu3.datamodel.{Configuration, Contact, GameData, GameDataWire, Vec3, Waypoint}
 import se.gigurra.leavu3.gfx.Drawable
 import se.gigurra.leavu3.util._
@@ -34,7 +34,7 @@ object GameIn extends Logging {
 
       DefaultTimer.fps(fps) {
         DcsRemote
-          .get(path, Some(if (DcsRemote.isActingMaster) 0L else 1000L)) // Master will always invalidate cache!
+          .get(path, Some(Duration.fromSeconds(if (DcsRemote.isActingMaster) 0 else 1))) // Master will update
           .map(JSON.read[GameDataWire])
           .map(_.toGameData)
           .map(postProcess)

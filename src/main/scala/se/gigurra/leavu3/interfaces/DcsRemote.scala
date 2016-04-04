@@ -3,7 +3,7 @@ package se.gigurra.leavu3.interfaces
 import java.util.UUID
 
 import com.twitter.finagle.FailedFastException
-import com.twitter.util.{Await, Future}
+import com.twitter.util.{Await, Duration, Future}
 import se.gigurra.heisenberg.MapData.SourceData
 import se.gigurra.heisenberg._
 import se.gigurra.leavu3.datamodel.DlinkData._
@@ -57,15 +57,9 @@ case class DcsRemote private(config: Configuration) extends Logging {
     client.delete(s"$category/$id")
   }
 
-  /**
-    * Load will always be empty on the first attempt,
-    * since it triggers the actual download from the Dcs Remote
-    */
-  def loadStatic[T: MapParser](category: String, maxAge: Option[Long]): Map[String, Stored[T]] = {
-
-    client.get(category, maxAge = maxAge).map { data =>
-
-      val rawData = JSON.readMap(data).asInstanceOf[Map[String, SourceData]].map {
+  def loadFromSource[T: MapParser](category: String, maxAge: Option[Duration], minTimeDelta: Option[Duration] = None): Future[Map[String, Stored[T]]] = {
+    client.get(category, maxAge = maxAge, minTimeDelta = minTimeDelta).map { data =>
+      val out = JSON.readMap(data).asInstanceOf[Map[String, SourceData]].map {
         case (k, v) => k ->
           Stored[T](
             timestamp = v("timestamp").asInstanceOf[Double],
@@ -73,15 +67,27 @@ case class DcsRemote private(config: Configuration) extends Logging {
             item = MapParser.parse[T](v("data").asInstanceOf[Map[String, SourceData]])
           )
       }
-
-      cache.put(category, rawData)
-
+      cache.put(category, out)
+      out
     }.onFailure {
       case e: IdenticalRequestPending =>
       case e: FailedFastException =>
       case NonFatal(e) => logger.warning(s"Unable to download and process category $category from local Dcs Remote: $e")
+    }.rescue {
+      case NonFatal(e) => Future.value(getCached(category))
     }
+  }
 
+  /**
+    * Load will always be empty on the first attempt,
+    * since it triggers the actual download from the Dcs Remote
+    */
+  def loadFromCache[T: MapParser](category: String, maxAge: Option[Duration], minTimeDelta: Option[Duration] = None): Map[String, Stored[T]] = {
+    loadFromSource[T](category, maxAge, minTimeDelta)
+    getCached(category)
+  }
+
+  private def getCached[T](category: String): Map[String, Stored[T]] = {
     cache.get(category).map(_.asInstanceOf[Map[String, Stored[T]]]).getOrElse(Map.empty[String, Stored[T]])
   }
 
@@ -105,7 +111,7 @@ case class DcsRemote private(config: Configuration) extends Logging {
 
   def isActingMaster: Boolean = {
 
-    val instanceLkup = loadStatic[Leavu3Instance]("leavu3-instances", maxAge = Some(1000L))
+    val instanceLkup = loadFromCache[Leavu3Instance]("leavu3-instances", maxAge = Some(Duration.fromSeconds(1)), minTimeDelta = Some(Duration.fromMilliseconds(20)))
 
     instanceLkup.get(ownInstanceId) match {
       case None => true

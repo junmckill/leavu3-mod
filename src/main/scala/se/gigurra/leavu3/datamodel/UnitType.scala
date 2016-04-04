@@ -147,7 +147,7 @@ object UnitType extends Schema[UnitType] with Logging {
       val script =s"{name=LoGetNameByType${t.typ}}"
       val url = s"export/$script"
 
-      DcsRemote.get(url, maxAge = Some(3600000L)).map { json =>
+      DcsRemote.get(url, maxAge = Some(Duration.fromSeconds(3600))).map { json =>
         val name = JSON.readMap(json)("name").asInstanceOf[String]
         mappedTypes.put(t.typ, UnitTypeData.apply(name, isKnown = true, t.typ))
         logger.info(s"Mapped type ${t.typ} -> $name")

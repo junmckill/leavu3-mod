@@ -4,6 +4,7 @@ import java.util.concurrent.ConcurrentLinkedQueue
 
 import com.badlogic.gdx.Gdx
 import com.twitter.finagle.FailedFastException
+import com.twitter.util.Duration
 import se.gigurra.leavu3.datamodel.{Configuration, Vec2}
 import se.gigurra.leavu3.gfx.Drawable
 import se.gigurra.leavu3.util.{DefaultTimer, IdenticalRequestPending}
@@ -23,7 +24,7 @@ object Keyboard extends Logging {
       var oldKeysPressed = Set.empty[Int]
 
       DefaultTimer.fps(configuration.gameDataFps) {
-        DcsRemote.get("keyboard", maxAge = Some(Int.MaxValue))
+        DcsRemote.get("keyboard", maxAge = Some(Duration.fromMilliseconds(Int.MaxValue)))
           .map(JSON.readMap(_).keys.map(_.toInt).toSet)
           .map { keysPressed =>
             if (keysPressed != oldKeysPressed) {

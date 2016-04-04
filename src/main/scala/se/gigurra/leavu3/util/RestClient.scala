@@ -23,26 +23,32 @@ case class RestClient(addr: String, port: Int, name: String)(implicit val timer:
   private val pending = new mutable.HashMap[String, Unit]()
   private val timeout = Duration.fromSeconds(3)
 
-  def get(path: String, maxAge: Option[Long] = None): Future[String] = {
-    doIfNotAlreadyPending(path)(doGet(path, maxAge))
+  def get(path: String, maxAge: Option[Duration] = None, minTimeDelta: Option[Duration] = None): Future[String] = {
+    doIfNotAlreadyPending(path, minTimeDelta)(doGet(path, maxAge))
   }
 
-  def put(path: String)(data: => String): Future[Unit] = {
-    doIfNotAlreadyPending(path)(doPut(path, data))
+  def put(path: String, minTimeDelta: Option[Duration] = None)(data: => String): Future[Unit] = {
+    doIfNotAlreadyPending(path, minTimeDelta)(doPut(path, data))
   }
 
-  def delete(path: String): Future[Unit] = {
-    doIfNotAlreadyPending(path + "?cache_only=true")(doDelete(path + "?cache_only=true"))
+  def delete(path: String, minTimeDelta: Option[Duration] = None): Future[Unit] = {
+    doIfNotAlreadyPending(path + "?cache_only=true", minTimeDelta)(doDelete(path + "?cache_only=true"))
   }
 
-  def post(path: String)(data: => String): Future[Unit] = {
-    doIfNotAlreadyPending(path)(doPost(path, data))
+  def post(path: String, minTimeDelta: Option[Duration] = None)(data: => String): Future[Unit] = {
+    doIfNotAlreadyPending(path, minTimeDelta)(doPost(path, data))
   }
 
-  private def doIfNotAlreadyPending[T](id: String)(f: => Future[T]): Future[T] = synchronized {
+  private def doIfNotAlreadyPending[T](id: String, minTimeDelta: Option[Duration])(f: => Future[T]): Future[T] = synchronized {
     pending.put(id, ()) match {
       case Some(prev) => Future.exception(IdenticalRequestPending(id))
-      case None => f.respond (_ => removePending(id)) // done synchronized
+      case None => f.respond {_ =>
+        minTimeDelta match {
+          // done synchronized
+          case Some(minTime) => DefaultTimer.onceAfter(minTime)(removePending(id))
+          case None => removePending(id)
+        }
+      }
     }
   }
 
@@ -50,8 +56,8 @@ case class RestClient(addr: String, port: Int, name: String)(implicit val timer:
     pending.remove(id)
   }
 
-  private def doGet(path: String, cacheMaxAgeMillis: Option[Long] = None): Future[String] = {
-    val params = cacheMaxAgeMillis.toSeq.map(x => "max_cached_age" -> x.toString)
+  private def doGet(path: String, cacheMaxAgeMillis: Option[Duration] = None): Future[String] = {
+    val params = cacheMaxAgeMillis.toSeq.map(x => "max_cached_age" -> x.inMillis.toString)
     val request = Request(path, params:_*)
     client.apply(request).raiseWithin(timeout).flatMap {
       case OkResponse(response)  => Future.value(response.contentString)

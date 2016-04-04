@@ -1,6 +1,7 @@
 package se.gigurra.leavu3.interfaces
 
 import com.twitter.finagle.FailedFastException
+import com.twitter.util.Duration
 import se.gigurra.heisenberg.MapDataParser
 import se.gigurra.leavu3.datamodel.{Configuration, DlinkConfiguration, DlinkData, Mark, Member, RawDlinkData}
 import se.gigurra.leavu3.interfaces.DcsRemote.Stored
@@ -54,7 +55,7 @@ object Dlink extends Logging {
 
     def doMasterUpdate(): Unit = {
       dlinkClient.foreach(_
-        .get(config.team, maxAge = Some(10000L))
+        .get(config.team, maxAge = Some(Duration.fromSeconds(6)))
         .foreach { rawData =>
           val mapData = JSON.readMap(rawData)
           processDlinkMapData(mapData)
@@ -84,10 +85,10 @@ object Dlink extends Logging {
     }
 
     def doSlaveUpdate(): Unit = {
-      DcsRemote.loadStatic[RawDlinkData]("dlink-in", maxAge = Some(3000L)).get("all") match {
+      DcsRemote.loadFromSource[RawDlinkData](category = "dlink-in", maxAge = Some(Duration.fromSeconds(3))).map(_.get("all") match {
         case None => recvOk = false
         case Some(data) => processDlinkMapData(data.item.source)
-      }
+      })
     }
 
     def start(): Unit = {
@@ -129,7 +130,7 @@ object Dlink extends Logging {
 
   object Out extends Logging {
 
-    def marks: Map[String, Stored[Mark]] = DcsRemote.loadStatic[Mark]("marks", maxAge = Some(Int.MaxValue))
+    def marks: Map[String, Stored[Mark]] = DcsRemote.loadFromCache[Mark]("marks", maxAge = Some(Duration.fromMilliseconds(Int.MaxValue)), minTimeDelta = Some(Duration.fromMilliseconds(100)))
     def hasMark(id: String): Boolean = marks.contains(id)
     def addMark(id: String, mark: Mark): Unit = DcsRemote.store("marks", id, mark)
     def deleteMark(id: String): Unit = DcsRemote.delete("marks", id)
