@@ -463,7 +463,7 @@ abstract class Page(val name: String, val priority: Int)(implicit config: Config
   }
 
   protected def isSelf(m: (String, DlinkData)): Boolean = {
-    m._2.data.planeId != self.planeId && m._1 != self.dlinkCallsign
+    m._2.data.planeId == self.planeId && m._1 == self.dlinkCallsign
   }
 
   protected def isInSameMission(m: (String, DlinkData)): Boolean = {
