@@ -132,7 +132,7 @@ case class SmsPage(implicit config: Configuration, mfd: MfdIfc) extends Page("SM
           drawFuel("internal", eng.fuelInternal, bingo = bingo * lbs_to_kg, joker = joker * lbs_to_kg)
           drawFuel("external", eng.fuelExternal, bingo = 1, joker = 0)
 
-          if (payload.cannon.shells < payload.cannon.shells)
+          if (payload.cannon.shells < gunLastCycle)
             gunBlinkCountdown = newCountdown()
 
           if (cms.chaff < chaffLastCycle)
