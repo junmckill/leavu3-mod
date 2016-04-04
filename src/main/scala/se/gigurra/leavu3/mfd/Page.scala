@@ -466,9 +466,12 @@ abstract class Page(val name: String, val priority: Int)(implicit config: Config
 
     val dlinksOfInterest = dlinkIn.filter(m => m._2.data.planeId != self.planeId || m._1 != self.dlinkCallsign)
 
-    for ((name, member) <- dlinksOfInterest) {
+    for {
+      (name, member) <- dlinksOfInterest
+      lag = self.modelTime - member.modelTime
+      if math.abs(lag) < 5.0
+    } {
 
-      val lag = self.modelTime - member.modelTime
       val memberPosition = member.position + member.velocity * lag
 
       drawContact(memberPosition, Some(member.heading), CYAN, centerText = name.take(2))
