@@ -1,9 +1,11 @@
 package se.gigurra.leavu3.util
 
-import se.gigurra.leavu3.datamodel.Contact
+import java.util.concurrent.TimeUnit
 
-import scala.collection.mutable
+import com.google.common.cache.CacheBuilder
+import se.gigurra.leavu3.datamodel.Contact
 import scala.language.implicitConversions
+import scala.collection.JavaConversions._
 
 /**
   * Created by kjolh on 3/31/2016.
@@ -12,33 +14,26 @@ abstract class Memory[T](timeoutSeconds: Double) {
 
   protected def idOf(t: T): String
 
-  private val data = new mutable.HashMap[String, Memorized[T]]
+  private val data = CacheBuilder.newBuilder().expireAfterWrite((timeoutSeconds * 1000.0).toLong, TimeUnit.MILLISECONDS).build[String, Memorized[T]]() //  mutable.HashMap[String, Memorized[T]]
 
-  def update(ts: Seq[T]): Seq[Memorized[T]] = synchronized {
-    clearExpired()
+  def update(ts: Seq[T]): Unit = {
     ts foreach update
-    all
   }
 
-  def get(t: T): Option[Memorized[T]] = synchronized {
-    data.get(idOf(t))
+  def get(t: T): Option[Memorized[T]] = {
+    Option(data.getIfPresent(idOf(t)))
   }
 
-  def all: Seq[Memorized[T]] = synchronized {
-    data.values.toArray.toSeq
+  def all: Seq[Memorized[T]] = {
+    data.asMap().values().filter(_ => true).toSeq
   }
 
   protected def update(t: T, gameTimeStamp: Double): Unit = {
-    val id = idOf(t)
-    data += id -> Memorized(t, timeoutSeconds, gameTimeStamp, CurTime.seconds)
+    data.put(idOf(t), Memorized(t, timeoutSeconds, gameTimeStamp, CurTime.seconds))
   }
 
   protected def update(t: T): Unit = {
     update(t, CurTime.seconds)
-  }
-
-  private def clearExpired(): Unit = {
-    data --= data.filter(_._2.expired).keys
   }
 }
 
