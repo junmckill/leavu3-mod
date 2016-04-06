@@ -42,7 +42,7 @@ object GameIn extends Logging {
             dcsGameConnected = true
             drawable.draw()
           }.onFailure {
-          case e: IdenticalRequestPending => // Ignore
+          case e: Throttled => // Ignore
           case e: ServiceException =>
             e.response.status match {
               case Status.ServiceUnavailable => // No need to log every message when not having dcs up and running
@@ -154,7 +154,7 @@ object GameIn extends Logging {
             case _ =>
               Future.Unit // Good to go!
           }.onFailure {
-            case e: IdenticalRequestPending => // Ignore ..
+            case e: Throttled => // Ignore ..
             case e: FailedFastException => // Ignore ..
             case e: ServiceException => e.response.status match {
               case Status.ServiceUnavailable => // No need to log every message when not having dcs up and running

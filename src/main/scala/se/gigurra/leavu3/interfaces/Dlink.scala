@@ -5,7 +5,7 @@ import com.twitter.util.Duration
 import se.gigurra.heisenberg.MapDataParser
 import se.gigurra.leavu3.datamodel.{Configuration, DlinkConfiguration, DlinkData, Mark, Member, RawDlinkData}
 import se.gigurra.leavu3.interfaces.DcsRemote.Stored
-import se.gigurra.leavu3.util.{DefaultTimer, IdenticalRequestPending, RestClient}
+import se.gigurra.leavu3.util.{DefaultTimer, Throttled, RestClient}
 import se.gigurra.serviceutils.json.JSON
 import se.gigurra.serviceutils.twitter.logging.Logging
 import se.gigurra.serviceutils.twitter.service.ServiceException
@@ -62,7 +62,7 @@ object Dlink extends Logging {
           DcsRemote.store("dlink-in", "all", rawData) // Store for slaves to use
         }
         .onFailure {
-          case e: IdenticalRequestPending =>
+          case e: Throttled =>
           case e: ServiceException =>
             recvOk = false
             clear()
@@ -156,7 +156,7 @@ object Dlink extends Logging {
               )
               JSON.write(self)
             }.onFailure {
-              case e: IdenticalRequestPending => // ignore
+              case e: Throttled => // ignore
               case e: FailedFastException => // ignore
               case e: ServiceException => logger.error(s"Data link host replied with an error: $e")
               case e => logger.error(e, s"Unexpected error when attempting to send to dlink")

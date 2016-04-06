@@ -97,5 +97,3 @@ object BadResponse {
     case _          => Some(response)
   }
 }
-
-case class IdenticalRequestPending(id: String) extends RuntimeException(s"Identical request to id $id already pending")

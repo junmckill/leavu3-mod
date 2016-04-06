@@ -7,7 +7,7 @@ import com.twitter.finagle.FailedFastException
 import com.twitter.util.Duration
 import se.gigurra.leavu3.datamodel.{Configuration, Vec2}
 import se.gigurra.leavu3.gfx.Drawable
-import se.gigurra.leavu3.util.{DefaultTimer, IdenticalRequestPending}
+import se.gigurra.leavu3.util.{DefaultTimer, Throttled}
 import se.gigurra.serviceutils.json.JSON
 import se.gigurra.serviceutils.twitter.logging.Logging
 
@@ -36,7 +36,7 @@ object Keyboard extends Logging {
             }
             oldKeysPressed = keysPressed
           }.onFailure {
-          case e: IdenticalRequestPending => // Ignore ..
+          case e: Throttled => // Ignore ..
           case e: FailedFastException => // Ignore ..
           case e => logger.warning(s"Unable to read keyboard state from dcs remote: $e")
         }

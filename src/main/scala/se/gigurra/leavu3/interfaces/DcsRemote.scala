@@ -8,7 +8,7 @@ import se.gigurra.heisenberg.MapData.SourceData
 import se.gigurra.heisenberg._
 import se.gigurra.leavu3.datamodel.DlinkData._
 import se.gigurra.leavu3.datamodel.{Configuration, DcsRemoteRemoteConfig, Leavu3Instance}
-import se.gigurra.leavu3.util.{DefaultTimer, IdenticalRequestPending, RestClient}
+import se.gigurra.leavu3.util.{DefaultTimer, Throttled, RestClient}
 import se.gigurra.serviceutils.json.JSON
 import se.gigurra.serviceutils.twitter.logging.Logging
 
@@ -30,7 +30,7 @@ case class DcsRemote private(config: Configuration) extends Logging {
         remoteConfig = staticData
       }
       .onFailure {
-        case e: IdenticalRequestPending =>
+        case e: Throttled =>
         case e: FailedFastException =>
         case e => logger.warning(s"Unable to download configuration from Dcs Remote: $e")
       }
@@ -39,7 +39,7 @@ case class DcsRemote private(config: Configuration) extends Logging {
   DefaultTimer.fps(config.gameDataFps / 2) {
     registerLeavu3Instance()
       .onFailure {
-        case e: IdenticalRequestPending =>
+        case e: Throttled =>
         case e: FailedFastException =>
         case e => logger.warning(s"Unable to register Leavu3 instance on Dcs Remote: $e")
       }
@@ -70,7 +70,7 @@ case class DcsRemote private(config: Configuration) extends Logging {
       cache.put(category, out)
       out
     }.onFailure {
-      case e: IdenticalRequestPending =>
+      case e: Throttled =>
       case e: FailedFastException =>
       case NonFatal(e) => logger.warning(s"Unable to download and process category $category from local Dcs Remote: $e")
     }.rescue {

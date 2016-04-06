@@ -17,7 +17,7 @@ case class Throttler[T](maxConcurrentUsersPerResource: Int = 1) {
     val prevAccessCount = pending.add(path, 1)
     if (prevAccessCount >= maxConcurrentUsersPerResource) {
       pending.remove(path, 1)
-      Future.exception(IdenticalRequestPending(path))
+      Future.exception(Throttled(path))
     } else {
       f.respond(_ => minTimeDelta match {
         case Some(minTime) => DefaultTimer.onceAfter(minTime)(pending.remove(path, 1))
@@ -26,3 +26,5 @@ case class Throttler[T](maxConcurrentUsersPerResource: Int = 1) {
     }
   }
 }
+
+case class Throttled(id: String) extends RuntimeException(s"Throttled request '$id' (perhaps already pending?)")
