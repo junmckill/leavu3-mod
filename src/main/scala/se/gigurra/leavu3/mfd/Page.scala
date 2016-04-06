@@ -3,7 +3,7 @@ package se.gigurra.leavu3.mfd
 import com.badlogic.gdx.graphics.Color
 import se.gigurra.leavu3.datamodel._
 import se.gigurra.leavu3.gfx.RenderContext._
-import se.gigurra.leavu3.gfx.{PpiProjection, Projection, ScreenProjection}
+import se.gigurra.leavu3.gfx.{WorldProjection, Projection, ScreenProjection}
 import se.gigurra.leavu3.interfaces.{GameIn, MouseClick}
 import se.gigurra.leavu3.lmath.NormalizeDegrees
 import se.gigurra.leavu3.util.CircleBuffer
@@ -14,7 +14,7 @@ import scala.language.postfixOps
 abstract class Page(val name: String, val priority: Int)(implicit config: Configuration, mfd: MfdIfc) extends Logging {
 
   val stdTextSize = 0.75f
-  val ppiProjection = new PpiProjection
+  val worldProjection = new WorldProjection
   val screenProjection = new ScreenProjection
   private val displayUnits = DisplayUnits.displayUnits.setBy(_.name == config.initialUnits)
   val shortName = this.getClass.getSimpleName.toLowerCase.subSequence(0, 3)
@@ -24,13 +24,9 @@ abstract class Page(val name: String, val priority: Int)(implicit config: Config
   def distScale: CircleBuffer[Double] = displayUnits.distScale
 
   def m_to_distUnit: Double = displayUnits.m_to_distUnit
-
   def m_to_altUnit: Double = displayUnits.m_to_altUnit
-
   def mps_to_speedUnit: Double = displayUnits.mps_to_speedUnit
-
   def kg_to_fuelUnit: Double = displayUnits.kg_to_fuelUnit
-
   def displayUnitName: String = displayUnits.name
 
   def stepDisplayUnits(): Unit = {
@@ -46,9 +42,7 @@ abstract class Page(val name: String, val priority: Int)(implicit config: Config
   def osb: MfdIfc#OsbIfc = mfd.osb
 
   def isDcltOn: Boolean = mfd.isDcltOn
-
   def verbose: Boolean = mfd.verbose
-
   def shouldDrawOsbs: Boolean = mfd.shouldDrawOsbs
 
   //////////////////////////////////////////////////////////////////////////////

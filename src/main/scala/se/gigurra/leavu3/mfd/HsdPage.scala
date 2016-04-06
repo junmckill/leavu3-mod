@@ -51,7 +51,7 @@ case class HsdPage(implicit config: Configuration, mfd: MfdIfc) extends Page("HS
   override def draw(game: GameData, dlinkIn: Seq[(String, DlinkData)]): Unit = {
     matchIngameScale(game)
     viewport(viewportSize = distScale * 2.0, offs = Vec2(0.0, -distScale * deprFactor), heading = self.heading){
-      implicit val p = ppiProjection
+      implicit val p = worldProjection
       drawSelf(game)
       drawHsi(game)
       drawWayPoints(game)
@@ -62,7 +62,7 @@ case class HsdPage(implicit config: Configuration, mfd: MfdIfc) extends Page("HS
       drawDlinkMembersAndTargets(dlinkIn)
       drawLockedTargets(game)
       drawTdc(game)
-    }(ppiProjection)
+    }(worldProjection)
     drawBullsEyeNumbrs(game)
     drawBraNumbrs(game)
     drawOwnHeading(game)
@@ -72,15 +72,15 @@ case class HsdPage(implicit config: Configuration, mfd: MfdIfc) extends Page("HS
   }
 
   def drawHsi(game: GameData): Unit = {
-    drawHsi(close = true, middle = true, far = true, tics = shouldDrawDetailedHsi)(ppiProjection)
+    drawHsi(close = true, middle = true, far = true, tics = shouldDrawDetailedHsi)(worldProjection)
   }
 
   def drawSelf(game: GameData): Unit = {
-    drawSelf(0.0)(ppiProjection)
+    drawSelf(0.0)(worldProjection)
   }
 
   def drawWayPoints(game: GameData): Unit = {
-    implicit val p = ppiProjection
+    implicit val p = worldProjection
 
     def wpByIndex(i: Int): Option[Waypoint] = {
       game.route.waypoints.find(_.index == i)
@@ -97,7 +97,7 @@ case class HsdPage(implicit config: Configuration, mfd: MfdIfc) extends Page("HS
   }
 
   def drawScanZone(game: GameData): Unit = {
-    implicit val p = ppiProjection
+    implicit val p = worldProjection
     val sensors = game.sensors.status
     if (sensors.sensorOn) {
       val dist = sensors.scale.distance
@@ -107,7 +107,7 @@ case class HsdPage(implicit config: Configuration, mfd: MfdIfc) extends Page("HS
   }
 
   def drawLockedTargets(game: GameData): Unit = {
-    implicit val p = ppiProjection
+    implicit val p = worldProjection
 
     val contacts = new mutable.HashMap[Int, Contact] // id -> data
     val order = new mutable.HashMap[Int, Int] // id -> index

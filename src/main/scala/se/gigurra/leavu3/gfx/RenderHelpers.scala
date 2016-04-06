@@ -270,7 +270,7 @@ case class ScreenProjection() extends Projection[Any] {
 
 }
 
-case class PpiProjection() extends Projection[Any] {
+case class WorldProjection() extends Projection[Any] {
 
   val transform = RenderContext.transform
 

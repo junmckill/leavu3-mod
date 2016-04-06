@@ -61,7 +61,7 @@ case class RwrPage(implicit config: Configuration, mfd: MfdIfc) extends Page("RW
       drawNotchBlocks(game)
       drawTargetBearings(game)
       drawThreats(game)
-    }(ppiProjection)
+    }(worldProjection)
     drawInfoText(game)
     drawOsbs(game)
   }
@@ -107,7 +107,7 @@ case class RwrPage(implicit config: Configuration, mfd: MfdIfc) extends Page("RW
   }
 
   def drawTargetBearings(game: GameData): Unit = for (target <- game.sensors.targets.locked) {
-    implicit val _p = ppiProjection
+    implicit val _p = worldProjection
     val a = minRangeOffset * (target.position - self.position : Vec2).normalized
     val b = (distScale:Double) * (target.position - self.position : Vec2).normalized
     lines(Seq(a -> b), DARK_GRAY)
@@ -122,7 +122,7 @@ case class RwrPage(implicit config: Configuration, mfd: MfdIfc) extends Page("RW
   }
 
   def drawThreats(game: GameData): Unit = {
-    implicit val _p = ppiProjection
+    implicit val _p = worldProjection
 
     val allEmitters = game.electronicWarf.rwr.emitters
 
@@ -158,15 +158,15 @@ case class RwrPage(implicit config: Configuration, mfd: MfdIfc) extends Page("RW
   }
 
   def drawHsi(game: GameData): Unit = {
-    drawHsi(close = false, middle = true, far = false, tics = shouldDrawDetailedHsi)(ppiProjection)
+    drawHsi(close = false, middle = true, far = false, tics = shouldDrawDetailedHsi)(worldProjection)
   }
 
   def drawSelf(game: GameData): Unit = {
-    drawSelf(minRangeOffset)(ppiProjection)
+    drawSelf(minRangeOffset)(worldProjection)
   }
 
   def drawNotchBlocks(game: GameData): Unit = {
-    implicit val _p = ppiProjection
+    implicit val _p = worldProjection
 
     for (azimuth <- Seq(-90.0f, 90.0f)) {
       val bearing = azimuth + self.heading
