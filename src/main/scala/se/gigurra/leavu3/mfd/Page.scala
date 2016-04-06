@@ -4,9 +4,9 @@ import com.badlogic.gdx.graphics.Color
 import se.gigurra.leavu3.datamodel._
 import se.gigurra.leavu3.gfx.RenderContext._
 import se.gigurra.leavu3.gfx.{PpiProjection, Projection, ScreenProjection}
-import se.gigurra.leavu3.interfaces.{DcsRemote, GameIn, MouseClick}
+import se.gigurra.leavu3.interfaces.{GameIn, MouseClick}
 import se.gigurra.leavu3.lmath.NormalizeDegrees
-import se.gigurra.leavu3.util.{CircleBuffer, CurTime}
+import se.gigurra.leavu3.util.CircleBuffer
 import se.gigurra.serviceutils.twitter.logging.Logging
 
 import scala.language.postfixOps
@@ -102,7 +102,7 @@ abstract class Page(val name: String, val priority: Int)(implicit config: Config
   protected def drawSelf[_: Projection](surroundCircleRadius: Double): Unit = {
     transform(_.rotate(-self.heading)) {
       circle(surroundCircleRadius, color = DARK_GRAY, typ = LINE)
-      lines(shapes.self.coords * symbolScale, CYAN)
+      lines(Page.self.coords * symbolScale, CYAN)
       circle(0.005 * symbolScale, color = CYAN, typ = FILL)
     }
   }
@@ -113,35 +113,35 @@ abstract class Page(val name: String, val priority: Int)(implicit config: Config
                                        tics: Boolean): Unit = {
     if (close) {
       circle(radius = distScale * 0.50, color = DARK_GRAY)
-      lines(shapes.hsi.flag * symbolScale + Vec2(0.0, distScale * 0.50),
-        shapes.hsi.eastPin * symbolScale + Vec2(distScale * 0.50, 0.0),
-        shapes.hsi.westPin * symbolScale + Vec2(-distScale * 0.50, 0.0),
-        shapes.hsi.southPin * symbolScale + Vec2(0.0, -distScale * 0.50)
+      lines(Page.hsi.flag * symbolScale + Vec2(0.0, distScale * 0.50),
+        Page.hsi.eastPin * symbolScale + Vec2(distScale * 0.50, 0.0),
+        Page.hsi.westPin * symbolScale + Vec2(-distScale * 0.50, 0.0),
+        Page.hsi.southPin * symbolScale + Vec2(0.0, -distScale * 0.50)
       )
     }
 
     if (middle) {
       circle(radius = distScale * 1.00, color = DARK_GRAY)
       lines(
-        shapes.hsi.flag * symbolScale + Vec2(0.0, distScale * 1.00),
-        shapes.hsi.eastPin * symbolScale + Vec2(distScale * 1.00, 0.0),
-        shapes.hsi.westPin * symbolScale + Vec2(-distScale * 1.00, 0.0),
-        shapes.hsi.southPin * symbolScale + Vec2(0.0, -distScale * 1.00)
+        Page.hsi.flag * symbolScale + Vec2(0.0, distScale * 1.00),
+        Page.hsi.eastPin * symbolScale + Vec2(distScale * 1.00, 0.0),
+        Page.hsi.westPin * symbolScale + Vec2(-distScale * 1.00, 0.0),
+        Page.hsi.southPin * symbolScale + Vec2(0.0, -distScale * 1.00)
       )
     }
 
     if (far) {
       circle(radius = distScale * 1.50, color = DARK_GRAY)
       lines(
-        shapes.hsi.flag * symbolScale + Vec2(0.0, distScale * 1.50),
-        shapes.hsi.eastPin * symbolScale + Vec2(distScale * 1.50, 0.0),
-        shapes.hsi.westPin * symbolScale + Vec2(-distScale * 1.50, 0.0),
-        shapes.hsi.southPin * symbolScale + Vec2(0.0, -distScale * 1.50)
+        Page.hsi.flag * symbolScale + Vec2(0.0, distScale * 1.50),
+        Page.hsi.eastPin * symbolScale + Vec2(distScale * 1.50, 0.0),
+        Page.hsi.westPin * symbolScale + Vec2(-distScale * 1.50, 0.0),
+        Page.hsi.southPin * symbolScale + Vec2(0.0, -distScale * 1.50)
       )
     }
 
     if (tics) {
-      lines(shapes.hsi.detail(distScale.toFloat), DARK_GRAY)
+      lines(Page.hsi.detail(distScale.toFloat), DARK_GRAY)
     }
   }
 
@@ -503,6 +503,7 @@ abstract class Page(val name: String, val priority: Int)(implicit config: Config
 }
 
 object Page {
+
   object Priorities {
     val BNK = 0
     val INF = 1
@@ -511,4 +512,46 @@ object Page {
     val HSD = 4
     val FCR = 5
   }
+
+  object hsi {
+
+    val w = 0.025
+    val h = 0.075
+
+    val flag = Seq(
+      Vec2(0.00,   0.00) -> Vec2(0.00,     -h),
+      Vec2(0.00,     -h) -> Vec2(  -w, -h+w/2),
+      Vec2(-w,   -h+w/2) -> Vec2(0.00,   -h+w)
+    )
+
+    val eastPin  = Seq(Vec2(0.00,  0.00) -> Vec2(-h/2, 0.00))
+    val westPin  = Seq(Vec2(0.00,  0.00) -> Vec2(+h/2, 0.00))
+    val southPin = Seq(Vec2(0.00,  0.00) -> Vec2(0.00, +h/2))
+
+    def detail(radius: Float) : Seq[(Vec2, Vec2)] = {
+      val r0 = radius.toDouble
+      val r1 = r0 -  radius * h / 2.0
+      val n = 36
+      for (i <- 0 until n) yield {
+        val angle = (360.0 * i.toDouble / n.toDouble).toRadians
+        val a = r0 * Vec2(math.cos(angle), math.sin(angle))
+        val b = r1 * Vec2(math.cos(angle), math.sin(angle))
+        a -> b
+      }
+    }
+  }
+
+  object self {
+
+    val h = 0.075
+    val dx1 = 0.015
+    val dx2 = 0.03
+
+    val coords = Seq(
+      Vec2(0.00,  -h/2) -> Vec2(0.00,   h/2),
+      Vec2(-dx1,  -h/4) -> Vec2( dx1,  -h/4),
+      Vec2(-dx2,   h/4) -> Vec2( dx2,   h/4)
+    )
+  }
+
 }

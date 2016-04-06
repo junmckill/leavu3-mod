@@ -10,11 +10,17 @@ import se.gigurra.serviceutils.twitter.service.ServiceException
 /**
   * Created by kjolh on 3/10/2016.
   */
-case class RestClient(addr: String, port: Int, name: String)(implicit val timer: JavaTimer = DefaultTimer.underlying) {
+case class RestClient(addr: String,
+                      port: Int,
+                      name: String,
+                      verifyAddress: Boolean = true)(implicit val timer: JavaTimer = DefaultTimer.underlying) {
 
-  // Check valid address first
-  try InetAddress.getByName(addr) catch {
-    case NonFatal(e) => throw new RuntimeException(s"Unable to connect to $name @ $addr:$port", e)
+  if (verifyAddress) {
+    // Check valid address first
+    // Otherwise Finagle will just keep on trying and log forever .. :S
+    try InetAddress.getByName(addr) catch {
+      case NonFatal(e) => throw new RuntimeException(s"Unable to connect to $name @ $addr:$port", e)
+    }
   }
 
   private val client = Http.client.newService(s"$addr:$port")
