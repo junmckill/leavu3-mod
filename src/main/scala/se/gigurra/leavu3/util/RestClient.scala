@@ -19,7 +19,7 @@ case class RestClient(addr: String,
     // Check valid address first
     // Otherwise Finagle will just keep on trying and log forever .. :S
     try InetAddress.getByName(addr) catch {
-      case NonFatal(e) => throw new RuntimeException(s"Unable to connect to $name @ $addr:$port", e)
+      case NonFatal(e) => throw new RuntimeException(s"Unable to look up address: $name @ $addr:$port", e)
     }
   }
 
