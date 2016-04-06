@@ -30,9 +30,7 @@ object GameIn extends Logging {
 
   object Updater {
     def start(appCfg: Configuration, drawable: Drawable): Unit = {
-      val fps = appCfg.gameDataFps
-
-      DefaultTimer.fps(fps) {
+      DefaultTimer.fps(appCfg.gameDataFps) {
         DcsRemote
           .get(path, Some(Duration.fromSeconds(if (DcsRemote.isActingMaster) 0 else 1))) // Master will update
           .map(JSON.read[GameDataWire])
