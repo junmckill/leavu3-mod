@@ -148,7 +148,7 @@ case class HsdPage(implicit config: Configuration, mfd: MfdIfc) extends Page("HS
   }
 
   def drawBraNumbrs(game: GameData) = {
-    drawBraNumbers(game, 0.02, (0.45, 0.9))
+    drawBraNumbers(game, 0.02, (0.425, 0.9))
   }
 
   def ownMarkpointActive: Boolean = {
