@@ -7,8 +7,6 @@ import com.twitter.finagle.http._
 import com.twitter.util.{JavaTimer, _}
 import se.gigurra.serviceutils.twitter.service.ServiceException
 
-import scala.collection.mutable
-
 /**
   * Created by kjolh on 3/10/2016.
   */
@@ -20,40 +18,23 @@ case class RestClient(addr: String, port: Int, name: String)(implicit val timer:
   }
 
   private val client = Http.client.newService(s"$addr:$port")
-  private val pending = new mutable.HashMap[String, Unit]()
+  private val throttler = Throttler[String]()
   private val timeout = Duration.fromSeconds(3)
 
   def get(path: String, maxAge: Option[Duration] = None, minTimeDelta: Option[Duration] = None): Future[String] = {
-    doIfNotAlreadyPending(path, minTimeDelta)(doGet(path, maxAge))
+    throttler.access(path, minTimeDelta)(doGet(path, maxAge))
   }
 
   def put(path: String, minTimeDelta: Option[Duration] = None)(data: => String): Future[Unit] = {
-    doIfNotAlreadyPending(path, minTimeDelta)(doPut(path, data))
+    throttler.access(path, minTimeDelta)(doPut(path, data))
   }
 
   def delete(path: String, minTimeDelta: Option[Duration] = None): Future[Unit] = {
-    doIfNotAlreadyPending(path + "?cache_only=true", minTimeDelta)(doDelete(path + "?cache_only=true"))
+    throttler.access(path, minTimeDelta)(doDelete(path + "?cache_only=true"))
   }
 
   def post(path: String, minTimeDelta: Option[Duration] = None)(data: => String): Future[Unit] = {
-    doIfNotAlreadyPending(path, minTimeDelta)(doPost(path, data))
-  }
-
-  private def doIfNotAlreadyPending[T](id: String, minTimeDelta: Option[Duration])(f: => Future[T]): Future[T] = synchronized {
-    pending.put(id, ()) match {
-      case Some(prev) => Future.exception(IdenticalRequestPending(id))
-      case None => f.respond {_ =>
-        minTimeDelta match {
-          // done synchronized
-          case Some(minTime) => DefaultTimer.onceAfter(minTime)(removePending(id))
-          case None => removePending(id)
-        }
-      }
-    }
-  }
-
-  private def removePending(id: String): Unit = synchronized {
-    pending.remove(id)
+    throttler.access(path, minTimeDelta)(doPost(path, data))
   }
 
   private def doGet(path: String, cacheMaxAgeMillis: Option[Duration] = None): Future[String] = {
