@@ -6,7 +6,7 @@ import com.twitter.util.{Duration, Future}
 /**
   * Created by kjolh on 4/6/2016.
   */
-case class Throttler[T](maxConcurrentUsersPerResource: Int = 1) {
+case class Throttler(maxConcurrentRequestsPerResource: Int = 1) {
 
   private val pending = ConcurrentHashMultiset.create[String]()
 
@@ -15,7 +15,7 @@ case class Throttler[T](maxConcurrentUsersPerResource: Int = 1) {
                (f: => Future[T]): Future[T] = {
 
     val prevAccessCount = pending.add(path, 1)
-    if (prevAccessCount >= maxConcurrentUsersPerResource) {
+    if (prevAccessCount >= maxConcurrentRequestsPerResource) {
       pending.remove(path, 1)
       Future.exception(Throttled(path))
     } else {

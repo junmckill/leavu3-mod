@@ -24,7 +24,7 @@ case class RestClient(addr: String,
   }
 
   private val client = Http.client.newService(s"$addr:$port")
-  private val throttler = Throttler[String]()
+  private val throttler = Throttler(maxConcurrentRequestsPerResource = 1)
   private val timeout = Duration.fromSeconds(3)
 
   def get(path: String, maxAge: Option[Duration] = None, minTimeDelta: Option[Duration] = None): Future[String] = {
