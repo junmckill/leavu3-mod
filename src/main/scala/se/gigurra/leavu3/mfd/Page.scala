@@ -300,11 +300,11 @@ abstract class Page(val name: String, val priority: Int)(implicit config: Config
       transform(_
         .scalexy(scale)) {
 
-        val beStr = s" BR from : self"
+        val beStr = s" BR from : self "
 
         var n = 0
         def drawTextLine(str: String, color: Color): Unit = {
-          transform(_.translate(y = -n.toFloat * font.getLineHeight))(str.drawRaw(xAlign = 0.5f, color = color))
+          transform(_.translate(y = -n.toFloat * font.getLineHeight))(str.padRight(18).take(18).drawRaw(xAlign = -0.5f, color = color))
           n += 1
         }
 

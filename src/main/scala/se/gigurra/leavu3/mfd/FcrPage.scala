@@ -368,7 +368,7 @@ case class FcrPage(implicit config: Configuration, mfd: MfdIfc) extends Page("FC
   }
 
   def drawBraNumbrs[_: Projection](game: GameData): Unit = {
-    drawBraNumbers(game, 0.0175, (0.50, 0.95))
+    drawBraNumbers(game, 0.0175, (0.90, 0.95))
   }
 
   def drawScale(game: GameData): Unit = {
