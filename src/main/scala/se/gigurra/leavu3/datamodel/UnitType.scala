@@ -55,6 +55,7 @@ object UnitTypeData {
     case x if x.startsWith("f-")                        => Data(firstNumber(x), DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
     case x if x.startsWith("m-2000")                    => Data("M2",           DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
     case x if x.startsWith("e-3")                       => Data("E3",           AWACS_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
+    case x if x.startsWith("a-50")                      => Data("50",           AWACS_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
 
     // SAMs
     case x if x.startsWith("s-300ps 40b6md sr") & sep   => Data("CS", DEFAULT_POWER_MAPPING_EXPONENT, DEFAULT_MAX_RANGE_INDICATION)
