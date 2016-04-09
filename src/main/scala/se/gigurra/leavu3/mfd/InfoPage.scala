@@ -113,7 +113,7 @@ case class InfoPage(implicit config: Configuration, mfd: MfdIfc) extends Page("I
             drawTextLine(title, line, color)
           }
         }
-        drawPlayerLists("BLUE", bluePlayerLists, BLUE)
+        drawPlayerLists("BLUE", bluePlayerLists, CYAN)
         drawPlayerLists("RED", redPlayerLists, RED)
         drawPlayerLists("NOT PLAYING", notPlayingPlayerLists, DARK_GRAY)
       }
