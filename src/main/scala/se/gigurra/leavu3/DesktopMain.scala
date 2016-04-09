@@ -1,5 +1,6 @@
 package se.gigurra.leavu3
 
+import java.lang.management.ManagementFactory
 import javax.swing.JOptionPane
 
 import com.badlogic.gdx.Gdx
@@ -19,6 +20,8 @@ object DesktopMain extends Logging {
 
     Capture.stdOutToFile(s"leavu3-debug-log.txt", append = true)
     Capture.stdErrToFile(s"leavu3-log.txt", append = true)
+
+    logSelectedGarbageCollectors()
 
     logger.info(s"Starting leavu version: $Version")
 
@@ -61,6 +64,13 @@ object DesktopMain extends Logging {
       backgroundFPS = 1 // We will override this and trigger drawing ourselves
       samples = config.aaSamples
       resizable = !config.borderless
+    }
+  }
+
+  private def logSelectedGarbageCollectors(): Unit = {
+    import scala.collection.JavaConversions._
+    for (gcMxBean <- ManagementFactory.getGarbageCollectorMXBeans) {
+      logger.info(s"Using GC: ${gcMxBean.getName}/${gcMxBean.getObjectName}")
     }
   }
 
