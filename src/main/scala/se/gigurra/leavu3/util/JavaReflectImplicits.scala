@@ -30,7 +30,7 @@ trait JavaReflectImplicits {
     }
   }
 
-  implicit class RichObjecy(o: Object) {
+  implicit class RichObject(o: Object) {
 
     def reflectField(name: String):Object = {
       o.getClass.reflectField(name, o)

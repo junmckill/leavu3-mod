@@ -11,7 +11,9 @@ import scala.language.implicitConversions
 /**
   * Created by kjolh on 3/20/2016.
   */
-case class App(appCfg: Configuration, onCreate: () => Unit) extends ApplicationAdapter with Logging {
+class App(appCfg: Configuration,
+          onCreate: => Unit,
+          onEveryFrame: => Unit) extends ApplicationAdapter with Logging {
 
   val instrumentClassName = appCfg.instrument
   val instrumentClass: Class[Instrument] =
@@ -30,10 +32,11 @@ case class App(appCfg: Configuration, onCreate: () => Unit) extends ApplicationA
       instrument.keyPressed(Keyboard.inputQue.poll)
     instrument.update(GameIn.snapshot, Dlink.In.ownTeam.toSeq.sortBy(_._1))
     DcsRemote.ownPriority = instrument.priority
+    onEveryFrame
   }
 
   override def create(): Unit = {
-    onCreate()
+    onCreate
   }
 
   val input = new InputAdapter {

@@ -30,7 +30,7 @@ object DesktopMain extends Logging {
     DcsRemote.init(config)
 
     val lwjglConfig = loadLwjglConfig(config)
-    val appListener = new App(config, () => onInitDisplay(config))
+    val appListener = new App(config, onCreate(config), onEveryFrame(config))
     val drawable = new DynamicFpsLwjglApplication(appListener, lwjglConfig)
     Gdx.input.setInputProcessor(appListener)
 
@@ -46,8 +46,12 @@ object DesktopMain extends Logging {
       System.exit(1)
   }
 
-  private def onInitDisplay(config: Configuration): Unit = {
+  private def onCreate(config: Configuration): Unit = {
     WindowTweaks.apply(config)
+  }
+
+  private def onEveryFrame(config: Configuration): Unit = {
+    WindowTweaks.updateStateMachine(config)
   }
 
   private def loadLwjglConfig(config: Configuration): LwjglApplicationConfiguration = {
