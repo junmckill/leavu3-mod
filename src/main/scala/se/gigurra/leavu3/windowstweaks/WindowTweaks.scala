@@ -1,7 +1,7 @@
 package se.gigurra.leavu3.windowstweaks
 
 import com.sun.jna.Pointer
-import com.sun.jna.platform.win32.User32
+import com.sun.jna.platform.win32.{User32, WinDef}
 import com.sun.jna.platform.win32.WinDef.HWND
 import se.gigurra.leavu3.datamodel.Configuration
 import se.gigurra.leavu3.util.JavaReflectImplicits
@@ -15,10 +15,6 @@ object WindowTweaks extends Logging with JavaReflectImplicits {
 
   val displayClass = Class.forName("org.lwjgl.opengl.Display")
   val display = displayClass.reflectField("display_impl")
-
-  var extraWidth: Int = 16
-  // Default on windows
-  var extraHeight: Int = 39 // Default on windows
 
   val SWP_NOMOVE = 0x0002
   val SWP_NOSIZE = 0x0001
@@ -36,11 +32,6 @@ object WindowTweaks extends Logging with JavaReflectImplicits {
 
   def apply(configuration: Configuration): Unit = {
 
-    if (configuration.borderless) {
-      extraWidth = 0
-      extraHeight = 0
-    }
-
     if (configuration.noFocusOnClick)
       setNeverCaptureFocus()
 
@@ -52,33 +43,37 @@ object WindowTweaks extends Logging with JavaReflectImplicits {
     display.getClass.getName == "org.lwjgl.opengl.WindowsDisplay"
   }
 
-  def getWindowPosition: Rect = {
-    Rect(
-      display.reflectGetter("getX").asInstanceOf[Int],
-      display.reflectGetter("getY").asInstanceOf[Int],
-      display.reflectGetter("getWidth").asInstanceOf[Int] + extraWidth,
-      display.reflectGetter("getHeight").asInstanceOf[Int] + extraHeight
-    )
+  def HWND: HWND = {
+    require(isPlatformWindows, "Cannot call HWND on non-Windows OS!")
+    new HWND(new Pointer(display.reflectField("hwnd").asInstanceOf[Long]))
   }
 
+  def getWindowPosition: Rect = {
+    if (isPlatformWindows) {
+      val winOut = new WinDef.RECT()
+      User32.INSTANCE.GetWindowRect(HWND, winOut)
+      Rect(
+        x = winOut.left,
+        y = winOut.top,
+        width = winOut.right - winOut.left,
+        height = winOut.bottom - winOut.top
+      )
+    } else {
+      Rect(
+        display.reflectGetter("getX").asInstanceOf[Int],
+        display.reflectGetter("getY").asInstanceOf[Int],
+        display.reflectGetter("getWidth").asInstanceOf[Int],
+        display.reflectGetter("getHeight").asInstanceOf[Int]
+      )
+    }
+  }
 
   def updateStateMachine(config: Configuration): Unit = {
 
     if (isPlatformWindows && config.noFocusOnClick) {
 
-      def windowHasFocus: Boolean = {
-        val hwndLong = display.reflectField("hwnd").asInstanceOf[Long]
-        val hwnd = new HWND(new Pointer(hwndLong))
-        val hwndWithFocus = AwGetter.INSTANCE.GetActiveWindow()
-        hwnd == hwndWithFocus
-      }
-
-      def windowIsForeground: Boolean = {
-        val hwndLong = display.reflectField("hwnd").asInstanceOf[Long]
-        val hwnd = new HWND(new Pointer(hwndLong))
-        val hwndWithFocus = User32.INSTANCE.GetForegroundWindow()
-        hwnd == hwndWithFocus
-      }
+      def windowHasFocus: Boolean = HWND == AwGetter.INSTANCE.GetActiveWindow()
+      def windowIsForeground: Boolean = HWND == User32.INSTANCE.GetForegroundWindow()
 
       if (windowHasFocus && windowIsForeground)
         windowStealsFocus = true
@@ -132,7 +127,7 @@ object WindowTweaks extends Logging with JavaReflectImplicits {
       val hwnd = display.reflectField("hwnd").asInstanceOf[Long]
       val oldWindowPos = getWindowPosition
 
-      def invoke() = display.reflectInvoke(
+      display.reflectInvoke(
         "setWindowPos",
         hwnd: java.lang.Long,
         (if (on) HWND_TOPMOST else HWND_BOTTOM): java.lang.Long,
@@ -143,15 +138,6 @@ object WindowTweaks extends Logging with JavaReflectImplicits {
         SWP_FRAMECHANGED: java.lang.Long
       )
 
-      invoke()
-
-      // Ensure that the window actually gets the desired size, otherwise, adjust
-      val newWindowPos = getWindowPosition
-      if (newWindowPos != oldWindowPos) {
-        extraWidth += oldWindowPos.width - newWindowPos.width
-        extraHeight += oldWindowPos.height - newWindowPos.height
-        invoke()
-      }
 
     } else {
       logger.warning(s"Setting configuration.alwaysOnTop unavailable on this operating system!")
