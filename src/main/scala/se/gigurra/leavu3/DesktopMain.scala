@@ -30,7 +30,7 @@ object DesktopMain extends Logging {
     DcsRemote.init(config)
 
     val lwjglConfig = loadLwjglConfig(config)
-    val appListener = new App(config, onCreate(config), onEveryFrame(config))
+    val appListener = new App(config, () => onCreate(config), () => onEveryFrame(config))
     val drawable = new DynamicFpsLwjglApplication(appListener, lwjglConfig)
     Gdx.input.setInputProcessor(appListener)
 

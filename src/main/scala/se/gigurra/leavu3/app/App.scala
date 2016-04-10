@@ -12,31 +12,21 @@ import scala.language.implicitConversions
   * Created by kjolh on 3/20/2016.
   */
 class App(appCfg: Configuration,
-          onCreate: => Unit,
-          onEveryFrame: => Unit) extends ApplicationAdapter with Logging {
+          onCreate: () => Unit,
+          onEveryFrame: () => Unit) extends ApplicationAdapter with Logging {
 
-  val instrumentClassName = appCfg.instrument
-  val instrumentClass: Class[Instrument] =
-    Try(Class.forName(instrumentClassName)) match {
-      case Success(cls) =>
-        cls.asInstanceOf[Class[Instrument]]
-      case Failure(e) =>
-        logger.error(s"Could not find instrument $instrumentClassName - Check your spelling")
-        throw e
-    }
-  logger.info(s"Creating instrument: $instrumentClass")
-  val instrument = instrumentClass.getConstructor(classOf[Configuration]).newInstance(appCfg)
+  val instrument = App.spawnInstrument(appCfg)
 
   override def render(): Unit = {
     while(!Keyboard.inputQue.isEmpty)
       instrument.keyPressed(Keyboard.inputQue.poll)
     instrument.update(GameIn.snapshot, Dlink.In.ownTeam.toSeq.sortBy(_._1))
     DcsRemote.ownPriority = instrument.priority
-    onEveryFrame
+    onEveryFrame()
   }
 
   override def create(): Unit = {
-    onCreate
+    onCreate()
   }
 
   val input = new InputAdapter {
@@ -48,6 +38,22 @@ class App(appCfg: Configuration,
 
 }
 
-object App {
+object App extends Logging {
+
   implicit def toInputAdapter(app: App): InputProcessor = app.input
+
+  def spawnInstrument(appCfg: Configuration): Instrument = {
+
+    val instrumentClassName = appCfg.instrument
+    val instrumentClass: Class[Instrument] =
+      Try(Class.forName(instrumentClassName)) match {
+        case Success(cls) =>
+          cls.asInstanceOf[Class[Instrument]]
+        case Failure(e) =>
+          logger.error(s"Could not find instrument $instrumentClassName - Check your spelling")
+          throw e
+      }
+    logger.info(s"Creating instrument: $instrumentClass")
+    instrumentClass.getConstructor(classOf[Configuration]).newInstance(appCfg)
+  }
 }
