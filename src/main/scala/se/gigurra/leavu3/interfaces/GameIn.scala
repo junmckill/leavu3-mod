@@ -68,10 +68,12 @@ object GameIn extends Logging {
   private val knownNavWaypoints = new mutable.HashMap[Int, Waypoint]
   private val rdrMemory = ContactMemory()
   private val rdrPositionUpdateMemory = new PositionChangeMemory()
+  private val fuelConsumption = DerivativeAverager(overSeconds = 0.75, minTimeStep = 0.25)
 
   @volatile var wingmenTgtsLastTminus1 = Seq.empty[Vec3] // To calculate ai wingmen tgt headings
   @volatile var wingmenTgtsLastTminus2 = Seq.empty[Vec3] // To calculate ai wingmen tgt headings
 
+  def estimatedFueldConsumption: Double = fuelConsumption.get
 
   def rdrMemory(contact: Contact): Option[Memorized[Contact]] = {
     rdrMemory.get(contact)
@@ -86,6 +88,7 @@ object GameIn extends Logging {
       .waypointWorkaround()
       .rdrMemoryWorkaround()
       .aiWingmenTgtHeadingsWorkaround()
+      .fuelConsumptionWorkaround()
     // Unfortunately can't keep adding workarounds like this...
     // .. Because Heisenberg flattens the whole shebang .. on every op
     // that ideally should be equivalent of CaseClass.copy(..).. but isn't! :(((
@@ -93,6 +96,11 @@ object GameIn extends Logging {
   }
 
   implicit class GameDataWorkarounds(newData: GameData) {
+
+    def fuelConsumptionWorkaround(): GameData = {
+      fuelConsumption.update(-newData.indicators.engines.fuelTotal, newData.metaData.modelTime)
+      newData
+    }
 
     def waypointWorkaround(): GameData = {
       if (newData.route.waypoints.nonEmpty) {

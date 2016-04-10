@@ -2,10 +2,10 @@ package se.gigurra.leavu3.mfd
 
 import com.badlogic.gdx.graphics.Color
 import com.google.common.base.Splitter
-import se.gigurra.leavu3.datamodel.{Configuration, CounterMeasures, DlinkData, EngineIndicators, GameData, Payload, Vec2}
+import se.gigurra.leavu3.datamodel.{Configuration, CounterMeasures, DlinkData, EngineIndicators, GameData, Payload, Vec2, self}
 import se.gigurra.leavu3.gfx.{Blink, CountDown}
 import se.gigurra.leavu3.gfx.RenderContext._
-import se.gigurra.leavu3.interfaces.DcsRemote
+import se.gigurra.leavu3.interfaces.{DcsRemote, GameIn}
 
 import scala.collection.JavaConversions._
 
@@ -87,6 +87,22 @@ case class SmsPage(implicit config: Configuration, mfd: MfdIfc) extends Page("SM
     }
   }
 
+  def bingo = DcsRemote.remoteConfig.missionSettings.bingo
+
+  def joker = DcsRemote.remoteConfig.missionSettings.joker
+
+  def getFuelTimeStringUntil(current: Double, target: Double): (String, Color) = {
+
+    val playtimeTotalSeconds = math.max(0.0, (current - target) / GameIn.estimatedFueldConsumption)
+    val playtimeTotalMinutes = (playtimeTotalSeconds / 60.0).round
+
+    val playtimeHours = (playtimeTotalSeconds / 3600.0).floor.round
+    val playtimeMinutes = playtimeTotalMinutes - playtimeHours * 60L
+
+    val playtimeColor = if (playtimeTotalMinutes > 10) GREEN else if (playtimeTotalMinutes > 0) YELLOW else RED
+    (s"${playtimeHours.pad(2, '0')}:${playtimeMinutes.pad(2, '0')}", playtimeColor)
+  }
+
   def drawTextPayload(payload: Payload, cms: CounterMeasures, eng: EngineIndicators): Unit = {
 
     val scale = config.symbolScale * 0.03 / font.getSpaceWidth
@@ -95,42 +111,53 @@ case class SmsPage(implicit config: Configuration, mfd: MfdIfc) extends Page("SM
       at((0.5, top - font.lineHeight * scale)) {
         transform(_.scalexy(scale)) {
 
+
           val leftPad = 8
           val rightPad = 22
-
-          val gunString = s"${payload.cannon.shells.toString.pad(leftPad)}x Gun".padRight(rightPad)
-          val chaffString = s"${cms.chaff.toString.pad(leftPad)}x Chaff".padRight(rightPad)
-          val flareString = s"${cms.flare.toString.pad(leftPad)}x Flare".padRight(rightPad)
-
           var n = 0
-          def drawTextLine(str: String, color: Color): Unit = {
-            transform(_.translate(y = -n.toFloat * font.getLineHeight))(str.drawRaw(color = color))
+
+          def nextLine(): Unit = {
             n += 1
           }
 
-          val gunColor = getRightSideTextColor(payload.cannon.shells, gunBlinkCountdown)
-          val chaffColor = getRightSideTextColor(cms.chaff, chaffBlinkCountdown)
-          val flareColor = getRightSideTextColor(cms.flare, flareBlinkCountdown)
-
-          def drawFuel(name: String, value: Double, bingo: Double, joker: Double): Unit = {
-            val fuelNumber = Splitter.fixedLength(3).split(((value * kg_to_fuelUnit * 0.1).round*10).toString.reverse).mkString(".").reverse
-            val fuelString  = s"${fuelNumber.pad(leftPad)}x $name".padRight(rightPad)
-            val fuelColor = if (value < bingo) RED else if (value < joker) YELLOW else GREEN
-            drawTextLine(fuelString, fuelColor)
+          def drawTextLine(left: Any, right: String, color: Color): Unit = {
+            val str = s"${left.toString.pad(leftPad)}x $right".padRight(rightPad)
+            transform(_.translate(y = -n.toFloat * font.getLineHeight))(str.drawRaw(color = color))
+            nextLine()
           }
 
+          def drawFuel(name: String, value: Double, bingo: Double, joker: Double, rounding: Long = 10): Unit = {
+            val m1 = 1.0 / rounding.toDouble
+            val m2 = rounding
+            val fuelNumber = Splitter.fixedLength(3).split(((value * kg_to_fuelUnit * m1).round*m2).toString.reverse).mkString(".").reverse
+            val fuelColor = if (value < bingo) RED else if (value < joker) YELLOW else GREEN
+            drawTextLine(fuelNumber, name, fuelColor)
+          }
 
-          drawTextLine(gunString, gunColor)
-          drawTextLine("", flareColor)
-          drawTextLine(chaffString, chaffColor)
-          drawTextLine(flareString, flareColor)
-          drawTextLine("", flareColor)
+          drawTextLine(payload.cannon.shells, "Gun", getRightSideTextColor(payload.cannon.shells, gunBlinkCountdown))
+          nextLine()
+          drawTextLine(cms.chaff, "Chaff", getRightSideTextColor(cms.chaff, chaffBlinkCountdown))
+          drawTextLine(cms.flare, "Flare", getRightSideTextColor(cms.flare, flareBlinkCountdown))
+          nextLine()
 
-          val bingo = DcsRemote.remoteConfig.missionSettings.bingo
-          val joker = DcsRemote.remoteConfig.missionSettings.joker
           drawFuel("Fuel", eng.fuelTotal, bingo = bingo * lbs_to_kg, joker = joker * lbs_to_kg)
           drawFuel("internal", eng.fuelInternal, bingo = bingo * lbs_to_kg, joker = joker * lbs_to_kg)
           drawFuel("external", eng.fuelExternal, bingo = 1, joker = 0)
+
+          nextLine()
+          drawTextLine(s"${eng.rpm.left.round} ${eng.rpm.right.round}", "RPM", GREEN)
+          drawFuel("Flow", GameIn.estimatedFueldConsumption * 3600.0, bingo = 100, joker = 1000, rounding = 100)
+
+          def drawFuelFlow(target: Double, name: String): Unit = {
+            val flow = getFuelTimeStringUntil(eng.fuelTotal, target)
+            drawTextLine(flow._1, s"T -> $name", flow._2)
+          }
+
+          if (GameIn.estimatedFueldConsumption > 0.001) {
+            drawFuelFlow(joker * lbs_to_kg, "Joker")
+            drawFuelFlow(bingo * lbs_to_kg, "Bingo")
+            drawFuelFlow(0, "Empty")
+          }
 
           if (payload.cannon.shells < gunLastCycle)
             gunBlinkCountdown = newCountdown()

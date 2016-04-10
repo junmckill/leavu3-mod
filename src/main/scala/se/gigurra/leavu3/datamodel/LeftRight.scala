@@ -6,6 +6,7 @@ import se.gigurra.heisenberg.{Schema, Parsed}
 case class LeftRight(source: SourceData = Map.empty) extends SafeParsed[LeftRight.type] {
   val left  = parse(schema.left)
   val right = parse(schema.right)
+  def total = left + right
 }
 
 object LeftRight extends Schema[LeftRight] {
