@@ -149,7 +149,7 @@ case class SmsPage(implicit config: Configuration, mfd: MfdIfc) extends Page("SM
 
           def drawFuelFlow(target: Double, name: String): Unit = {
             val flow = getFuelTimeStringUntil(eng.fuelTotal, target)
-            drawTextLine(flow._1, s"T -> $name", flow._2)
+            drawTextLine(flow._1, s"T->$name", flow._2)
           }
 
           if (GameIn.estimatedFueldConsumption > 0.001) {
