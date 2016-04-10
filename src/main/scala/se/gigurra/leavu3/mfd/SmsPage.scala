@@ -143,9 +143,8 @@ case class SmsPage(implicit config: Configuration, mfd: MfdIfc) extends Page("SM
           drawFuel("Fuel", eng.fuelTotal, bingo = bingo * lbs_to_kg, joker = joker * lbs_to_kg)
           drawFuel("internal", eng.fuelInternal, bingo = bingo * lbs_to_kg, joker = joker * lbs_to_kg)
           drawFuel("external", eng.fuelExternal, bingo = 1, joker = 0)
-
           nextLine()
-          drawTextLine(s"${eng.rpm.left.round} ${eng.rpm.right.round}", "RPM", GREEN)
+
           drawFuel("Flow", GameIn.estimatedFueldConsumption * 3600.0, bingo = 100, joker = 1000, rounding = 100)
 
           def drawFuelFlow(target: Double, name: String): Unit = {
@@ -158,6 +157,10 @@ case class SmsPage(implicit config: Configuration, mfd: MfdIfc) extends Page("SM
             drawFuelFlow(bingo * lbs_to_kg, "Bingo")
             drawFuelFlow(0, "Empty")
           }
+          nextLine()
+
+          drawFuel("lbs=Joker", joker * lbs_to_kg, -1, -1)
+          drawFuel("lbs=Bingo", bingo * lbs_to_kg, -1, -1)
 
           if (payload.cannon.shells < gunLastCycle)
             gunBlinkCountdown = newCountdown()
