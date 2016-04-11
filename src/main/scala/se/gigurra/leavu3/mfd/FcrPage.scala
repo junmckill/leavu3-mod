@@ -260,9 +260,23 @@ case class FcrPage(implicit config: Configuration, mfd: MfdIfc) extends Page("FC
 
         val w = 0.0225
 
+
+        val distCenterOwnshipNose = elev2dist(self.pitch)
+        val braCenterOwnshipNose = Bra(az, distCenterOwnshipNose, 0.0)
+        val centerOwnshipNose = self.position + braCenterOwnshipNose.toOffset: Vec2
+
+        at(centerOwnshipNose, heading = self.heading) {
+          lines(Seq(Vec2(-w, 0.0) -> Vec2(-w/4, 0.0)) * symbolScale, CYAN)
+        }
+
+        at(centerOwnshipNose) {
+          val elevString = deltaAngleString(elDir)
+          "w".drawCentered(CYAN, 0.55f)
+        }
+
         for (pos <- Seq(center, up, down)) {
           at(pos, heading = self.heading) {
-            lines(Seq(Vec2(-w, 0.0) -> Vec2(w, 0.0)) * symbolScale)
+            lines(Seq(Vec2(-w, 0.0) -> Vec2(w, 0.0)) * symbolScale, WHITE)
           }
         }
 
