@@ -15,6 +15,7 @@ Leavu is a software for building home cockpits for DCS Flaming Cliffs. It uses [
 * Unzip both where you like
 * Launch dcs-remote2.jar on your game PC
   * Verify a tray icon appears (black square with the text *oo DCS* inside it)
+  * Edit static-data.json with your callsign and data link host+group information
 * Launch leavu3.jar (an MFD should appear)
   * Click INF to get to the INFO page and verify Dcs Remote is connected
 * [**Make sure you don't expose dcs-remote2's listening port online**](https://github.com/GiGurra/dcs-remote2)
