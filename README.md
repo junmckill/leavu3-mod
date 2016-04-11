@@ -1,19 +1,18 @@
 # Leavu3
 
-Leavu is a software for building home cockpits for DCS Flaming Cliffs. It uses [Dcs Remote 2](https://github.com/GiGurra/dcs-remote2) to communicate with DCS. Leavu currently includes one instrument - a generic MFD with 3 pages:
+Leavu is a software for building home cockpits for DCS Flaming Cliffs. It uses [Dcs Remote 2](https://github.com/GiGurra/dcs-remote2) to communicate with DCS. Leavu currently includes one instrument - a generic MFD with 5 pages:
  * HSD
  * RWR
+ * SMS
+ * FCR
  * INFO
 
 
 ### INSTALLATION
 
-* Make sure you have java 8 or greater installed
+* Make sure you have [java 8 or greater installed](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
 * [Download dcs-remote2.zip and leavu3.zip](http://build.culvertsoft.se/dcs/)
 * Unzip both where you like
-* Copy the files inside the dcs-remote2/lua/ folder into your Dcs/Scripts/ folder
-  * e.g C:/Users/\<username>/Saved Games/DCS/Scripts/
-  * If you don't have a 'Scripts' folder - create one.
 * Launch dcs-remote2.jar on your game PC
   * Verify a tray icon appears (black square with the text *oo DCS* inside it)
 * Launch leavu3.jar (an MFD should appear)
@@ -22,6 +21,7 @@ Leavu is a software for building home cockpits for DCS Flaming Cliffs. It uses [
   * Otherwise anyone can run any lua script inside your DCS game ..
   * This is 12340 by default - do NOT expose/forward/open this port online!
 
+FYI: Dcs-Remote will automatically on startup install all required scripts into your DCS installation.
 
 ### CONFIGURATION
 
