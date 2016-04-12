@@ -57,6 +57,6 @@ Thanks!
 Built with LibGDX for cross platform compatibility. Works out of the box on:
 * Windows
 * Linux
-* Mac (untested)
+* Mac
 
 If you know someone with android experience that wants to do an android build, send a pull request!
