@@ -1,87 +1,129 @@
-
-local function addScriptDir(path)
-    package.path = package.path .. ";" .. path .. "/?.lua" .. ";" .. path .. "/?.dll"
-end
-
-addScriptDir(lfs.writedir() .. "/Scripts")
-addScriptDir(lfs.writedir() .. "/LuaSocket")
-addScriptDir(lfs.currentdir() .. "/Scripts")
-addScriptDir(lfs.currentdir() .. "/LuaSocket")
-
-local JSON = require 'dkjson'
-
 -- Because dkjson is simply much much too slow we need to do this :(
 
 dcs_remote_last_export_model_time = 0.0
 dcs_remote_export_cache = {}
-setmetatable(dcs_remote_export_cache, { __tojson = dcs_remote_export_cache_to_json })
-local buffer = {}
-local buffer_len = 0
-local byteConcatBuffer = {}
-local byteConcatBuffer_len = 0
+dcs_remote_buffer = {}
+dcs_remote_buffer_len = 0
+escape_strings = {}
+escape_strings[string.byte("\b")] = "\\b"
+escape_strings[string.byte("\f")] = "\\f"
+escape_strings[string.byte("\n")] = "\\n"
+escape_strings[string.byte("\r")] = "\\r"
+escape_strings[string.byte("\t")] = "\\t"
+escape_strings[string.byte("\"")] = "\\\""
+escape_strings[string.byte("\\")] = "\\\\"
 
-local character_escapes = {}
-character_escapes[string.byte("\b")] = "\\b"
-character_escapes[string.byte("\f")] = "\\f"
-character_escapes[string.byte("\n")] = "\\n"
-character_escapes[string.byte("\r")] = "\\r"
-character_escapes[string.byte("\t")] = "\\t"
-character_escapes[string.byte("\"")] = "\\\""
-character_escapes[string.byte("\\")] = "\\\\"
-
-function needs_escape(str)
+local function needs_escape(str)
     for idx = 1, #str do
         local char = str:byte(idx)
-        if character_escapes(char) then
+        if escape_strings[char] then
             return true
         end
     end
     return false
 end
 
-function escape_string(str)
+local function append(str)
+    dcs_remote_buffer[dcs_remote_buffer_len+1] = str
+    dcs_remote_buffer_len = dcs_remote_buffer_len + 1
+end
+
+local function append_escaped_string(str)
+
+    append("\"")
 
     if not needs_escape(str) then
-        return str
-    end
+        append(str)
+    else
 
-    byteConcatBuffer_len = 0
+        -- Assume DCS at least exports in utf8 format
 
-    for idx = 1, #str do
-        local char = str:byte(idx)
-        local escape = character_escapes(char)
-        if escape then
-            byteConcatBuffer[byteConcatBuffer_len+1] = string.byte(escape, 1)
-            byteConcatBuffer[byteConcatBuffer_len+1] = string.byte(escape, 2)
-        else
-            byteConcatBuffer[byteConcatBuffer_len+1] = char
+        LoSetCommand(156)
+
+        for idx = 1, #str do
+            local byte = str:byte(idx)
+            append(escape_strings[byte] or string.char(byte))
         end
     end
-    return table.concat(byteConcatBuffer, 0, byteConcatBuffer_len)
+
+    append("\"")
 end
 
-function dcs_remote_export_cache_to_json(data)
-
-    buffer_len = 0
-
-    for key, value in pairs(data) do
-        if type(key) == 'string' then
-            table.insert(string_keys, key)
-        elseif type(key) == 'number' then
-            table.insert(number_keys, key)
-            if key <= 0 or key >= math.huge then
-                number_keys_must_be_strings = true
-            elseif not maximum_number_key or key > maximum_number_key then
-                maximum_number_key = key
+local function isarray (tbl)
+    local max, n, arraylen = 0, 0, 0
+    for k,v in pairs (tbl) do
+        if k == 'n' and type(v) == 'number' then
+            arraylen = v
+            if v > max then
+                max = v
             end
+        else
+            if type(k) ~= 'number' or k < 1 or math.floor(k) ~= k then
+                return false
+            end
+            if k > max then
+                max = k
+            end
+            n = n + 1
         end
     end
-
-    setmetatable(data, nil)
-    local out = JSON.encode(data)
-    setmetatable(data, { __tojson = dcs_remote_export_cache_to_json })
-    return out
+    if max > 10 and max > arraylen and max > n * 2 then
+        return false -- don't create an array with too many holes
+    end
+    return true, max
 end
+
+local function write(data)
+
+    if not data then
+        append("null")
+        return
+    end
+
+    local tpe = type(data)
+
+    if tpe == 'string' then
+        append_escaped_string(data)
+
+    elseif tpe == 'number' then
+        append(tostring(data))
+
+    elseif tpe == 'boolean' then
+        append(data and "true" or "false")
+
+    elseif tpe == 'table' then
+
+        local isa, n = isarray(data)
+
+        if isa then
+            append("[")
+            for i = 1, n do
+                if i > 1 then append(",") end
+                write(data[i])
+            end
+            append("]")
+        else
+            append("{")
+            local i = 1
+            for key, value in pairs(data) do
+                if i > 1 then append(",") end
+                append_escaped_string(key)
+                append(":")
+                write(value)
+                i = i + 1
+            end
+            append("}")
+        end
+    end
+end
+
+local function dcs_remote_export_cache_to_json(data)
+    dcs_remote_buffer_len = 0
+    write(data)
+    return table.concat(dcs_remote_buffer, "", 1, dcs_remote_buffer_len)
+end
+
+setmetatable(dcs_remote_export_cache, { __tojson = dcs_remote_export_cache_to_json })
 
 function dcs_remote_export_data()
 
@@ -91,7 +133,7 @@ function dcs_remote_export_data()
         local t = LoGetModelTime()
         if t ~= dcs_remote_last_export_model_time then
             dcs_remote_last_export_model_time = t
-                
+
             local _pitch, _roll, _heading = LoGetADIPitchBankYaw()
             dcs_remote_export_cache.metaData = {
                 version = LoGetVersionInfo(),

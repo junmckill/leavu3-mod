@@ -18,7 +18,7 @@ import scala.collection.mutable
 object GameIn extends Logging {
 
   val path = "export/dcs_remote_export_data()"
-  val exportFunctionVersion = 11
+  val exportFunctionVersion = 1
   val versionFunctionName = "dcs_remote_export_version"
   val versionFunctionPath = s"export/$versionFunctionName()"
   val luaDataExportScript = Resource2String("lua_scripts/LoDataExport.lua")
@@ -163,7 +163,7 @@ object GameIn extends Logging {
     def start(appCfg: Configuration): Unit = {
 
       def doInject(): Future[Unit] = {
-        DcsRemote.post("export")(versionFunctionSourceCode).flatMap( _ => DcsRemote.post("export")(luaDataExportScript))
+        DcsRemote.post("export")(luaDataExportScript).flatMap( _ => DcsRemote.post("export")(versionFunctionSourceCode))
       }
 
       DefaultTimer.fps(1) {
@@ -176,7 +176,6 @@ object GameIn extends Logging {
               logger.info(s"Injecting data export script (New script version) .. -> ${GameIn.path}")
               doInject()
             case _ =>
-              println("OK")
               Future.Unit // Good to go!
           }.onFailure {
             case e: Throttled => // Ignore ..
