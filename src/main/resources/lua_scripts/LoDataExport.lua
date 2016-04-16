@@ -151,7 +151,7 @@ end
 
 local function dcs_remote_export_cache_to_json(data)
     dcs_remote_buffer_len = 0
-    write_value(data, "")
+    append_object(data, "")
     return table.concat(dcs_remote_buffer, "", 1, dcs_remote_buffer_len)
 end
 
