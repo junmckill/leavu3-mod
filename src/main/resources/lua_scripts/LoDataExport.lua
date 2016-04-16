@@ -40,8 +40,6 @@ local function append_escaped_string(str)
 
         -- Assume DCS at least exports in utf8 format
 
-        LoSetCommand(156)
-
         for idx = 1, #str do
             local byte = str:byte(idx)
             append(escape_strings[byte] or string.char(byte))
