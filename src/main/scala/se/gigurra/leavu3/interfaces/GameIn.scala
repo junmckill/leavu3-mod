@@ -3,7 +3,7 @@ package se.gigurra.leavu3.interfaces
 import com.twitter.finagle.FailedFastException
 import com.twitter.finagle.http.Status
 import com.twitter.util.{Duration, Future}
-import se.gigurra.leavu3.datamodel.{Configuration, Contact, GameData, GameDataWire, Vec3, Waypoint}
+import se.gigurra.leavu3.datamodel._
 import se.gigurra.leavu3.gfx.Drawable
 import se.gigurra.leavu3.util._
 import se.gigurra.serviceutils.json.JSON
@@ -18,6 +18,17 @@ import scala.collection.mutable
 object GameIn extends Logging {
 
   val path = "export/dcs_remote_export_data()"
+  val exportFunctionVersion = 1
+  val versionFunctionName = "dcs_remote_export_version"
+  val versionFunctionPath = s"export/$versionFunctionName()"
+  val luaDataExportScript = Resource2String("lua_scripts/LoDataExport.lua")
+  val versionFunctionSourceCode: String = {
+    s"""
+       |function $versionFunctionName()
+       |  return { version = $exportFunctionVersion }
+       |end
+       """.stripMargin
+  }
 
   @volatile var snapshot = GameData()
   @volatile var dcsRemoteConnected = true
@@ -149,16 +160,21 @@ object GameIn extends Logging {
 
   object ScriptInject extends Logging {
 
-    val luaDataExportScript = Resource2String("lua_scripts/LoDataExport.lua")
-
     def start(appCfg: Configuration): Unit = {
 
+      def doInject(): Future[Unit] = {
+        DcsRemote.post("export")(versionFunctionSourceCode).flatMap( _ => DcsRemote.post("export")(luaDataExportScript))
+      }
+
       DefaultTimer.fps(1) {
-        if (DcsRemote.isActingMaster && dcsGameConnected && !snapshot.isValid) {
-          DcsRemote.get(GameIn.path).map(JSON.read[GameDataWire]).flatMap {
+        if (DcsRemote.isActingMaster && dcsGameConnected) {
+          DcsRemote.get(versionFunctionPath).map(JSON.read[ExportVersion]).flatMap {
             case data if data.err.isDefined =>
-              logger.info(s"Injecting data export script .. -> ${GameIn.path}")
-              DcsRemote.post("export")(luaDataExportScript)
+              logger.info(s"Injecting data export script (None present) .. -> ${GameIn.path}")
+              doInject()
+            case data if data.version < exportFunctionVersion =>
+              logger.info(s"Injecting data export script (New script version) .. -> ${GameIn.path}")
+              doInject()
             case _ =>
               Future.Unit // Good to go!
           }.onFailure {

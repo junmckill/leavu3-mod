@@ -93,4 +93,15 @@ object GameDataWire extends Schema[GameDataWire] with Logging {
   val metadata        = required[MetaData]("metaData", default = MetaData())
 }
 
+case class ExportVersion(source: SourceData = Map.empty) extends SafeParsed[ExportVersion.type] {
+  val err       = parse(schema.err)
+  val requestId = parse(schema.requestId)
+  val version   = parse(schema.version)
+}
+
+object ExportVersion extends Schema[ExportVersion] with Logging {
+  val err       = optional[String]("err")
+  val requestId = optional[String]("requestId")
+  val version   = required[Int]("version", default = -1)
+}
 
