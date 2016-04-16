@@ -75,7 +75,7 @@ end
 
 local function write(data)
 
-    if not data then
+    if data == nil then
         append("null")
         return
     end
