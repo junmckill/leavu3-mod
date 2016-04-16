@@ -6,11 +6,11 @@ import se.gigurra.heisenberg.{Schema, Parsed}
 
 case class Indicators(source: SourceData = Map.empty) extends SafeParsed[Indicators.type] {
   val nav               = parse(schema.nav)
-  val beacons           = parse(schema.beacons)
+  //val beacons           = parse(schema.beacons)
   val engines           = parse(schema.engines)
-  val mechIndicators    = parse(schema.mechIndicators)
+ /* val mechIndicators    = parse(schema.mechIndicators)
   val failureIndicators = parse(schema.failureIndicators)
-  val hsiIndicators     = parse(schema.hsiIndicators)
+  val hsiIndicators     = parse(schema.hsiIndicators)*/
 }
 
 object Indicators extends Schema[Indicators] {

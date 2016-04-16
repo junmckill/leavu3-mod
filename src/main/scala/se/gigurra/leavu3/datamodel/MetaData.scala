@@ -4,10 +4,10 @@ import se.gigurra.heisenberg.MapData._
 import se.gigurra.heisenberg.{Schema, Parsed}
 
 case class MetaData(source: SourceData = Map.empty) extends SafeParsed[MetaData.type] {
-  val camera    = parse(schema.camera)
+  //val camera    = parse(schema.camera)
   val planeId   = parse(schema.planeId)
   val modelTime = parse(schema.modelTime)
-  val version   = parse(schema.version)
+  //val version   = parse(schema.version)
   val selfData  = parse(schema.selfData)
 }
 
