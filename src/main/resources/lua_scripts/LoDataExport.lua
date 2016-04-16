@@ -83,11 +83,12 @@ end
 
 local function append_array(data, path)
     local elementPath = path .. ".element"
+    local knownWriter = cached_writers[elementPath]
     local _, n = isarray(data)
     append("[")
     for i = 1,n  do
         if i > 1 then append(",") end
-        write_value(data[i], elementPath)
+        write_value(data[i], elementPath, knownWriter)
     end
     append("]")
 end
@@ -105,14 +106,14 @@ local function append_object(data, path)
     append("}")
 end
 
-function write_value(data, path)
+function write_value(data, path, knownWriter)
 
     if data == nil then
         append("null")
         return
     end
 
-    local writer = cached_writers[path]
+    local writer = knownWriter or cached_writers[path]
 
     if writer then
         writer(data, path)
