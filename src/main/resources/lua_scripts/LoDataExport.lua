@@ -57,31 +57,6 @@ local function append_boolean(data)
     append(data and "true" or "false")
 end
 
-local function append_array(data, path)
-    local elementPath = path .. ".element"
-    local n = #data
-    local knownWriter = cached_writers[elementPath]
-    append("[")
-    for i = 1,n  do
-        if i > 1 then append(",") end
-        write_value(data[i], elementPath, knownWriter)
-    end
-    append("]")
-end
-
-local function append_object(data, path)
-    append("{")
-    local i = 1
-    for key, value in pairs(data) do
-        if i > 1 then append(",") end
-        append_escaped_string(key)
-        append(":")
-        write_value(value, path .. "." .. key)
-        i = i + 1
-    end
-    append("}")
-end
-
 local function isarray (tbl)
     local max, n, arraylen = 0, 0, 0
     for k,v in pairs (tbl) do
@@ -106,14 +81,38 @@ local function isarray (tbl)
     return true, max
 end
 
-function write_value(data, path, knownWriter)
+local function append_array(data, path)
+    local elementPath = path .. ".element"
+    local _, n = isarray(data)
+    append("[")
+    for i = 1,n  do
+        if i > 1 then append(",") end
+        write_value(data[i], elementPath)
+    end
+    append("]")
+end
+
+local function append_object(data, path)
+    append("{")
+    local i = 1
+    for key, value in pairs(data) do
+        if i > 1 then append(",") end
+        append_escaped_string(key)
+        append(":")
+        write_value(value, path .. "." .. key)
+        i = i + 1
+    end
+    append("}")
+end
+
+function write_value(data, path)
 
     if data == nil then
         append("null")
         return
     end
 
-    local writer = knownWriter or cached_writers[path]
+    local writer = cached_writers[path]
 
     if writer then
         writer(data, path)
