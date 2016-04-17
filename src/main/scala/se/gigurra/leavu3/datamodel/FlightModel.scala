@@ -4,14 +4,14 @@ import se.gigurra.heisenberg.MapData._
 import se.gigurra.heisenberg.{Schema, Parsed}
 
 case class FlightModel(source: SourceData = Map.empty) extends SafeParsed[FlightModel.type] {
-  val pitch             = parse(schema.pitch).toDegrees
+  /*val pitch             = parse(schema.pitch).toDegrees
   val roll              = parse(schema.roll).toDegrees
   val trueHeading       = parse(schema.trueHeading).toDegrees
   val magneticHeading   = parse(schema.magneticHeading).toDegrees
   val angleOfAttack     = parse(schema.angleOfAttack).toDegrees
-
+*/
   val velocity          = parse(schema.velocity)
-  val acceleration      = parse(schema.acceleration)
+ /* val acceleration      = parse(schema.acceleration)
 
   val indicatedAirspeed = parse(schema.indicatedAirspeed)
   val trueAirspeed      = parse(schema.trueAirspeed)
@@ -26,7 +26,7 @@ case class FlightModel(source: SourceData = Map.empty) extends SafeParsed[Flight
   val slipBallDeviation = parse(schema.slipBallDeviation)
 
   val ilsLocalizer      = parse(schema.ilsLocalizer)
-  val ilsGlideslope     = parse(schema.ilsGlideslope)
+  val ilsGlideslope     = parse(schema.ilsGlideslope)*/
 }
 
 object FlightModel extends Schema[FlightModel] {

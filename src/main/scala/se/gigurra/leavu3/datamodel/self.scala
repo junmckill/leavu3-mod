@@ -15,6 +15,5 @@ object self {
   def heading: Float = GameIn.snapshot.selfData.heading
   def position: Vec3 = GameIn.snapshot.selfData.position
   def velocity: Vec3 = GameIn.snapshot.flightModel.velocity
-  def acceleration: Vec3 = GameIn.snapshot.flightModel.acceleration
 }
 
