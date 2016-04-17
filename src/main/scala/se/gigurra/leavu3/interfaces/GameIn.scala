@@ -172,7 +172,7 @@ object GameIn extends Logging {
             case data if data.err.isDefined =>
               logger.info(s"Injecting data export script (None present) .. -> ${GameIn.path}")
               doInject()
-            case data if data.version > exportFunctionVersion =>
+            case data if data.version < exportFunctionVersion =>
               logger.info(s"Injecting data export script (New script version) .. -> ${GameIn.path}")
               doInject()
             case _ =>
