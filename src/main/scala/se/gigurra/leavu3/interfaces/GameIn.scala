@@ -167,7 +167,7 @@ object GameIn extends Logging {
       }
 
       DefaultTimer.fps(1) {
-        if (DcsRemote.isActingMaster/* && dcsGameConnected*/) {
+        if (DcsRemote.isActingMaster) {
           DcsRemote.get(versionFunctionPath).map(JSON.read[ExportVersion]).flatMap {
             case data if data.err.isDefined =>
               logger.info(s"Injecting data export script (None present) .. -> ${GameIn.path}")
