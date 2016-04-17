@@ -11,7 +11,6 @@ escape_strings[string.byte("\r")] = "\\r"
 escape_strings[string.byte("\t")] = "\\t"
 escape_strings[string.byte("\"")] = "\\\""
 escape_strings[string.byte("\\")] = "\\\\"
-local cached_writers = {}
 
 local write_value
 
@@ -21,7 +20,8 @@ local function append(s)
 end
 
 local function needs_escape(str)
-    for idx = 1, #str do
+    local n = string.len(str)
+    for idx = 1,n  do
         local char = str:byte(idx)
         if escape_strings[char] then
             return true
@@ -40,7 +40,8 @@ local function append_escaped_string(str)
 
         -- Assume DCS at least exports in utf8 format
 
-        for idx = 1, #str do
+        local n = string.len(str)
+        for idx = 1,n do
             local byte = str:byte(idx)
             append(escape_strings[byte] or string.char(byte))
         end
@@ -81,70 +82,54 @@ local function isarray (tbl)
     return true, max
 end
 
-local function append_array(data, path)
-    local elementPath = path .. ".element"
-    local knownWriter = cached_writers[elementPath]
-    local _, n = isarray(data)
+local function append_array(data, n)
     append("[")
     for i = 1,n  do
         if i > 1 then append(",") end
-        write_value(data[i], elementPath, knownWriter)
+        write_value(data[i])
     end
     append("]")
 end
 
-local function append_object(data, path)
+local function append_object(data)
     append("{")
     local i = 1
     for key, value in pairs(data) do
         if i > 1 then append(",") end
         append_escaped_string(key)
         append(":")
-        write_value(value, path .. "." .. key)
+        write_value(value)
         i = i + 1
     end
     append("}")
 end
 
-function write_value(data, path, knownWriter)
+function write_value(data)
 
     if data == nil then
         append("null")
         return
     end
 
-    local writer = knownWriter or cached_writers[path]
-
-    if writer then
-        writer(data, path)
-        return
-    end
-
     local tpe = type(data)
 
     if tpe == 'string' then
-        append_escaped_string(data, path)
-        cached_writers[path] = append_escaped_string
+        append_escaped_string(data)
 
     elseif tpe == 'number' then
-        append_number(data, path)
-        cached_writers[path] = append_number
+        append_number(data)
 
     elseif tpe == 'boolean' then
-        append_boolean(data, path)
-        cached_writers[path] = append_boolean
+        append_boolean(data)
 
     elseif tpe == 'table' then
 
-        local isa = isarray(data)
+        local isa, n = isarray(data)
 
         if isa then
-            append_array(data, path)
-            cached_writers[path] = append_array
-
+            append_array(data, n)
         else
-            append_object(data, path)
-            cached_writers[path] = append_object
+            append_object(data)
         end
     end
 end
