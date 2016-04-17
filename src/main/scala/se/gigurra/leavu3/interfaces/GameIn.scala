@@ -30,8 +30,7 @@ object GameIn extends Logging {
        """.stripMargin
   }
 
-  @volatile var renderThreadSnapshot = GameData()
-  @volatile var latestReceivedSnapshot = GameData()
+  @volatile var snapshot = GameData()
   @volatile var dcsRemoteConnected = true
   @volatile var dcsGameConnected = false
 
@@ -51,9 +50,9 @@ object GameIn extends Logging {
           while(true) {
 
             if (DcsRemote.isActingMaster) {
-              val oldSnapshot = latestReceivedSnapshot
+              val oldSnapshot = snapshot
               Try(Await.result(doUpdate(drawable)))
-              val newSnapshot = latestReceivedSnapshot
+              val newSnapshot = snapshot
               if (!(oldSnapshot eq newSnapshot) && newSnapshot.modelTime == oldSnapshot.modelTime) {
                 logger.warning("DCS Overloaded with requests... backing off")
                 Thread.sleep(backoffTimeMillis) // Wait some more
@@ -83,7 +82,7 @@ object GameIn extends Logging {
         .map(_.toGameData)
         .map(postProcess)
         .map { newSnapshot =>
-          latestReceivedSnapshot = newSnapshot
+          snapshot = newSnapshot
           dcsRemoteConnected = true
           dcsGameConnected = true
           drawable.draw()
@@ -96,16 +95,16 @@ object GameIn extends Logging {
           }
           dcsRemoteConnected = true
           dcsGameConnected = false
-          latestReceivedSnapshot = GameData()
+          snapshot = GameData()
         case e: FailedFastException =>
           dcsRemoteConnected = false
           dcsGameConnected = false
-          latestReceivedSnapshot = GameData()
+          snapshot = GameData()
         case e =>
           logger.error(s"Could not fetch game data from Dcs Remote: $e")
           dcsRemoteConnected = false
           dcsGameConnected = false
-          latestReceivedSnapshot = GameData()
+          snapshot = GameData()
       }
     }
   }

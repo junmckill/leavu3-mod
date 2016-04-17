@@ -14,9 +14,9 @@ import scala.collection.mutable
   */
 case class FcrPage(implicit config: Configuration, mfd: MfdIfc) extends Page("FCR", Page.Priorities.FCR) {
 
-  def screenDistMeters: Double = GameIn.renderThreadSnapshot.sensors.status.scale.distance
+  def screenDistMeters: Double = GameIn.snapshot.sensors.status.scale.distance
 
-  def screenWidthDegrees: Double = GameIn.renderThreadSnapshot.sensors.status.scale.azimuth
+  def screenWidthDegrees: Double = GameIn.snapshot.sensors.status.scale.azimuth
 
   val inset = 0.2
   val OSB_AI = 18

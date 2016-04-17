@@ -80,7 +80,7 @@ object Dlink extends Logging {
     def processDlinkMapData(mapData: Map[String, Any]): Unit = {
       val everyoneOnNetwork = membersByName(mapData)
       allTeams = everyoneOnNetwork.groupBy(_._2.selfData.coalitionId)
-      ownTeam = allTeams.getOrElse(GameIn.renderThreadSnapshot.selfData.coalitionId, Map.empty)
+      ownTeam = allTeams.getOrElse(GameIn.snapshot.selfData.coalitionId, Map.empty)
       recvOk = true
     }
 
@@ -123,7 +123,7 @@ object Dlink extends Logging {
     }
 
     def sameTeam(data: DlinkData): Boolean = {
-      data.selfData.coalitionId == GameIn.renderThreadSnapshot.selfData.coalitionId
+      data.selfData.coalitionId == GameIn.snapshot.selfData.coalitionId
     }
   }
 
@@ -139,7 +139,7 @@ object Dlink extends Logging {
 
       DefaultTimer.fps(2) {
 
-        val source = GameIn.renderThreadSnapshot
+        val source = GameIn.snapshot
         if (DcsRemote.isActingMaster && source.err.isEmpty && source.age < 3.0) {
 
           dlinkClient.foreach {

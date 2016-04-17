@@ -54,7 +54,7 @@ abstract class Page(val name: String, val priority: Int)(implicit config: Config
   }
 
   protected def scanZoneAzDirectionAndWidth: (Double, Double) = {
-    val game = GameIn.renderThreadSnapshot
+    val game = GameIn.snapshot
     val sensors = game.sensors.status
     val sttScanZoneOverride = game.pdt.isDefined &&
       (game.aircraftMode.isInCac || game.aircraftMode.isStt)
@@ -65,7 +65,7 @@ abstract class Page(val name: String, val priority: Int)(implicit config: Config
 
   protected def scanZoneElDirectionAndHeight: (Double, Double) = {
 
-    val game = GameIn.renderThreadSnapshot
+    val game = GameIn.snapshot
     val sensors = game.sensors.status
     val sttScanZoneOverride = game.pdt.isDefined &&
       (game.aircraftMode.isInCac || game.aircraftMode.isStt)
@@ -383,7 +383,7 @@ abstract class Page(val name: String, val priority: Int)(implicit config: Config
 
 
     val drawDist = if (designated) {
-      GameIn.renderThreadSnapshot.tdcPosition.fold(drawDistUndesignated)(tdcp => (tdcp - self.position).asBra.range2d)
+      GameIn.snapshot.tdcPosition.fold(drawDistUndesignated)(tdcp => (tdcp - self.position).asBra.range2d)
     } else {
       drawDistUndesignated
     }
