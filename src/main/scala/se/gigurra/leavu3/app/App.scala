@@ -19,8 +19,6 @@ class App(appCfg: Configuration,
 
   override def render(): Unit = {
 
-    GameIn.snapshot = GameIn.snapshot
-
     while(!Keyboard.inputQue.isEmpty)
       instrument.keyPressed(Keyboard.inputQue.poll)
     instrument.update(GameIn.snapshot, Dlink.In.ownTeam.toSeq.sortBy(_._1))
