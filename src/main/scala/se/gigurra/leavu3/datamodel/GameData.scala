@@ -53,6 +53,8 @@ case class GameData(err: Option[String] = None,
                     route: Route = Route(),
                     metaData: MetaData = MetaData()) {
 
+  def modelTime: Double = metaData.modelTime
+
   def selfData: SelfData = metaData.selfData
 
   def tdcPosition: Option[Vec2] = sensors.status.tdcPosition(selfData.heading, selfData.position)

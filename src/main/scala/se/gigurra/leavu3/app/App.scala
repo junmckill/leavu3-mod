@@ -18,9 +18,12 @@ class App(appCfg: Configuration,
   val instrument = App.spawnInstrument(appCfg)
 
   override def render(): Unit = {
+
+    GameIn.renderThreadSnapshot = GameIn.latestReceivedSnapshot
+
     while(!Keyboard.inputQue.isEmpty)
       instrument.keyPressed(Keyboard.inputQue.poll)
-    instrument.update(GameIn.snapshot, Dlink.In.ownTeam.toSeq.sortBy(_._1))
+    instrument.update(GameIn.renderThreadSnapshot, Dlink.In.ownTeam.toSeq.sortBy(_._1))
     DcsRemote.ownPriority = instrument.priority
     onEveryFrame()
   }

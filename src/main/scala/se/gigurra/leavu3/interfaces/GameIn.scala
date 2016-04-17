@@ -2,7 +2,7 @@ package se.gigurra.leavu3.interfaces
 
 import com.twitter.finagle.FailedFastException
 import com.twitter.finagle.http.Status
-import com.twitter.util.{Duration, Future}
+import com.twitter.util.{Await, Duration, Future, Try}
 import se.gigurra.leavu3.datamodel._
 import se.gigurra.leavu3.gfx.Drawable
 import se.gigurra.leavu3.util._
@@ -30,7 +30,8 @@ object GameIn extends Logging {
        """.stripMargin
   }
 
-  @volatile var snapshot = GameData()
+  @volatile var renderThreadSnapshot = GameData()
+  @volatile var latestReceivedSnapshot = GameData()
   @volatile var dcsRemoteConnected = true
   @volatile var dcsGameConnected = false
 
@@ -41,37 +42,70 @@ object GameIn extends Logging {
 
   object Updater {
     def start(appCfg: Configuration, drawable: Drawable): Unit = {
-      DefaultTimer.fps(appCfg.gameDataFps) {
-        DcsRemote
-          .get(path, Some(Duration.fromSeconds(if (DcsRemote.isActingMaster) 0 else 1))) // Master will update
-          .map(JSON.read[GameDataWire])
-          .map(_.toGameData)
-          .map(postProcess)
-          .map { newSnapshot =>
-            snapshot = newSnapshot
-            dcsRemoteConnected = true
-            dcsGameConnected = true
-            drawable.draw()
-          }.onFailure {
-          case e: Throttled => // Ignore
-          case e: ServiceException =>
-            e.response.status match {
-              case Status.ServiceUnavailable => // No need to log every message when not having dcs up and running
-              case _ => logger.warning(s"Dcs Remote replied: Could not fetch game data from Dcs Remote: $e")
+
+      new Thread() {
+
+        val backoffTimeMillis = 25
+
+        override def run(): Unit = {
+          while(true) {
+
+            if (DcsRemote.isActingMaster) {
+              val oldSnapshot = latestReceivedSnapshot
+              Try(Await.result(doUpdate(drawable)))
+              val newSnapshot = latestReceivedSnapshot
+              if (!(oldSnapshot eq newSnapshot) && newSnapshot.modelTime == oldSnapshot.modelTime) {
+                logger.warning("DCS Overloaded with requests... backing off")
+                Thread.sleep(backoffTimeMillis) // Wait some more
+              }
+              Thread.sleep(1)
+            } else {
+              Thread.sleep(10)
             }
-            dcsRemoteConnected = true
-            dcsGameConnected = false
-            snapshot = GameData()
-          case e: FailedFastException =>
-            dcsRemoteConnected = false
-            dcsGameConnected = false
-            snapshot = GameData()
-          case e =>
-            logger.error(s"Could not fetch game data from Dcs Remote: $e")
-            dcsRemoteConnected = false
-            dcsGameConnected = false
-            snapshot = GameData()
+
+          }
         }
+        setDaemon(true)
+        start()
+      }
+
+      DefaultTimer.fps(appCfg.gameDataFps) {
+        if (DcsRemote.isActingSlave) {
+          doUpdate(drawable)
+        }
+      }
+    }
+
+    def doUpdate(drawable: Drawable): Future[Unit] = {
+      DcsRemote
+        .get(path, Some(Duration.fromSeconds(if (DcsRemote.isActingMaster) 0 else 1))) // Master will update
+        .map(JSON.read[GameDataWire])
+        .map(_.toGameData)
+        .map(postProcess)
+        .map { newSnapshot =>
+          latestReceivedSnapshot = newSnapshot
+          dcsRemoteConnected = true
+          dcsGameConnected = true
+          drawable.draw()
+        }.onFailure {
+        case e: Throttled => // Ignore
+        case e: ServiceException =>
+          e.response.status match {
+            case Status.ServiceUnavailable => // No need to log every message when not having dcs up and running
+            case _ => logger.warning(s"Dcs Remote replied: Could not fetch game data from Dcs Remote: $e")
+          }
+          dcsRemoteConnected = true
+          dcsGameConnected = false
+          latestReceivedSnapshot = GameData()
+        case e: FailedFastException =>
+          dcsRemoteConnected = false
+          dcsGameConnected = false
+          latestReceivedSnapshot = GameData()
+        case e =>
+          logger.error(s"Could not fetch game data from Dcs Remote: $e")
+          dcsRemoteConnected = false
+          dcsGameConnected = false
+          latestReceivedSnapshot = GameData()
       }
     }
   }
