@@ -52,6 +52,12 @@ ONLY use [the Issue tracker at the top of this page](https://github.com/GiGurra/
 Thanks!
 
 
+### Performance!
+
+For max performance, try configuring your jvm to something along the lines of:
+JAVA_TOOL_OPTIONS: -XX:+UseG1GC -XX:MaxGCPauseMillis=5 -Xms32m -XX:CompileThreshold=100
+
+
 ### COMPATIBILITY
 
 Built with LibGDX for cross platform compatibility. Works out of the box on:
