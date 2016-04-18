@@ -1,5 +1,6 @@
 package se.gigurra.leavu3.datamodel
 
+import com.twitter.util.NonFatal
 import se.gigurra.heisenberg._
 
 /**
@@ -11,7 +12,7 @@ abstract class SafeParsed[S <: Schema[_]](implicit schema: S) extends Parsed[S](
     try {
       super.parse(field, orElse)
     } catch {
-      case e: Exception => field.getDefault
+      case NonFatal(e) => field.getDefault
     }
   }
 
@@ -19,7 +20,7 @@ abstract class SafeParsed[S <: Schema[_]](implicit schema: S) extends Parsed[S](
     try {
       super.parse(field)
     } catch {
-      case e: Exception => field.getDefault
+      case NonFatal(e) => field.getDefault
     }
   }
 
@@ -27,7 +28,7 @@ abstract class SafeParsed[S <: Schema[_]](implicit schema: S) extends Parsed[S](
     try {
       super.parse(field, orElse)
     } catch {
-      case e: Exception =>
+      case NonFatal(e) =>
         field.getDefault.getOrElse(throw new RuntimeException(s"No default value set for field $field on ${this.getClass}"))
     }
   }
@@ -36,7 +37,7 @@ abstract class SafeParsed[S <: Schema[_]](implicit schema: S) extends Parsed[S](
     try {
       super.parse(field)
     } catch {
-      case e: Exception =>
+      case NonFatal(e) =>
         field.getDefault.getOrElse(throw new RuntimeException(s"No default value set for field $field on ${this.getClass}"))
     }
   }
