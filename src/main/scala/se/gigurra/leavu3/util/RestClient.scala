@@ -4,7 +4,7 @@ import java.net.InetAddress
 
 import com.twitter.finagle.Http
 import com.twitter.finagle.http._
-import com.twitter.util.{JavaTimer, _}
+import com.twitter.util._
 import se.gigurra.serviceutils.twitter.service.ServiceException
 
 /**
@@ -13,7 +13,7 @@ import se.gigurra.serviceutils.twitter.service.ServiceException
 case class RestClient(addr: String,
                       port: Int,
                       name: String,
-                      verifyAddress: Boolean = true)(implicit val timer: JavaTimer = DefaultTimer.underlying) {
+                      verifyAddress: Boolean = true)(implicit val timer: Timer = DefaultTimer.underlying) {
 
   if (verifyAddress) {
     // Check valid address first
@@ -54,9 +54,9 @@ case class RestClient(addr: String,
 
   private def doPost(path: String, data: String): Future[Unit] = {
     val request = Request(Version.Http11, Method.Post, path)
+    request.setContentTypeJson()
     request.contentString = data
     request.contentLength = request.length
-    request.contentType = "application/json"
     client.apply(request).raiseWithin(timeout).flatMap {
       case OkResponse(response)  => Future.Unit
       case BadResponse(response) => Future.exception(ServiceException(response))
@@ -73,9 +73,9 @@ case class RestClient(addr: String,
 
   private def doPut(path: String, data: String): Future[Unit] = {
     val request = Request(Version.Http11, Method.Put, path)
+    request.setContentTypeJson()
     request.contentString = data
     request.contentLength = request.length
-    request.contentType = "application/json"
     client.apply(request).raiseWithin(timeout).flatMap {
       case OkResponse(response)  => Future.Unit
       case BadResponse(response) => Future.exception(ServiceException(response))

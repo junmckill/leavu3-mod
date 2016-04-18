@@ -23,7 +23,7 @@ object Keyboard extends Logging {
     if (configuration.keyInputEnabled) {
       var oldKeysPressed = Set.empty[Int]
 
-      DefaultTimer.fps(configuration.gameDataFps) {
+      DefaultTimer.fps(40) {
         DcsRemote.get("keyboard", maxAge = Some(Duration.fromMilliseconds(Int.MaxValue)))
           .map(JSON.readMap(_).keys.map(_.toInt).toSet)
           .map { keysPressed =>

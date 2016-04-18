@@ -40,8 +40,12 @@ object GameIn extends Logging {
   }
 
   object Updater {
+
+    // Try having the update timer on its own thread
+    object updateTimer extends UtilTimer
+
     def start(appCfg: Configuration, drawable: Drawable): Unit = {
-      DefaultTimer.fps(appCfg.gameDataFps) {
+      updateTimer.fps(appCfg.gameDataFps) {
         DcsRemote
           .get(path, Some(Duration.fromSeconds(if (DcsRemote.isActingMaster) 0 else 1))) // Master will update
           .map(JSON.read[GameDataWire])
@@ -100,10 +104,6 @@ object GameIn extends Logging {
       .rdrMemoryWorkaround()
       .aiWingmenTgtHeadingsWorkaround()
       .fuelConsumptionWorkaround()
-    // Unfortunately can't keep adding workarounds like this...
-    // .. Because Heisenberg flattens the whole shebang .. on every op
-    // that ideally should be equivalent of CaseClass.copy(..).. but isn't! :(((
-    // Need to rethink or replace heisenberg..
   }
 
   implicit class GameDataWorkarounds(newData: GameData) {

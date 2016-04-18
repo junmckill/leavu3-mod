@@ -36,7 +36,7 @@ case class DcsRemote private(config: Configuration) extends Logging {
       }
   }
 
-  DefaultTimer.fps(config.gameDataFps / 2) {
+  DefaultTimer.fps(10) {
     registerLeavu3Instance()
       .onFailure {
         case e: Throttled =>
