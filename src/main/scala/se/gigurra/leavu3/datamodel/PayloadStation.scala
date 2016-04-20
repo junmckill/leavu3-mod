@@ -8,6 +8,9 @@ case class PayloadStation(source: SourceData) extends SafeParsed[PayloadStation.
   val isContainer = parse(schema.isContainer)
   val count       = parse(schema.count)
   val typ         = parse(schema.typ)
+
+  def isEmpty: Boolean = count <= 0
+  def nonEmpty: Boolean = !isEmpty
 }
 
 object PayloadStation extends Schema[PayloadStation] {

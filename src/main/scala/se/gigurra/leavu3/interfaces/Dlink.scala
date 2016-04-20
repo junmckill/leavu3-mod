@@ -25,7 +25,7 @@ object Dlink extends Logging {
 
   def start(appCfg: Configuration): Unit = {
     In.start()
-    Out.start()
+    Out.start(appCfg)
   }
 
   object CfgUpdate {
@@ -135,7 +135,7 @@ object Dlink extends Logging {
     def addMark(id: String, mark: Mark): Unit = DcsRemote.store("marks", id, mark)
     def deleteMark(id: String): Unit = DcsRemote.delete("marks", id)
 
-    def start(): Unit = {
+    def start(appCfg: Configuration): Unit = {
 
       DefaultTimer.fps(2) {
 
@@ -152,7 +152,8 @@ object Dlink extends Logging {
                 Member.velocity -> source.flightModel.velocity,
                 Member.targets -> source.sensors.targets.locked,
                 Member.selfData -> source.metaData.selfData,
-                Member.markPos -> marks.mapValues(_.item)
+                Member.markPos -> marks.mapValues(_.item),
+                Member.pylons -> source.payload.toDlinkPayload(appCfg)
               )
               JSON.write(self)
             }.onFailure {

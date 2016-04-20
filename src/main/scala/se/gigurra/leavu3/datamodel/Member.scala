@@ -15,6 +15,7 @@ case class Member(source: SourceData = Map.empty) extends SafeParsed[Member.type
   val selfData        = parse(schema.selfData)
   val targets         = parse(schema.targets)
   val marks           = parse(schema.markPos)
+  val pylons          = parse(schema.pylons)
   def pitch           = selfData.pitch
   def roll            = selfData.roll
   def heading         = selfData.heading
@@ -30,4 +31,5 @@ object Member extends Schema[Member] {
   val selfData  = required[SelfData]("selfData", default = SelfData())
   val targets   = required[Seq[Target]]("targets", default = Seq.empty)
   val markPos   = required[Map[String, Mark]]("markPos", default = Map.empty[String, Mark])
+  val pylons   = required[Map[String, DlinkPylon]]("pylons", default = Map.empty[String, DlinkPylon])
 }
