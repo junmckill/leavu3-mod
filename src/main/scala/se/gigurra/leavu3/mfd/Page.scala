@@ -224,7 +224,7 @@ abstract class Page(val name: String, val priority: Int)(implicit config: Config
           drawTextLine(tdcStr, WHITE)
         }
 
-        game.pdt.filter(_.isPositionKnown) foreach { pdt =>
+        game.pdt.filterNot(_.isEcmStrobe) foreach { pdt =>
           val pdtBra = (pdt.position - bullsEye.position).asBra
           val pdtStr = mkBraString("pdt".pad(8), pdtBra)
           drawTextLine(pdtStr, contactColor(pdt, fromDatalink = false))
@@ -268,7 +268,7 @@ abstract class Page(val name: String, val priority: Int)(implicit config: Config
           drawTextLine(tdcStr, WHITE)
         }
 
-        game.pdt.filter(_.isPositionKnown) foreach { pdt =>
+        game.pdt.filterNot(_.isEcmStrobe) foreach { pdt =>
           val pdtBra = (pdt.position - bullsEye.position).asBra
           val pdtStr = mkBraString("pdt".pad(8), pdtBra)
           drawTextLine(pdtStr, contactColor(pdt, fromDatalink = false))
@@ -321,7 +321,7 @@ abstract class Page(val name: String, val priority: Int)(implicit config: Config
           drawTextLine(tdcStr, WHITE)
         }
 
-        game.pdt.filter(_.isPositionKnown) foreach { pdt =>
+        game.pdt.filterNot(_.isEcmStrobe) foreach { pdt =>
           val pdtBra = (pdt.position - self.position).asBra
           val pdtStr = mkBraString("pdt".pad(8), pdtBra)
           drawTextLine(pdtStr, contactColor(pdt, fromDatalink = false))
@@ -464,7 +464,7 @@ abstract class Page(val name: String, val priority: Int)(implicit config: Config
     m._2.isInSameMission
   }
 
-  protected def drawDlinkMembersAndTargets[_: Projection](dlinkIn: Seq[(String, DlinkData)]): Unit = {
+  protected def drawDlinkMembersAndTargets[_: Projection](dlinkIn: Seq[(String, DlinkData)], showJammers: Boolean): Unit = {
 
     val dlinksOfInterest = dlinkIn.filterNot(isSelf).filter(isInSameMission)
 
@@ -478,7 +478,7 @@ abstract class Page(val name: String, val priority: Int)(implicit config: Config
 
         val targetPosition = target.position + target.velocity * member.lag
 
-        if (target.isPositionKnown) {
+        if (!target.isEcmStrobe) {
           drawContact(
             position = targetPosition,
             heading = Some(target.heading),
@@ -486,7 +486,7 @@ abstract class Page(val name: String, val priority: Int)(implicit config: Config
             rightText = name.take(2),
             fill = true
           )
-        } else { // HOJ
+        } else if (showJammers) { // HOJ
           lineBetween(memberPosition, targetPosition, YELLOW, scaleOut = 10000.0)
         }
       }

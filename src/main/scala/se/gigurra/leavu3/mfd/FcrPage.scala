@@ -62,7 +62,7 @@ case class FcrPage(implicit config: Configuration, mfd: MfdIfc) extends Page("FC
               drawAiWingmen(game)
               drawAiWingmenTargets(game)
             }
-            drawDlinkMembersAndTargets(dlinkIn)
+            drawDlinkMembersAndTargets(dlinkIn, showJammers = false)
           }
           drawOwnContacts(game, dlinkIn)
           drawTdc(game)
@@ -141,22 +141,22 @@ case class FcrPage(implicit config: Configuration, mfd: MfdIfc) extends Page("FC
 
     val positionsEchoed = contacts.values.toSeq
       .filterNot(_.isDesignated)
-      .filter(_.isPositionKnown)
+      .filterNot(_.isEcmStrobe)
       .sortBy(_.index)
 
     val positionsDesignated = contacts.values.toSeq
       .filter(_.isDesignated)
-      .filter(_.isPositionKnown)
+      .filterNot(_.isEcmStrobe)
       .sortBy(_.index)
 
     val bearingsEchoed = contacts.values.toSeq
       .filterNot(_.isDesignated)
-      .filterNot(_.isPositionKnown)
+      .filter(_.isEcmStrobe)
       .sortBy(_.index)
 
     val bearingsDesignated = contacts.values.toSeq
       .filter(_.isDesignated)
-      .filterNot(_.isPositionKnown)
+      .filter(_.isEcmStrobe)
       .sortBy(_.index)
 
     def drawKnownPosContacts(contacts: Seq[Contact]): Unit = {
@@ -445,7 +445,7 @@ case class FcrPage(implicit config: Configuration, mfd: MfdIfc) extends Page("FC
   def drawDlz[_: Projection](game: GameData): Unit = {
 
     game.pdt
-      .filter(_.isPositionKnown)
+      .filterNot(_.isEcmStrobe)
       .filter(_.dlz.rAero > 1000)
       .foreach { pdt =>
 
@@ -523,7 +523,7 @@ case class FcrPage(implicit config: Configuration, mfd: MfdIfc) extends Page("FC
 
       drawTextLine(ownSpeedText, CYAN)
 
-      game.pdt.filter(_.isPositionKnown).foreach { pdt =>
+      game.pdt.filterNot(_.isEcmStrobe).foreach { pdt =>
         val tgtSpeed = pdt.velocity.norm * mps_to_speedUnit
         val tgtClosureText = closureTextOf(pdt)
         val tgtSpeedText = s" pdt: ${tgtSpeed.round} -> ${headingString(pdt.heading)} c$tgtClosureText"

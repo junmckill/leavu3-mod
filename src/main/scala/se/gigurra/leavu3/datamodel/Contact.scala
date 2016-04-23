@@ -5,8 +5,6 @@ import se.gigurra.heisenberg.Schema
 import se.gigurra.leavu3.interfaces.GameIn
 import se.gigurra.leavu3.util.{CurTime, Memorized}
 
-import scala.collection.mutable
-
 object SensorFlags {
   val RADAR_VIEW   = 0x0002
   val EOS_VIEW     = 0x0004
@@ -63,10 +61,10 @@ case class Contact(source: SourceData) extends SafeParsed[Contact.type] {
 
   import SensorFlags._
   def isDesignated           = flags.hasAnyOf(RADAR_BUG | EOS_BUG | RADAR_HOJ)
-  def isPositionKnown        = flags.hasNoneOf(RADAR_HOJ) && (!jamming || burnthrough)
+  def isEcmStrobe            = jamming && !burnthrough
   def isRws                  = flags.hasAnyOf(RADAR_VIEW | EOS_VIEW)
 
-  def haveIff: Boolean       = isPositionKnown && flags.hasAnyOf(RADAR_BUG | RADAR_VIEW | RADAR_TWS)
+  def haveIff: Boolean       = !isEcmStrobe && flags.hasAnyOf(RADAR_BUG | RADAR_VIEW | RADAR_TWS)
 
 }
 

@@ -59,7 +59,7 @@ case class HsdPage(implicit config: Configuration, mfd: MfdIfc) extends Page("HS
       drawScanZone(game)
       drawAiWingmen(game)
       drawAiWingmenTargets(game)
-      drawDlinkMembersAndTargets(dlinkIn)
+      drawDlinkMembersAndTargets(dlinkIn, showJammers = true)
       drawLockedTargets(game)
       drawTdc(game)
     }(worldProjection)
@@ -126,12 +126,12 @@ case class HsdPage(implicit config: Configuration, mfd: MfdIfc) extends Page("HS
 
     val positionsDesignated = contacts.values.toSeq
       .filter(_.isDesignated)
-      .filter(_.isPositionKnown)
+      .filterNot(_.isEcmStrobe)
       .sortBy(_.index)
 
     val bearingsDesignated = contacts.values.toSeq
       .filter(_.isDesignated)
-      .filterNot(_.isPositionKnown)
+      .filter(_.isEcmStrobe)
       .sortBy(_.index)
 
     for (contact <- bearingsDesignated) {
