@@ -153,7 +153,9 @@ object Dlink extends Logging {
                 Member.targets -> source.sensors.targets.locked,
                 Member.selfData -> source.metaData.selfData,
                 Member.markPos -> marks.mapValues(_.item),
-                Member.pylons -> source.payload.toDlinkPayload(appCfg)
+                Member.pylons -> source.payload.toDlinkPayload(appCfg),
+                Member.mode -> source.aircraftMode,
+                Member.sensor -> source.sensors.status
               )
               JSON.write(self)
             }.onFailure {
