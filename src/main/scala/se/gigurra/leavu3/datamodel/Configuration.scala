@@ -41,6 +41,7 @@ case class Configuration(source: SourceData = Map.empty) extends Parsed[Configur
   val dclt              = parse(schema.dclt)
   val keyInputEnabled   = parse(schema.keyInputEnabled)
   val keyBindings       = parse(schema.keyBindings)
+  val maxParrallelRequests = parse(schema.maxParrallelRequests)
 
   if (parse(schema.keyBindingOffset) != 0)
     JOptionPane.showMessageDialog(null, "The 'keyBindingOffset' option no longer exists \n ->Specify actual key bindings instead in the config file!")
@@ -91,6 +92,7 @@ object Configuration extends Schema[Configuration] with Logging {
   val slaveMode         = required[Boolean]     ("slave-mode",        default = false)
   val keyInputEnabled   = required[Boolean]     ("keyInputEnabled",   default = true)
   val keyBindings       = required[Map[String, String]] ("keyBindings", default = DefaultMfdKeyBindings())
+  val maxParrallelRequests = required[Int]("maxParrallelRequests", default = 1)
 
   def readFromFile(s: String = "leavu3-cfg.json"): Configuration = {
     logger.info(s"Loading configuration file: $s")
