@@ -51,7 +51,11 @@ local function append_escaped_string(str)
 end
 
 local function append_number(data)
-    append(tostring(data))
+    if data == data and data ~= math.huge and data ~= -math.huge then
+        append(tostring(data))
+    else
+        append("0") -- nan or inf
+    end
 end
 
 local function append_boolean(data)
