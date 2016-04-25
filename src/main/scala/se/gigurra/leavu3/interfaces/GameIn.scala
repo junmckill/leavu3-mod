@@ -47,7 +47,11 @@ object GameIn extends Logging {
     def start(appCfg: Configuration, drawable: Drawable): Unit = {
       updateTimer.fps(appCfg.gameDataFps) {
         DcsRemote
-          .get(path, Some(Duration.fromSeconds(if (DcsRemote.isActingMaster) 0 else 1))) // Master will update
+          .get(
+            path,
+            maxAge = Some(Duration.fromSeconds(if (DcsRemote.isActingMaster) 0 else 1)),  // Master will update
+            maxParallelAccesses = 3 // In case we have some temporary packet loss, we shouldn't just stop
+            )
           .map(JSON.read[GameDataWire])
           .map(_.toGameData)
           .map(postProcess)
@@ -98,7 +102,7 @@ object GameIn extends Logging {
     rdrPositionUpdateMemory.get(contact)
   }
 
-  private def postProcess(newData: GameData): GameData = {
+  private def postProcess(newData: GameData): GameData = synchronized {
     newData
       .waypointWorkaround()
       .rdrMemoryWorkaround()

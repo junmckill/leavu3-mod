@@ -24,23 +24,23 @@ case class RestClient(addr: String,
   }
 
   private val client = Http.client.newService(s"$addr:$port")
-  private val throttler = Throttler(maxConcurrentRequestsPerResource = 1)
+  private val throttler = Throttler()
   private val timeout = Duration.fromSeconds(3)
 
-  def get(path: String, maxAge: Option[Duration] = None, minTimeDelta: Option[Duration] = None): Future[String] = {
-    throttler.access(path, minTimeDelta)(doGet(path, maxAge))
+  def get(path: String, maxAge: Option[Duration] = None, minTimeDelta: Option[Duration] = None, maxParallelAccesses: Int = 1): Future[String] = {
+    throttler.access(path, minTimeDelta, maxParallelAccesses)(doGet(path, maxAge))
   }
 
-  def put(path: String, minTimeDelta: Option[Duration] = None)(data: => String): Future[Unit] = {
-    throttler.access(path, minTimeDelta)(doPut(path, data))
+  def put(path: String, minTimeDelta: Option[Duration] = None, maxParallelAccesses: Int = 1)(data: => String): Future[Unit] = {
+    throttler.access(path, minTimeDelta, maxParallelAccesses)(doPut(path, data))
   }
 
-  def delete(path: String, minTimeDelta: Option[Duration] = None): Future[Unit] = {
-    throttler.access(path, minTimeDelta)(doDelete(path + "?cache_only=true"))
+  def delete(path: String, minTimeDelta: Option[Duration] = None, maxParallelAccesses: Int = 1): Future[Unit] = {
+    throttler.access(path, minTimeDelta, maxParallelAccesses)(doDelete(path + "?cache_only=true"))
   }
 
-  def post(path: String, minTimeDelta: Option[Duration] = None)(data: => String): Future[Unit] = {
-    throttler.access(path, minTimeDelta)(doPost(path, data))
+  def post(path: String, minTimeDelta: Option[Duration] = None, maxParallelAccesses: Int = 1)(data: => String): Future[Unit] = {
+    throttler.access(path, minTimeDelta, maxParallelAccesses)(doPost(path, data))
   }
 
   private def doGet(path: String, cacheMaxAgeMillis: Option[Duration] = None): Future[String] = {
