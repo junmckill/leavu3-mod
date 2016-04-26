@@ -18,6 +18,7 @@ case class Member(source: SourceData = Map.empty) extends SafeParsed[Member.type
   val pylons          = parse(schema.pylons)
   val mode            = parse(schema.mode)
   val sensor          = parse(schema.sensor)
+  val leavuVersion    = parse(schema.leavuVersion)
   def pitch           = selfData.pitch
   def roll            = selfData.roll
   def heading         = selfData.heading
@@ -36,4 +37,5 @@ object Member extends Schema[Member] {
   val pylons    = required[Map[String, DlinkPylon]]("pylons", default = Map.empty[String, DlinkPylon])
   val mode      = required[AircraftMode]("mode", default = AircraftMode())
   val sensor    = required[SensorsStatus]("sensor", default = SensorsStatus())
+  val leavuVersion = optional[String]("leavuVersion")
 }

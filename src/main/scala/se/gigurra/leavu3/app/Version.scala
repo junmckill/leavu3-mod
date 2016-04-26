@@ -17,8 +17,21 @@ object Version extends Logging {
 
   val versionUrl = "http://build.culvertsoft.se/dcs/leavu3-version.txt"
   val downloadUrl = "http://build.culvertsoft.se/dcs/"
-  var latest = Try(scala.io.Source.fromURL(versionUrl, "UTF-8").mkString).getOrElse("unknown")
-  val current = Try(Resource2String("version.txt")).getOrElse("unknown")
+  var latestOpt = Try(scala.io.Source.fromURL(versionUrl, "UTF-8").mkString).toOption
+  val currentOpt = Try(Resource2String("version.txt")).toOption
+
+  def versionsKnown: Boolean = {
+    currentOpt.isDefined && latestOpt.isDefined
+  }
+
+  def updateAvailable: Option[Boolean] = {
+    for {
+      current <- currentOpt
+      latest <- latestOpt
+    } yield {
+      current != latest
+    }
+  }
 
   def downloadLatest(): Unit = {
     if(Desktop.isDesktopSupported) {
@@ -28,6 +41,6 @@ object Version extends Logging {
     }
   }
 
-  override def toString: String = current
+  override def toString: String = currentOpt.getOrElse("unknown")
 
 }

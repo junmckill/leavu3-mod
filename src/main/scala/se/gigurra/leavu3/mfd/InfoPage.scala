@@ -1,12 +1,11 @@
 package se.gigurra.leavu3.mfd
 
-
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import se.gigurra.leavu3.app.Version
 import se.gigurra.leavu3.datamodel._
 import se.gigurra.leavu3.gfx.RenderContext._
-import se.gigurra.leavu3.gfx.{Blink, ScreenProjection}
+import se.gigurra.leavu3.gfx.Blink
 import se.gigurra.leavu3.interfaces.{DcsRemote, Dlink, GameIn, MouseClick}
 import se.gigurra.leavu3.lmath.Box
 
@@ -45,8 +44,9 @@ case class InfoPage(implicit config: Configuration, mfd: MfdIfc) extends Page("I
 
   override def draw(game: GameData, dlinkIn: Seq[(String, DlinkData)]): Unit = {
 
-    val updateAvailable = Version.current != Version.latest
     val scale = config.symbolScale * 0.02 / font.getSpaceWidth
+    val updateAvailable = Version.updateAvailable.getOrElse(false)
+    val versionsKnown = Version.versionsKnown
 
     batched { at((-0.8, 0.8)) {
 
@@ -87,9 +87,9 @@ case class InfoPage(implicit config: Configuration, mfd: MfdIfc) extends Page("I
         val notPlayingPlayerLists = buildPlayerLists(Dlink.In.notPlaying)
 
         drawTextLine("-----VERSION----", "--------------------------------", LIGHT_GRAY)
-        drawTextLine(" Latest version", Version.latest, LIGHT_GRAY)
-        drawTextLine("   Your version", Version.current, if (updateAvailable) YELLOW else LIGHT_GRAY)
-        drawTextLine("Update available", if (updateAvailable) "Yes" else "No", if (updateAvailable) YELLOW else LIGHT_GRAY)
+        drawTextLine(" Latest version", Version.latestOpt.getOrElse("unknown"), LIGHT_GRAY)
+        drawTextLine("   Your version", Version.currentOpt.getOrElse("unknown"), if (updateAvailable) YELLOW else LIGHT_GRAY)
+        drawTextLine("Update available", if (updateAvailable) "Yes" else if (versionsKnown) "No" else "Unknown", if (updateAvailable) YELLOW else LIGHT_GRAY)
         drawTextLine("                ", "", LIGHT_GRAY)
         drawTextLine("-----STATUS-----", "--------------------------------", LIGHT_GRAY)
         drawTextLine("      DCS Remote", if (GameIn.dcsRemoteConnected) "connected" else "disconnected", if (GameIn.dcsRemoteConnected) GREEN else RED)
