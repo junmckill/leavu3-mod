@@ -112,19 +112,26 @@ case class DcsRemote private(config: Configuration) extends Logging {
 
   def isActingMaster: Boolean = {
 
-    val instanceLkup = loadFromCache[Leavu3Instance]("leavu3-instances", maxAge = Some(Duration.fromSeconds(1)), minTimeDelta = Some(Duration.fromMilliseconds(20)))
+    if (forcedSlave) {
+      false
+    }
 
-    instanceLkup.get(ownInstanceId) match {
-      case None => true
-      case Some(myInstance) =>
-        val instances: Seq[Leavu3Instance] = instanceLkup.values.map(_.item).toSeq.sortBy(_.id)
-        val highestPriority = instances.map(_.priority).max
-        val instancesWithHighestPrio = instances.filter(_.priority == highestPriority)
-        if (instancesWithHighestPrio.size == 1) {
-          instancesWithHighestPrio.head.id == ownInstanceId
-        } else {
-          instances.head.id == ownInstanceId
-        }
+    else {
+
+      val instanceLkup = loadFromCache[Leavu3Instance]("leavu3-instances", maxAge = Some(Duration.fromSeconds(1)), minTimeDelta = Some(Duration.fromMilliseconds(20)))
+
+      instanceLkup.get(ownInstanceId) match {
+        case None => true
+        case Some(myInstance) =>
+          val instances: Seq[Leavu3Instance] = instanceLkup.values.map(_.item).toSeq.sortBy(_.id)
+          val highestPriority = instances.map(_.priority).max
+          val instancesWithHighestPrio = instances.filter(_.priority == highestPriority)
+          if (instancesWithHighestPrio.size == 1) {
+            instancesWithHighestPrio.head.id == ownInstanceId
+          } else {
+            instances.head.id == ownInstanceId
+          }
+      }
     }
   }
 }
