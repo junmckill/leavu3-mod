@@ -142,10 +142,8 @@ abstract class Page(val name: String, val priority: Int)(implicit config: Config
   protected def contactColor(contact: Contact, fromDatalink: Boolean): Color = {
     if (contact.haveIff && self.coalition == contact.country) {
       GREEN
-    } else if (contact.haveIff && fromDatalink) {
-      RED
     } else {
-      YELLOW
+      if (fromDatalink) RED else YELLOW
     }
   }
 
