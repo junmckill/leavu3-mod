@@ -18,6 +18,7 @@ import scala.util.control.NonFatal
 case class DcsRemote private(config: Configuration) extends Logging {
   import DcsRemote._
 
+  private val forcedSlave = config.forcedSlave
   private val ownInstanceId = UUID.randomUUID().toString
   private val client = RestClient(config.dcsRemoteAddress, config.dcsRemotePort, "Dcs Remote")
   private val cache = new scala.collection.concurrent.TrieMap[String, Map[String, Stored[_]]]
@@ -102,7 +103,7 @@ case class DcsRemote private(config: Configuration) extends Logging {
   }
 
   private def registerLeavu3Instance(): Future[Unit] = {
-    store("leavu3-instances", ownInstanceId, Leavu3Instance(ownInstanceId, ownPriority, isActingMaster))
+    store("leavu3-instances", ownInstanceId, Leavu3Instance(ownInstanceId, if (forcedSlave) -1 else ownPriority, isActingMaster))
   }
 
   def isActingSlave: Boolean = {
