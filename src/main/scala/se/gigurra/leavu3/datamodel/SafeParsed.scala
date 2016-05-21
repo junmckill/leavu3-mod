@@ -8,7 +8,7 @@ import se.gigurra.heisenberg._
   */
 abstract class SafeParsed[S <: Schema[_]](implicit schema: S) extends Parsed[S]() {
 
-  override protected def parse[FieldType : MapDataProducer](field: FieldOption[FieldType], orElse: => Option[FieldType]): Option[FieldType] = {
+  override protected def parse[FieldType](field: FieldOption[FieldType], orElse: => Option[FieldType]): Option[FieldType] = {
     try {
       super.parse(field, orElse)
     } catch {
@@ -16,7 +16,7 @@ abstract class SafeParsed[S <: Schema[_]](implicit schema: S) extends Parsed[S](
     }
   }
 
-  override protected def parse[FieldType : MapDataProducer](field: FieldOption[FieldType]): Option[FieldType] = {
+  override protected def parse[FieldType](field: FieldOption[FieldType]): Option[FieldType] = {
     try {
       super.parse(field)
     } catch {
@@ -24,7 +24,7 @@ abstract class SafeParsed[S <: Schema[_]](implicit schema: S) extends Parsed[S](
     }
   }
 
-  override protected def parse[FieldType : MapDataProducer](field: FieldRequired[FieldType], orElse: => FieldType): FieldType = {
+  override protected def parse[FieldType](field: FieldRequired[FieldType], orElse: => FieldType): FieldType = {
     try {
       super.parse(field, orElse)
     } catch {
@@ -33,7 +33,7 @@ abstract class SafeParsed[S <: Schema[_]](implicit schema: S) extends Parsed[S](
     }
   }
 
-  override protected def parse[FieldType : MapDataProducer](field: FieldRequired[FieldType]): FieldType = {
+  override protected def parse[FieldType](field: FieldRequired[FieldType]): FieldType = {
     try {
       super.parse(field)
     } catch {
