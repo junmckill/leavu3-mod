@@ -1,11 +1,14 @@
 package se.gigurra.leavu3.datamodel
 
 import se.gigurra.heisenberg.MapData._
-import se.gigurra.heisenberg.{Schema, Parsed}
+import se.gigurra.heisenberg.{Parsed, Schema}
+import se.gigurra.leavu3.lmath.UnitConversions
 
-case class RadarDisplayScale(source: SourceData = Map.empty) extends SafeParsed[RadarDisplayScale.type] {
+case class RadarDisplayScale(source: SourceData = Map.empty)
+  extends SafeParsed[RadarDisplayScale.type]
+  with UnitConversions {
   val azimuth  = math.max(parse(schema.azimuth).toDegrees * 2.0, 0.1)
-  val distance = math.max(parse(schema.distance), 10)
+  val distance = math.max(parse(schema.distance), 20 * nmi_to_m)
 }
 
 object RadarDisplayScale extends Schema[RadarDisplayScale] {
