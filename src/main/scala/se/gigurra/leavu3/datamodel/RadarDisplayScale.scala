@@ -8,7 +8,7 @@ case class RadarDisplayScale(source: SourceData = Map.empty)
   extends SafeParsed[RadarDisplayScale.type]
   with UnitConversions {
   val azimuth  = math.max(parse(schema.azimuth).toDegrees * 2.0, 0.1)
-  val distance = math.max(parse(schema.distance), 20 * nmi_to_m)
+  val distance = math.max(parse(schema.distance), 80 * nmi_to_m)
 }
 
 object RadarDisplayScale extends Schema[RadarDisplayScale] {
